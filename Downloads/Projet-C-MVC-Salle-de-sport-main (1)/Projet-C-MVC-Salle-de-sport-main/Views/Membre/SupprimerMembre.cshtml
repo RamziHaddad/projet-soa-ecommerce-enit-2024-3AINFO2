@@ -1,0 +1,53 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Membre>
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Liste des Membres</title>
+    </head>
+    <body>
+        <h1>Liste des Membres</h1>
+
+        @if (Model != null && Model.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>id_membre</th>
+                        <th>nom</th>
+                        <th>prenom</th>
+                        <th>telephone</th>
+                        <th>mail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var membre in Model)
+                    {
+                        <tr>
+                            <td>@(membre.id_membre != null ? membre.id_membre.ToString() : "N/A")</td>
+                            <td>@(membre.nom ??  "N/A")</td>
+                            <td>@(membre.prenom ?? "N/A")</td>
+                            <td>@(membre.telephone != null ? membre.telephone.ToString() : "N/A")</td>
+                            <td>@(membre.mail ?? "N/A")</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h2>Supprimer un membre</h2>
+            using (Html.BeginForm("SupprimerMembre", "Membre", FormMethod.Post))
+            {
+                <label for="idMembre">ID du membre à supprimer :</label>
+                <input type="text" id="idMembre" name="idMembre">
+                <button type="submit">Supprimer</button>
+            }
+        }
+        else
+        {
+            < p > Aucun membre à afficher.</ p >
+        }
+    </body>
+</html>
+
+

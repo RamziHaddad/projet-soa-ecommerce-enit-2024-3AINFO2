@@ -1,0 +1,38 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Cours>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Metadonnées, titres, liens CSS, scripts, etc. -->
+</head>
+<body>
+    <!-- Contenu de la page -->
+    @{
+        ViewBag.Title = "Planning des cours";
+    }
+
+    <h2>@ViewBag.Title</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Coach</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cours in Model)
+            {
+                <tr>
+                    <td>@cours.nom</td>
+                    <td>@cours.date.ToShortDateString()</td>
+                    <td>@cours.heure</td>
+                    <td>@cours.NomCoach</td> <!-- Utilisation de la propriété calculée NomCoach -->
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

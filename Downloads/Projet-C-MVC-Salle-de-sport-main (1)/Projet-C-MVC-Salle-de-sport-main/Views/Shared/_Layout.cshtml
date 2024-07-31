@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - FitLAND</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+        <div class="container-fluid">
+            @Html.ActionLink("FitLAND", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"> </span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+<<<<<<< HEAD
+                <ul class="navbar-nav ">
+                    <li>@Html.ActionLink("Acceuil", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    @if (Session["UserType"] != null)
+                    {
+                        var userType = Session["UserType"].ToString();
+                        if (userType == "admin")
+                        {
+                            <li>@Html.ActionLink("Ajouter Membre", "Ajouter", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Liste Membres", "ListeMembres", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Ajouter Coach", "Ajouter", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Liste Coaches", "ListeCoaches", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Logout", "Logout", "LoginAdmin", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Ajouter Cours", "Ajouter", "Admin", new { area = "" }, new { @class = "nav-link" })</li>
+                        }
+
+                        if (userType == "membre")
+                        {
+                            <li>@Html.ActionLink("Planning", "Index", "Planning", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Logout", "Logout", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+                        }
+                        if (userType == "coach")
+                        {
+                            <li>@Html.ActionLink("Planning", "Index", "Planning", new { area = "" }, new { @class = "nav-link" })</li>
+=======
+                <ul class="navbar-nav flex-grow-1">
+                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    @if (Session["UserType"] != null)
+                    {
+                        var userType = Session["UserType"].ToString();
+
+
+
+                        if (userType == "admin")
+                        {
+                            <li>@Html.ActionLink("Ajouter Membre", "Ajouter", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Liste Membres", "ListeMembres", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Ajouter Coach", "Ajouter", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Liste Coaches", "ListeCoaches", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Logout", "Logout", "LoginAdmin", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Ajouter Cours", "Ajouter", "Admin", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Liste Cours", "ListeCours", "Admin", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Supprimer Cours", "Supprimer", "Admin", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Supprimer Membre", "Supprimer", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Supprimer Coach", "Supprimer", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                        }
+
+                        if (userType == "membre")
+                        {
+                            int userId = Convert.ToInt32(Session["UserID"]);
+                            <li>@Html.ActionLink("Planning", "Index", "Cours", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Consulter Progrès", "ConsulterProgres", "Membre", new { id = userId }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Logout", "Logout", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+
+                        }
+                        if (userType == "coach")
+                        {
+                            <li>@Html.ActionLink("Planning", "Index", "Cours", new { area = "" }, new { @class = "nav-link" })</li>
+                            <li>@Html.ActionLink("Ajouter Progrés", "AjouterProgres", "Membre", new { area = "" }, new { @class = "nav-link" })</li>
+>>>>>>> 9302fff822ecb79e10b2c0f6ae0ee2f4cc840620
+                            <li>@Html.ActionLink("Logout", "Logout", "Coach", new { area = "" }, new { @class = "nav-link" })</li>
+                        }
+                    }
+                    else
+                    {
+<<<<<<< HEAD
+                        <li>@Html.ActionLink("Connexion", "ChooseUser", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Inscription", "SignUp", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+=======
+                        <li>@Html.ActionLink("Login", "ChooseUser", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Register Member ", "SignUp", "Auth", new { area = "" }, new { @class = "nav-link" })</li>
+>>>>>>> 9302fff822ecb79e10b2c0f6ae0ee2f4cc840620
+
+                    }
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+<<<<<<< HEAD
+      
+=======
+        <hr />
+        <footer>
+           
+        </footer>
+>>>>>>> 9302fff822ecb79e10b2c0f6ae0ee2f4cc840620
+    </div>
+
+
+
+
+
+
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

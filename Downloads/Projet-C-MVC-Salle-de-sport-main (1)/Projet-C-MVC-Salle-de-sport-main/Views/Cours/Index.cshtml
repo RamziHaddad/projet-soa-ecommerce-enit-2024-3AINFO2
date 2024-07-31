@@ -1,0 +1,45 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Cours>
+
+@{
+    ViewBag.Title = "Liste des Cours";
+}
+
+<h2> Ne ratez pas les cours d'Aujourd'hui</h2>
+
+<table class="table">
+    <tr>
+        <th>Nom</th>
+        <th>Heure</th>
+        <th>Date</th>
+        <th>Coach</th>
+    </tr>
+    @foreach (var cours in Model.Where(c => c.date.Date == DateTime.Today))
+    {
+        <tr>
+            <td>@cours.nom</td>
+            <td>@cours.heure</td>
+            <td>@cours.date.ToShortDateString()</td>
+            <td>@(cours.Coaches != null ? cours.Coaches.nom + " " + cours.Coaches.prenom : "")</td>
+        </tr>
+    }
+</table>
+
+<h2>Liste des Cours</h2>
+
+<table class="table">
+    <tr>
+        <th>Nom</th>
+        <th>Heure</th>
+        <th>Date</th>
+        <th>Coach</th>
+    </tr>
+    @foreach (var cours in Model)
+    {
+        <tr>
+            <td>@cours.nom</td>
+            <td>@cours.heure</td>
+            <td>@cours.date.ToShortDateString()</td>
+            <td>@(cours.Coaches != null ? cours.Coaches.nom + " " + cours.Coaches.prenom : "")</td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,38 @@
+﻿@model ProjetC_MVCSalleSport.Models.Membre
+
+@{
+    ViewBag.Title = "Consulter Progrès";
+}
+
+<h2>Progrès </h2>
+
+@if (Model.Progres != null && Model.Progres.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Poids</th>
+                <th>IMC</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var progres in Model.Progres)
+            {
+                <tr>
+                    <td>@progres.date.ToShortDateString()</td>
+                    <td>@progres.poids</td>
+                    <td>@progres.imc</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Aucun progrès à afficher pour ce membre.</p>
+}
+
+<div>
+    @Html.ActionLink("Retour à homePage", "index")
+</div>

@@ -1,0 +1,55 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Cours>
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Liste des Cours</title>
+    </head>
+    <body>
+        <h1>Liste des Cours</h1>
+
+        @if (Model != null && Model.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>id_cours</th>
+                        <th>date</th>
+                        <th>heure</th>
+                        <th>Nom</th>
+                        <th>type</th>
+                        <th>id_coach</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cours in Model)
+                    {
+                        <tr>
+                            <td>@(cours.id_cours != null ? cours.id_cours.ToString() : "N/A")</td>
+                            <td>@(cours.date != null ? cours.date.ToString() : "N/A")</td>
+                            <td>@(cours.heure ?? "N/A")</td>
+                            <td>@(cours.nom ?? "N/A")</td>
+                            <td>@(cours.type ?? "N/A")</td>
+                            <td>@(cours.id_coach != null ? cours.id_coach.ToString() : "N/A")</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h2>Supprimer un cours</h2>
+            using (Html.BeginForm("SupprimerCours", "Admin", FormMethod.Post))
+            {
+                <label for="idCours">ID du cours à supprimer :</label>
+                <input type="text" id="idCours" name="idCours">
+                <button type="submit">Supprimer</button>
+            }
+         }
+            else
+            {
+              < p > Aucun cours à afficher.</ p >
+            }
+    </body>
+</html>
+
+

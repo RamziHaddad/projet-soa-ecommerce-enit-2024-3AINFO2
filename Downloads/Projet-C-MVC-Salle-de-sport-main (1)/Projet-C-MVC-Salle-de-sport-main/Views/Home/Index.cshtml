@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    body {
+        background-image: url('Content/image.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+    }
+
+    .container {
+        padding-top: 20px;
+    }
+
+    h1 {
+        font-size: 48px;
+    }
+
+    .btn {
+        margin-top: 20px;
+        margin-right: 10px;
+    }
+</style>
+
+<main class="container" style="background-color:black">
+    <h1>FitLAND</h1>
+    <section class="hero-section set-bg container-fluid" style="background-image: url('/Content/hero-bg.jpg'); padding-top: 100px; padding-bottom: 100px;">
+        <div class="hero-text text-center">
+            <h2>Transformez</h2>
+            <h2>votre passion  <span>en Puissance !</span></h2>
+
+            @Html.ActionLink("Inscription", "SignUp", "Auth", new { area = "" }, new { @class = "btn btn-primary" })
+
+        </div>
+    </section>
+
+    <section class="feature-section" style=" background-color:white ; margin-bottom:20px;">
+        <div class="container" style="color:black ;  margin-bottom:20px; ">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title text-center" style="color:black">
+                        <h2 style="color:black">
+                            Le vrai
+                            <span style="color:black">travail physique</span>
+                            commence lorsque vous voulez arrêter.
+                        </h2>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top:20px">
+                <div class="col-md-4">
+                    <div class="image-box-item">
+                        <img src="~/Content/calendar.png" style="max-width : 20%" alt="Calendrier" class="img-fluid">
+                        <h4 class="text-center mt-3">Calendrier en ligne</h4>
+                        <p>Consulter votre planning et choissez vos cours préférés de chez vous ! à tout moment</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="image-box-item">
+                        <img src="~/Content/notepad.png" style="max-width : 20%" alt="Intense Workouts" class="img-fluid">
+                        <h4 class="text-center mt-3">Progrès Workouts</h4>
+                        <p>Profitez d'un suivi régulier par nos coach et consultez votre avancement en ligne!'</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="image-box-item">
+                        <img src="~/Content/maintenance.png" style="max-width : 20%" alt="Intense Workouts" class="img-fluid">
+                        <h4 class="text-center mt-3">Support</h4>
+                        <p>Notre équipe de support est disponible 24/24h pour votre aide ! </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-text text-center" style="margin-bottom:20px">
+
+            @Html.ActionLink("Connexion", "ChooseUser", "Auth", new { area = "" }, new { @class = "btn btn-primary" })
+
+        </div>
+    </section>
+
+   
+
+    <section class="trainers-section"  margin-top:20px">
+        <div class="container">
+            <div class="section-title text-center">
+                <h2>Rencontrez les <span>Entraîneurs</span></h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="trainer-item text-center">
+                        <div class="trainer-pic">
+                            <img src="Content/Ghada.jpg" style="max-width:80%;" alt="">
+                        </div>
+                        <h4>Ghada MRASSI</h4>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="trainer-item text-center">
+                        <div class="trainer-pic">
+                            <img src="Content/Maram.png" style="max-width:80%;" alt="">
+                        </div>
+                        <h4>Maram ABAIDI</h4>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="trainer-item text-center">
+                        <div class="trainer-pic">
+                            <img src="Content/Fatma.png" style="max-width:80%;" alt="">
+                        </div>
+                        <h4>Fatma REBEI</h4>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="trainer-item text-center">
+                        <div class="trainer-pic">
+                            <img src="Content/Amine.png" style="max-width:80%;" alt="">
+                        </div>
+                        <h4>Amine ZIADI</h4>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6">
+                    <div class="trainer-item text-center">
+                        <div class="trainer-pic">
+                            <img src="Content/Sami.png" style="max-width:80%;" alt="">
+                        </div>
+                        <h4>Sami MASMOUDI</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+    </footer>
+
+</main>

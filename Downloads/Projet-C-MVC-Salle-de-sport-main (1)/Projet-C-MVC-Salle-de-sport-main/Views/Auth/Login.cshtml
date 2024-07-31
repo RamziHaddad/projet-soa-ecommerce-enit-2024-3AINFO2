@@ -1,0 +1,137 @@
+﻿@model ProjetC_MVCSalleSport.Models.Membre
+
+<!---@using (Html.BeginForm("Login", "Auth", FormMethod.Post))
+{
+    <div>
+        <label for="mail">Email:</label>
+        @Html.TextBoxFor(model => model.mail, new { id = "mail" })
+    </div>
+
+    <div>
+        <label for="motDePasse">Mot de passe:</label>
+        @Html.PasswordFor(model => model.motDePasse, new { id = "motDePasse" })
+    </div>
+
+    <button type="submit">Se connecter</button>
+    @Html.ActionLink("S'inscrire", "SignUp", "Auth")
+}-->
+
+<section class="vh-100">
+
+<<<<<<< HEAD
+    <div class="card bg-glass">
+
+        <div class="card-body px-4 py-5 px-md-5">
+            <div class="container-fluid h-custom">
+
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-md-9 col-lg-6 col-xl-5">
+                        <img src="\Content\Girl-Gym.png"
+                             class="img-fluid" alt="Sample image">
+                    </div>
+                    <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                        <h2>Login Membre</h2>
+                        @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
+                        {
+
+
+
+
+                            <!-- Email input -->
+
+                            <div data-mdb-input-init class="form-outline mb-3">
+                                @Html.TextBoxFor(model => model.mail, new { id = "mail", @class = "form-control form-control-lg", placeholder = "Entrez votre Mail" })
+                                <label class="form-label" for="mail">Email address</label>
+                            </div>
+
+
+                            <!-- Password input -->
+                            <div data-mdb-input-init class="form-outline mb-2">
+                                @Html.PasswordFor(model => model.motDePasse, new { id = "motDePasse", @class = "form-control form-control-lg", placeholder = "Entrez votre Mot De Passe" })
+                                <label class="form-label" for="motDePasse">Password</label>
+                            </div>
+
+
+
+
+
+                            <div class="text-center text-lg-start mt-1 pt-2  mb-2">
+                                <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                                        style="padding-left: 2.5rem; padding-right: 2.5rem;">
+                                    Login
+                                </button>
+
+
+
+
+
+                            </div>
+
+                            <div class="text-center text-lg-start mt-2 pt-2  mb-2">
+                                <!-- Action link styled to resemble the button -->
+                                <div><a>Pas de compte ? </a></div>
+                                @Html.ActionLink("S'inscrire", "SignUp", "Auth", null, new { @class = "btn btn-primary btn-sm", style = "padding-left: 2.5rem; padding-right: 2.5rem;" })
+                            </div>
+
+                        }
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+=======
+
+    <div class="container-fluid h-custom">
+
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-md-9 col-lg-6 col-xl-5">
+                <img src="\Content\Girl-Gym.png"
+                     class="img-fluid" alt="Sample image">
+            </div>
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                <h2>Login Membre</h2>
+                @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
+                {
+
+
+
+
+                    <!-- Email input -->
+
+                    <div data-mdb-input-init class="form-outline mb-4">
+                        @Html.TextBoxFor(model => model.mail, new { id = "mail", @class = "form-control form-control-lg", placeholder = "Entrez votre Mail" })
+                        <label class="form-label" for="mail">Email address</label>
+                    </div>
+
+
+                    <!-- Password input -->
+                    <div data-mdb-input-init class="form-outline mb-3">
+                        @Html.PasswordFor(model => model.motDePasse, new { id = "motDePasse", @class = "form-control form-control-lg", placeholder = "Entrez votre Mot De Passe" })
+                        <label class="form-label" for="motDePasse">Password</label>
+                    </div>
+
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Checkbox -->
+
+                    </div>
+
+                    <div class="text-center text-lg-start mt-4 pt-2">
+                        <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-lg"
+                                style="padding-left: 2.5rem; padding-right: 2.5rem;">
+                            Login
+                        </button>
+
+                      
+
+                        <!-- Action link styled to resemble the button -->
+                        @Html.ActionLink("S'inscrire", "SignUp", "Auth", null, new { @class = "btn btn-primary btn-lg", style = "padding-left: 2.5rem; padding-right: 2.5rem;" })
+
+
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+>>>>>>> 9302fff822ecb79e10b2c0f6ae0ee2f4cc840620

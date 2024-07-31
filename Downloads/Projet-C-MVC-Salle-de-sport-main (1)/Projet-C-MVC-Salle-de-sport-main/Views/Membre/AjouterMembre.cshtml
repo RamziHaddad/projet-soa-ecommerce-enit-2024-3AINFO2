@@ -1,0 +1,26 @@
+﻿@model ProjetC_MVCSalleSport.Models.Membre
+
+@using (Html.BeginForm("AjouterMembre", "Membre", FormMethod.Post))
+{
+    @Html.LabelFor(model => model.nom)
+    @Html.TextBoxFor(model => model.nom)
+    <br />
+
+    @Html.LabelFor(model => model.prenom)
+    @Html.TextBoxFor(model => model.prenom)
+    <br />
+
+    @Html.LabelFor(model => model.telephone)
+    @Html.TextBoxFor(model => model.telephone)
+    <br />
+
+    @Html.LabelFor(model => model.motDePasse)
+    @Html.TextBoxFor(model => model.motDePasse)
+    <br />
+
+    @Html.LabelFor(model => model.mail)
+    @Html.TextBoxFor(model => model.mail)
+    <br />
+
+    <input type="submit" value="Ajouter" />
+}

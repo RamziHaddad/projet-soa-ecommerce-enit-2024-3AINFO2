@@ -1,0 +1,40 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Coach>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liste des Coachs</title>
+</head>
+<body>
+    <h1>Liste des Coachs</h1>
+
+    @if (Model != null && Model.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Téléphone</th>
+                    <th>Mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var coach in Model)
+                {
+                    <tr>
+                        <td>@(coach.nom ?? "N/A")</td>
+                        <td>@(coach.prenom ?? "N/A")</td>
+                        <td>@(coach.telephone != null ? coach.telephone.ToString() : "N/A")</td>
+                        <td>@(coach.mail ?? "N/A")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Aucun coach à afficher.</p>
+    }
+</body>
+</html>

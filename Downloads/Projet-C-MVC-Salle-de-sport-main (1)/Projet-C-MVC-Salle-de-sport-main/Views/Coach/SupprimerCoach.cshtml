@@ -1,0 +1,53 @@
+﻿@model List<ProjetC_MVCSalleSport.Models.Coach>
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Liste des Coaches</title>
+    </head>
+    <body>
+        <h1>Liste des Coaches</h1>
+
+        @if (Model != null && Model.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>id_coach</th>
+                        <th>nom</th>
+                        <th>prenom</th>
+                        <th>telephone</th>
+                        <th>mail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var coach in Model)
+                    {
+                        <tr>
+                            <td>@(coach.id_coach != null ? coach.id_coach.ToString() : "N/A")</td>
+                            <td>@(coach.nom ??  "N/A")</td>
+                            <td>@(coach.prenom ?? "N/A")</td>
+                            <td>@(coach.telephone != null ? coach.telephone.ToString() : "N/A")</td>
+                            <td>@(coach.mail ?? "N/A")</td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <h2>Supprimer un Coach</h2>
+            using (Html.BeginForm("SupprimerCoach", "Coach", FormMethod.Post))
+            {
+                <label for="idCoach">ID du coach à supprimer :</label>
+                <input type="text" id="idCoach" name="idCoach">
+                <button type="submit">Supprimer</button>
+            }
+        }
+        else
+        {
+            < p > Aucun Coach à afficher.</ p >
+        }
+    </body>
+</html>
+
+
