@@ -1,0 +1,8 @@
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/controllers/ShippingAddressController.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/controllers/ShippingOrderController.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/entities/ShippingAddress.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/entities/ShippingOrder.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/services/ShippingAddressService.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/com/services/ShippingOrderService.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/org/acme/GreetingResource.java
+/home/tahya/Musique/Shipping/shipping-service/src/main/java/org/acme/MyEntity.java

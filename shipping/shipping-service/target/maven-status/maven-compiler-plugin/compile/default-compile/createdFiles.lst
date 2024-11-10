@@ -1,0 +1,9 @@
+org/acme/MyEntity.class
+com/services/ShippingOrderService.class
+com/entities/ShippingAddress.class
+com/entities/ShippingOrder.class
+com/services/ShippingAddressService.class
+org/acme/GreetingResource.class
+com/controllers/ShippingAddressController.class
+com/controllers/ShippingOrderController.class
+com/entities/ShippingOrder$OrderStatus.class
