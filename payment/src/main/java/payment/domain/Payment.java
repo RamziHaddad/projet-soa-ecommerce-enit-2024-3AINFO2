@@ -1,10 +1,14 @@
-package main.java.payment.domain;
+package payment.domain;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import main.java.payment.domain.objectValues.PaymentMethod;
-import main.java.payment.domain.objectValues.PaymentStatus;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import payment.domain.objectValues.PaymentMethod;
+import payment.domain.objectValues.PaymentStatus;
 
 @Entity 
 public class Payment {

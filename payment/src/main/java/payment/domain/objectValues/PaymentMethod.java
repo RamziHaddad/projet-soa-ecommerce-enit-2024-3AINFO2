@@ -1,4 +1,4 @@
-package main.java.payment.domain.objectValues;
+package payment.domain.objectValues;
 
 public enum PaymentMethod {
     CARD , PAYPALL , CASH    

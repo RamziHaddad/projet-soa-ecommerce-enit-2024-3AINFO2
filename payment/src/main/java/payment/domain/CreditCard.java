@@ -1,6 +1,9 @@
-package main.java.payment.domain;
+package payment.domain;
 
 import java.util.UUID;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
 public class CreditCard {
