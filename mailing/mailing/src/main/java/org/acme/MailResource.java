@@ -17,8 +17,7 @@ public class MailResource {
     @Inject
     Mailer mailer;
 
-    @GET
-    @Blocking
+    
     @GET
     @Blocking
     public Response sendEmail() {
