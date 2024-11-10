@@ -1,1 +1,7 @@
-description
+# 1 mvn io.quarkus.platform:quarkus-maven-plugin:3.16.2:create `
+    -DprojectGroupId="org.acme" `
+    -DprojectArtifactId="mailing" `
+    -Dextensions="resteasy-reactive,quarkus-mailer,qute" `
+    -DnoCode
+
+# 2 ./mvnw quarkus:add-extension -Dextensions='mailer'
