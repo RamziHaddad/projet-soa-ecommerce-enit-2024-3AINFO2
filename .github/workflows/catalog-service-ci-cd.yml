@@ -22,23 +22,15 @@ jobs:
           distribution: 'temurin' 
           java-version: '17'
       
-      - name: Install SDKMAN! and Quarkus
+      - name: Build with Maven
         run: |
-          curl -s "https://get.sdkman.io" | bash
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install quarkus
-
-      - name: Build with Quarkus
-        run: |
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
           cd catalog/catalog-service/
-          quarkus build --uber-jar  # Génère un fichier JAR exécutable
+          mvn clean package -Dquarkus.package.type=uber-jar  # Création du JAR exécutable
 
-      - name: Run Tests
+      - name: Run Tests with Maven
         run: |
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
           cd catalog/catalog-service/
-          quarkus test
+          mvn test
 
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
@@ -63,10 +55,7 @@ jobs:
           username: ${{ secrets.VM_USERNAME }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            # Crée un répertoire pour l'application s'il n'existe pas
             mkdir -p ~/service-catalog
-            # Copie le fichier JAR sur la VM
             scp service-catalog.jar ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:~/service-catalog/service-catalog.jar
-            # Redémarre l'application avec le nouveau JAR sur le port 8082
-            pkill -f 'java.*service-catalog.jar' || true  # Arrête l'ancienne instance
+            pkill -f 'java.*service-catalog.jar' || true
             nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
