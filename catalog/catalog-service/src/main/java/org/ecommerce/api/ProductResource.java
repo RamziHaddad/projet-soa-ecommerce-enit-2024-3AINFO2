@@ -54,14 +54,16 @@ public class ProductResource {
     }
 
     @POST
-    @Operation(summary = "Create a new product", description = "Creates a new product.")
-    public Response add(Product product) {
+    @Operation(summary = "Create a new product with category", description = "Creates a new product with a specified category.")
+    public Response addProductWithCategory(Product product, @QueryParam("categoryName") String categoryName) {
         try {
-            Product createdProduct = productService.add(product);
+            Product createdProduct = productService.add(product, categoryName);
             URI uri = UriBuilder.fromResource(ProductResource.class).path("/{id}").resolveTemplate("id", createdProduct.getId()).build();
             return Response.created(uri).entity(createdProduct).build();
         } catch (EntityAlreadyExistsException e) {
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+        } catch (EntityNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Category not found: " + categoryName).build();
         }
     }
 

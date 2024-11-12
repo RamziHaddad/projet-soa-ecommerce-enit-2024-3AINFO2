@@ -10,6 +10,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
 
 import org.ecommerce.domain.Product;
+import org.ecommerce.domain.ProductCategory;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 
@@ -18,6 +19,8 @@ public class ProductRepository {
 
     @Inject
     EntityManager em;
+    @Inject
+    ProductCategoryRepository categoryRepo;
 
     public List<Product> findAll() {
         return em.createQuery("from Product", Product.class)
@@ -52,6 +55,14 @@ public class ProductRepository {
             }
         }
         throw new EntityAlreadyExistsException("Product already has an ID");
+    }
+
+    @Transactional
+    public Product addProductWithCategory(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
+        // Validate that the category exists
+        ProductCategory category = categoryRepo.findByName(categoryName);
+        product.setCategory(category); // Set only the category name
+        return insert(product);
     }
 
     @Transactional

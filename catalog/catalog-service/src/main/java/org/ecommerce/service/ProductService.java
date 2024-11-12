@@ -29,8 +29,8 @@ public class ProductService {
         return productRepo.findById(id);
     }
 
-    public Product add(Product product) throws EntityAlreadyExistsException {
-        return productRepo.insert(product);
+    public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
+        return productRepo.addProductWithCategory(product, categoryName);
     }
 
     public Product updateProduct(Product product) throws EntityNotFoundException {

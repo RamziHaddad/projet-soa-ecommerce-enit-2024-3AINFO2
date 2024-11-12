@@ -6,6 +6,8 @@ import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Product {
@@ -16,24 +18,40 @@ public class Product {
     private String description;
     @Column
     private LocalDateTime createdAt = LocalDateTime.now();
-    private double price;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id",nullable = false)
+    private ProductCategory category;
+    private double basePrice;
+    private double shownPrice=basePrice;
     public Product() {
     }
     
-    public Product(String productName, String description, LocalDateTime createdAt, double price) {
+    
+
+    public Product(String productName, String description, LocalDateTime createdAt, ProductCategory category,
+            double basePrice, double shownPrice) {
         this.productName = productName;
         this.description = description;
         this.createdAt = createdAt;
-        this.price = price;
+        this.category = category;
+        this.basePrice = basePrice;
+        this.shownPrice = shownPrice;
     }
-    
-    public Product(UUID id, String productName, String description, LocalDateTime createdAt, double price) {
+
+
+
+    public Product(UUID id, String productName, String description, LocalDateTime createdAt, ProductCategory category,
+            double basePrice, double shownPrice) {
         this.id = id;
         this.productName = productName;
         this.description = description;
         this.createdAt = createdAt;
-        this.price = price;
+        this.category = category;
+        this.basePrice = basePrice;
+        this.shownPrice = shownPrice;
     }
+
+
 
     public UUID getId() {
         return id;
@@ -59,9 +77,45 @@ public class Product {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    public double getPrice() {
-        return price;
+
+
+
+    public ProductCategory getCategory() {
+        return category;
     }
+
+
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+
+
+    public double getShownPrice() {
+        return shownPrice;
+    }
+
+
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
+
+
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+
+
+    public void setShownPrice(double shownPrice) {
+        this.shownPrice = shownPrice;
+    }
+
+
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -70,11 +124,17 @@ public class Product {
         result = prime * result + ((productName == null) ? 0 : productName.hashCode());
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + ((category == null) ? 0 : category.hashCode());
         long temp;
-        temp = Double.doubleToLongBits(price);
+        temp = Double.doubleToLongBits(basePrice);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(shownPrice);
         result = prime * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
+
+
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -104,12 +164,26 @@ public class Product {
                 return false;
         } else if (!createdAt.equals(other.createdAt))
             return false;
-        if (Double.doubleToLongBits(price) != Double.doubleToLongBits(other.price))
+        if (category == null) {
+            if (other.category != null)
+                return false;
+        } else if (!category.equals(other.category))
+            return false;
+        if (Double.doubleToLongBits(basePrice) != Double.doubleToLongBits(other.basePrice))
+            return false;
+        if (Double.doubleToLongBits(shownPrice) != Double.doubleToLongBits(other.shownPrice))
             return false;
         return true;
     }
-    public void setPrice(double price) {
-        this.price = price;
+
+
+
+    @Override
+    public String toString() {
+        return "Product [id=" + id + ", productName=" + productName + ", description=" + description + ", createdAt="
+                + createdAt + ", category=" + category + ", basePrice=" + basePrice + ", shownPrice=" + shownPrice
+                + "]";
     }
+    
 
 }
