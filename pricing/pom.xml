@@ -9,11 +9,11 @@
 		<version>3.3.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.microservice.pricing</groupId>
+	<groupId>com.enit.pricing</groupId>
 	<artifactId>pricing</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pricing</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Pricing microservice </description>
 	<url/>
 	<licenses>
 		<license/>

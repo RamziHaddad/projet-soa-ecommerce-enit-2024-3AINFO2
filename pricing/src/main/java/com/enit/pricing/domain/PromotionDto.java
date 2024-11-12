@@ -1,9 +1,10 @@
-package domain;
+package com.enit.pricing.domain;
+
 
 import java.util.Date;
 import java.util.UUID;
 
-public class promotionDto {
+public class PromotionDto {
 	
     private UUID promotionId;
 	private int productId ; 

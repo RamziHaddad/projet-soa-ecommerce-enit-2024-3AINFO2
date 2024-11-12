@@ -2,25 +2,27 @@ package com.enit.pricing.repositories;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import domain.promotion;
+import com.enit.pricing.domain.Promotion;
 
 
 @Repository
-public interface promotionRepository extends JpaRepository<promotion, Integer> {
+public interface promotionRepository extends JpaRepository<Promotion, UUID> {
 
 
     void deleteById(int promotionId);
-    List<promotion> findAll();
+    List<Promotion> findAll();
     long count();
 
-    List<promotion> findByProductId(int productId);
-    void deletePromotionByProductId(int productId);
+    void deletePromotionByProductId(UUID productId);
 
     @Query("SELECT p FROM Promotion p WHERE  (p.startDate <= :endDate AND p.endDate >= :startDate)")
-    List<promotion> findActivePromotions(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<Promotion> findActivePromotions(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    
     }
