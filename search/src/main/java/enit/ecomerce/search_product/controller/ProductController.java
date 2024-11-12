@@ -2,14 +2,10 @@ package enit.ecomerce.search_product.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.data.elasticsearch.core.query.*;
 import enit.ecomerce.search_product.product.Product;
-import enit.ecomerce.search_product.repository.ProductRepository;
+import enit.ecomerce.search_product.service.ProductService;
 
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -19,49 +15,38 @@ import java.util.Optional;
 public class ProductController {
 
     @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
-    @Autowired
-    private ProductRepository repository;
+    private ProductService ProductService;
 
     @PostMapping
     public Product create(@RequestBody Product Product) {
-        return repository.save(Product);
+        return ProductService.createProduct(Product);
     }
 
     @GetMapping("/{id}")
     public Optional<Product> findById(@PathVariable String id) {
-        return repository.findById(id);
+        return ProductService.findProductById(id);
     }
 
     @GetMapping
     public Iterable<Product> findAll() {
-        return repository.findAll();
+        return ProductService.findAllProducts();
     }
 
     @PutMapping("/{id}")
     public Product update(@PathVariable String id, @RequestBody Product Product) {
-        Product.setId(id);
-        return repository.save(Product);
+       
+        return ProductService.updateProduct(id,Product);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
-        repository.deleteById(id);
+        ProductService.deleteProductById(id);
     }
 
     @GetMapping("/search")
-    public List<Product> searchEmployees(@RequestParam String inputQuery) {
+    public List<Product> searchProducts(@RequestParam String inputQuery) {
 
-        Query query = NativeQuery.builder()
-                 
-                .withQuery(q -> q
-                        .multiMatch(m -> m
-                                .fields("name","description","category")
-                                .query(inputQuery)))
-        
-                .build();
+        return ProductService.searchProducts(inputQuery);
 
-        SearchHits<Product> searchHits = elasticsearchOperations.search(query, Product.class); 
-        return searchHits.stream().map(s->s.getContent()).toList();
     }
 }
