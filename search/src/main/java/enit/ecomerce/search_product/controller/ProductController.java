@@ -5,13 +5,11 @@ import org.springframework.web.bind.annotation.*;
 import enit.ecomerce.search_product.product.Product;
 import enit.ecomerce.search_product.service.ProductService;
 
-
-
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/employees")
+@RequestMapping("/api/products")
 public class ProductController {
 
     @Autowired
@@ -34,8 +32,8 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public Product update(@PathVariable String id, @RequestBody Product Product) {
-       
-        return ProductService.updateProduct(id,Product);
+
+        return ProductService.updateProduct(id, Product);
     }
 
     @DeleteMapping("/{id}")
@@ -49,4 +47,10 @@ public class ProductController {
         return ProductService.searchProducts(inputQuery);
 
     }
+
+    @GetMapping("/autocomplete")
+    public List<Product> autocompleteSuggestions(@RequestParam String queryText) {
+        return ProductService.autocompleteSuggestions(queryText);
+    }
+
 }
