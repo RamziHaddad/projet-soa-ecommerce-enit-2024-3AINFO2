@@ -3,7 +3,6 @@ package enit.ecomerce.search_product.service;
 import enit.ecomerce.search_product.product.Product;
 import enit.ecomerce.search_product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -55,17 +54,37 @@ public class ProductService {
         return searchHits.stream().map(s -> s.getContent()).toList();
     }
 
-    public List<Product> autocompleteSuggestions(String queryText) {
+    public List<Product> autocompleteSuggestions(String inputQuery) {
         Query query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .match(m -> m
-                                .field("name")
-                                .query(queryText)))
-                .withPageable(PageRequest.of(0, 10))
+                        .bool(b -> b
+                                .should(s -> s.wildcard(w -> w
+                                        .field("name")
+                                        .value("*" + inputQuery.toLowerCase() + "*")))))
+
                 .build();
 
         SearchHits<Product> searchHits = elasticsearchOperations.search(query, Product.class);
-        return searchHits.stream().map(hit -> hit.getContent()).toList();
+        return searchHits.stream().map(s -> s.getContent()).toList();
+    }
+
+    public List<Product> fuzzySearch(String inputQuery) {
+        Query query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> b
+                                .should(s -> s.fuzzy(f -> f
+                                        .field("name")
+                                        .value(inputQuery)
+                                        .fuzziness("AUTO")))
+                                .should(s -> s.fuzzy(f -> f
+                                        .field("description")
+                                        .value(inputQuery)
+                                        .fuzziness("AUTO")))))
+
+                .build();
+
+        SearchHits<Product> searchHits = elasticsearchOperations.search(query, Product.class);
+        return searchHits.stream().map(s -> s.getContent()).toList();
     }
 
 }

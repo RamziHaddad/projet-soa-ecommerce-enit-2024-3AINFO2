@@ -48,9 +48,14 @@ public class ProductController {
 
     }
 
-    @GetMapping("/autocomplete")
-    public List<Product> autocompleteSuggestions(@RequestParam String queryText) {
-        return ProductService.autocompleteSuggestions(queryText);
+    @GetMapping("/autocompletesubstring")
+    public List<Product> autocompleteSuggestions(@RequestParam String inputQuery) {
+        return ProductService.autocompleteSuggestions(inputQuery);
+    }
+
+    @GetMapping("/fuzzySearch")
+    public List<Product> fuzzySearch(@RequestParam String inputQuery) {
+        return ProductService.fuzzySearch(inputQuery);
     }
 
 }
