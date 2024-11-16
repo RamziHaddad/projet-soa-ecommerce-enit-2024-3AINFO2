@@ -1,12 +1,14 @@
 version: '4'
 services:
-  mysql:
-    image: mysql:8.1.0
-    container_name: mysql
+  postgres:
+    image: postgres:16.3
+    container_name: Order_Service
     environment:
-      MYSQL_ROOT_PASSWORD: mysql
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SQL_2023test
+      POSTGRES_DB: order_service
     ports:
-      - "3308:3306"  # Change the host port to 3308 or another free port
+      - "5437:5432"
     volumes:
-      - ./mysql:/var/lib/mysql
-      - ./docker/mysql/init.sql:/docker-entrypoint.initdb.d/init.sql
+      - ./postgres:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql

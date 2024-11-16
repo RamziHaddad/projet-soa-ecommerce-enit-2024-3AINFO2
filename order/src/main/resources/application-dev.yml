@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/order_service
     username: postgres
-    password: Test
+    password: SQL_2023test
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
