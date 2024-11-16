@@ -17,12 +17,21 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Order {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int Id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "orderNumber")
     private String orderNumber;
+
+    @Column(name = "skuCode")
     private String skuCode;
+
+    @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name="quantity")
     private Integer quantity;
 
 }
+
