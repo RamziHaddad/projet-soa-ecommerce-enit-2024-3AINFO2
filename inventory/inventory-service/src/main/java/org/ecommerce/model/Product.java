@@ -1,18 +1,26 @@
-package org.enit.model;
+package org.ecommerce.model;
 
+import java.util.UUID;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-
-import java.util.UUID;
 
 @Entity
 public class Product {
     @Id
     @GeneratedValue
     private UUID id;
-    private int  totalQuantity;
-    private int  ReservedQuantity;
+    private int totalQuantity;
+    private int reservedQuantity;
+
+    public Product() {
+    }
+
+    public Product(UUID id, int quantity) {
+        this.id = id;
+        this.totalQuantity = quantity;
+        this.reservedQuantity = 0;
+    }
 
     public UUID getId() {
         return id;
@@ -31,10 +39,14 @@ public class Product {
     }
 
     public int getReservedQuantity() {
-        return ReservedQuantity;
+        return reservedQuantity;
     }
 
     public void setReservedQuantity(int reservedQuantity) {
-        ReservedQuantity = reservedQuantity;
+        this.reservedQuantity = reservedQuantity;
+    }
+
+    public int availableQuantity() {
+        return totalQuantity - reservedQuantity;
     }
 }
