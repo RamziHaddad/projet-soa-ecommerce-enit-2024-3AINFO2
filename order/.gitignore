@@ -1,3 +1,6 @@
+order/mysql/mysql.sock
+
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
