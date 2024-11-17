@@ -1,6 +1,7 @@
 package com.microservices.order_service.controller;
 
 import com.microservices.order_service.dto.OrderRequest;
+import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,19 +27,19 @@ public class OrderController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> DeleteOrder(@PathVariable("id") Long id){
-        orderService.DeleteOrder(id);
+        orderService.deleteOrder(id);
         return ResponseEntity.ok("Order deleted");
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<String> UpdateOrder(@PathVariable("id") Long id, @RequestBody OrderRequest orderRequest){
-        orderService.UpdateOrder(id, orderRequest);
+        orderService.updateOrder(id, orderRequest);
         return ResponseEntity.ok("Order updated successfully");
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable("id") Long id){
-        Order order = orderService.GetOrderById(id);
+        Order order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
 }
