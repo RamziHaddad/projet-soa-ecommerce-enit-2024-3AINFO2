@@ -52,9 +52,9 @@ jobs:
           echo "Listing files in the current directory:"
           ls -l /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2
 
-      - name: Verify if the file exists
+      - name: Verify if the correct JAR file exists
         run: |
-          ls /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2/service-catalog.jar
+          ls /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2/catalog-service-1.0.0-SNAPSHOT-runner.jar
 
       - name: Add Server to Known Hosts
         run: |
@@ -64,9 +64,9 @@ jobs:
       - name: Transfer JAR to VPS
         run: |
           # Vérification de la présence du fichier téléchargé
-          if [ -f "./service-catalog.jar" ]; then
+          if [ -f "./catalog-service-1.0.0-SNAPSHOT-runner.jar" ]; then
             echo "File exists, proceeding with SCP transfer"
-            sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
+            sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./catalog-service-1.0.0-SNAPSHOT-runner.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
           else
             echo "File not found, aborting transfer"
             exit 1
