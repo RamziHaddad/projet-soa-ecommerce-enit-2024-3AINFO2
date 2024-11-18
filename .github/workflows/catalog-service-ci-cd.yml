@@ -27,14 +27,11 @@ jobs:
           cd catalog/catalog-service/
           mvn clean package -Dquarkus.package.type=uber-jar
 
-      - name: List files in target directory
-        run: ls -l catalog/catalog-service/target/
-
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
           name: service-catalog.jar
-          path: catalog/catalog-service/target/*-runner.jar
+          path: catalog/catalog-service/target/catalog-service-1.0.0-SNAPSHOT-runner.jar
 
   deploy:
     runs-on: ubuntu-latest
