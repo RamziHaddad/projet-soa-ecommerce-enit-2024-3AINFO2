@@ -54,10 +54,10 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2/service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
 
       - name: Deploy JAR to VPS
-        uses: appleboy/ssh-action@v0.1.2  # Mise à jour de la version
+        uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}
           username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
