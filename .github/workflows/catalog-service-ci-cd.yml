@@ -107,7 +107,10 @@ jobs:
             sleep 5
           
             # Lancer le service en arrière-plan
+            echo "Starting Java service..."
             java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+            echo "Java service started, checking logs..."
+
           
             # Vérification des logs pour détecter des erreurs
             tail -n 10 ~/service-catalog/app.log
