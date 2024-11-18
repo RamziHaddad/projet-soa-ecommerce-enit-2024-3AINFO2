@@ -27,6 +27,9 @@ jobs:
           cd catalog/catalog-service/
           mvn clean package -Dquarkus.package.type=uber-jar
 
+      - name: List files in target directory
+        run: ls -l catalog/catalog-service/target/
+
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -54,7 +57,7 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2/service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
 
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
