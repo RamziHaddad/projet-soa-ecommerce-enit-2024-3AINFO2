@@ -3,6 +3,7 @@ package org.ecommerce.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.ecommerce.domain.Product;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
@@ -18,7 +19,7 @@ public class ProductService {
 
     @Inject
     ProductRepository productRepo;
-    @Inject
+    @RestClient
     PricingService pricingService;
 
     public List<Product> findByRange(int page , int maxResults) {
