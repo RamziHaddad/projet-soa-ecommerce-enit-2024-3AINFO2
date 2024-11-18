@@ -1,31 +1,27 @@
-//The MailResource class implements the HTTP API exposed by our application. It handles GET request on `http://localhost:8080/mail.
-package main.java.org.acme;
-
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.Mailer;
-import io.smallrye.common.annotation.Blocking;
+package org.acme;
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import java.io.IOException;
 
 @Path("/mail")
 public class MailResource {
 
     @Inject
-    Mailer mailer;
+    MailtrapService mailtrapService;
 
-    
     @GET
-    @Blocking
-    public Response sendEmail() {
-        mailer.send(
-                Mail.withText("quarkus@quarkus.io",
-                        "Ahoy from Quarkus",
-                        "A simple email sent from a Quarkus application."));
-        return Response.ok("Email sent successfully!").build(); // Return a success message
+    @Path("/send")
+    public String sendTestEmail() {
+        String toEmail = "samsoum.tecktonick@gmail.com";
+        String subject = "You are awesome!";
+        String message = "Congrats for sending a test email with Mailtrap!";
+        try {
+            return mailtrapService.sendEmail(subject, message, toEmail);
+        } catch (IOException e) {
+            e.printStackTrace(); // Log the error or handle it as needed
+            return "Error sending email: " + e.getMessage();
+        }
     }
-
 }
