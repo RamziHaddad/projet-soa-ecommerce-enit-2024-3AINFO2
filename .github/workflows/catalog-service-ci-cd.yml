@@ -72,6 +72,9 @@ jobs:
             exit 1
           fi
 
+      - name: Set execute permissions for the JAR file
+        run: chmod +x ~/service-catalog/service-catalog.jar
+
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
         with:
@@ -88,7 +91,7 @@ jobs:
             sleep 5
 
             # Lancer le service en arrière-plan
-            nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+            java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
 
             # Vérification des logs pour détecter des erreurs
             tail -n 10 ~/service-catalog/app.log
