@@ -3,68 +3,71 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - service-catalog  # Déclenche le pipeline sur la branche `service-catalog`
+      - service-catalog
   pull_request:
     branches:
-      - service-catalog  # Déclenche le pipeline sur les PR vers la branche `service-catalog`
+      - service-catalog
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Utilise un runner Ubuntu pour ce job
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Récupère le code de la branche `service-catalog`
+        uses: actions/checkout@v2
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin'  # Choix de la distribution JDK
-          java-version: '17'  # Version de Java 17
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Build with Maven
         run: |
-          cd catalog/catalog-service/  # Accède au répertoire du service `catalog`
-          mvn clean package -Dquarkus.package.type=uber-jar  # Compile le projet
+          cd catalog/catalog-service/
+          mvn clean package -Dquarkus.package.type=uber-jar
 
       - name: Run Tests with Maven
         run: |
-          cd catalog/catalog-service/  # Accède à nouveau au répertoire du service `catalog`
-          mvn test  # Exécute les tests Maven
+          cd catalog/catalog-service/
+          mvn test
 
       - name: Archive JAR Artifact
-        uses: actions/upload-artifact@v3  # Télécharge l'artefact généré
+        uses: actions/upload-artifact@v3
         with:
-          name: service-catalog.jar  # Nom de l'artefact
-          path: catalog/catalog-service/target/*-runner.jar  # Chemin du fichier JAR
+          name: service-catalog.jar
+          path: catalog/catalog-service/target/*-runner.jar
 
   deploy:
-    runs-on: ubuntu-latest  # Utilise un runner Ubuntu pour ce job
-    needs: build  # Ce job dépend du job `build`
+    runs-on: ubuntu-latest
+    needs: build
 
     steps:
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: Download JAR Artifact
-        uses: actions/download-artifact@v3  # Télécharge l'artefact généré dans le job précédent
+        uses: actions/download-artifact@v3
         with:
-          name: service-catalog.jar  # Nom de l'artefact à télécharger
-          path: ./  # Emplacement de destination sur le runner
+          name: service-catalog.jar
+          path: ./  
 
       - name: Add Server to Known Hosts
         run: |
-          mkdir -p ~/.ssh  # Crée le dossier SSH si nécessaire
-          ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts  # Ajoute l'IP du serveur à la liste des hôtes connus
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
 
       - name: Transfer JAR to VPS
         run: |
-          scp service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar  # Transfert du fichier `.jar` vers le VPS
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
 
       - name: Deploy JAR to VPS
-        uses: appleboy/ssh-action@v0.1.0  # Utilisation de l'action SSH avec la version correcte
+        uses: appleboy/ssh-action@v0.1.2  # Mise à jour de la version
         with:
-          host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}  # IP du serveur VPS
-          username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}  # Nom d'utilisateur pour SSH
-          password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}  # Mot de passe SSH (ou clé privée)
+          host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}
+          username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
+          password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
-            mkdir -p ~/service-catalog  # Crée le répertoire du service
-            pkill -f 'java.*service-catalog.jar' || true  # Arrête toute instance précédente de l'application
-            nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &  # Lance l'application en arrière-plan
+            mkdir -p ~/service-catalog
+            pkill -f 'java.*service-catalog.jar' || true
+            nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
