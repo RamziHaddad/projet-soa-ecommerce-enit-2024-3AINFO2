@@ -80,5 +80,15 @@ jobs:
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
             mkdir -p ~/service-catalog
+
+            # Tuer le processus existant Java si présent
             pkill -f 'java.*service-catalog.jar' || true
+
+            # Attendre 5 secondes avant de relancer le service
+            sleep 5
+
+            # Lancer le service en arrière-plan
             nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+
+            # Vérification des logs pour détecter des erreurs
+            tail -n 10 ~/service-catalog/app.log
