@@ -106,9 +106,8 @@ jobs:
             # Attendre 5 secondes avant de relancer le service
             sleep 5
           
-            # Lancer le service en arrière-plan
             echo "Starting Java service..."
-            java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+            java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 
             echo "Java service started, checking logs..."
 
           
