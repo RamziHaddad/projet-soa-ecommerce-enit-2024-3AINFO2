@@ -62,9 +62,8 @@ jobs:
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
             mkdir -p ~/service-catalog
-            mv service-catalog.jar ~/service-catalog/service-catalog.jar
             pkill -f 'java.*service-catalog.jar' || true
             nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
-
-            pkill -f 'java.*service-catalog.jar' || true
-            nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+      - name: Transfer JAR to VPS
+        run: |
+          scp service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
