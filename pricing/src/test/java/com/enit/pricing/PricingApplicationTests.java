@@ -1,4 +1,4 @@
-package com.microservice.pricing;
+package com.enit.pricing;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

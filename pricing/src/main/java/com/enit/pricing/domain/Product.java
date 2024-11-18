@@ -1,45 +1,44 @@
 package com.enit.pricing.domain;
-
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
-import org.hibernate.annotations.ManyToAny;
+import org.hibernate.annotations.GenericGenerator;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "products")
+
+
 public class Product {
+	
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id", nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "product_id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
     private UUID productId;
 
-    @Column(name="base_price", nullable = false)
-    private double basePrice;
+    @Column(name = "base_price", nullable = false)
+    private BigDecimal basePrice;
 
-    @Column(name="category")
+    @Column(name = "category")
     private String category;
-
-    @ManyToMany 
-    @JoinTable(
-        name= "product_promotions",
-        joinColumns = @JoinColumn(name= "product_id"),
-        inverseJoinColumns = @JoinColumn(name="promotion_id")
-    )
-    private Set<Promotion> promotions; 
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, targetEntity = ProductPromotion.class)
+    private Set<Promotion> promotions;
 
 
 
-    public UUID getProductId() {
+	public UUID getProductId() {
         return productId;
     }
 
@@ -47,11 +46,19 @@ public class Product {
         this.productId = productId;
     }
 
-    public double getBasePrice() {
+    public BigDecimal getBasePrice() {
         return basePrice;
     }
 
-    public void setBasePrice(double basePrice) {
+    public Set<Promotion> getPromotions() {
+		return promotions;
+	}
+
+	public void setPromotions(Set<Promotion> promotions) {
+		this.promotions = promotions;
+	}
+
+	public void setBasePrice(BigDecimal basePrice) {
         this.basePrice = basePrice;
     }
 
@@ -62,7 +69,10 @@ public class Product {
     public void setCategory(String category) {
         this.category = category;
     }
+    
+
+   
+
 
 
 }
-
