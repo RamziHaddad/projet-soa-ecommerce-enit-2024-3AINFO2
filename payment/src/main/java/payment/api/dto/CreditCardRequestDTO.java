@@ -1,20 +1,16 @@
-package payment.domain;
+package payment.api.dto;
 
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+public class CreditCardRequestDTO {
+    private UUID id;
+    private Long cardCode;
+    private UUID customerId;
+    private int secretNumber;
 
-@Entity
-public class CreditCard {
-    @Id
-    private UUID id ; 
-    private Long cardCode ;  
-    private UUID customerId ;
-    private int secretNumber ;
-
+    // Getters and Setters
     public UUID getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(UUID id) {
@@ -22,7 +18,7 @@ public class CreditCard {
     }
 
     public Long getCardCode() {
-        return this.cardCode;
+        return cardCode;
     }
 
     public void setCardCode(Long cardCode) {
@@ -30,7 +26,7 @@ public class CreditCard {
     }
 
     public UUID getCustomerId() {
-        return this.customerId;
+        return customerId;
     }
 
     public void setCustomerId(UUID customerId) {
@@ -38,11 +34,10 @@ public class CreditCard {
     }
 
     public int getSecretNumber() {
-        return this.secretNumber;
+        return secretNumber;
     }
 
     public void setSecretNumber(int secretNumber) {
         this.secretNumber = secretNumber;
     }
-
 }
