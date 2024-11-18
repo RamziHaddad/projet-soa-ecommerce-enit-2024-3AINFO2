@@ -27,10 +27,8 @@ jobs:
           cd catalog/catalog-service/
           mvn clean package -Dquarkus.package.type=uber-jar
 
-      - name: Run Tests with Maven
-        run: |
-          cd catalog/catalog-service/
-          mvn test
+      - name: List files in target directory  # Vérifiez les fichiers générés
+        run: ls -l catalog/catalog-service/target/
 
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
@@ -59,10 +57,10 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp catalog/catalog-service/target/service-catalog-*-runner.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
 
       - name: Deploy JAR to VPS
-        uses: appleboy/ssh-action@v0.1.2  # Mise à jour de la version
+        uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}
           username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
