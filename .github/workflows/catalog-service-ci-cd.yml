@@ -26,7 +26,6 @@ jobs:
         run: |
           cd catalog/catalog-service/
           mvn clean package -Dquarkus.package.type=uber-jar
-
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -51,16 +50,13 @@ jobs:
         run: |
           echo "Listing files in the current directory:"
           ls -l /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2
-
       - name: Verify if the correct JAR file exists
         run: |
           ls /home/runner/work/projet-soa-ecommerce-enit-2024-3AINFO2/projet-soa-ecommerce-enit-2024-3AINFO2/catalog-service-1.0.0-SNAPSHOT-runner.jar
-
       - name: Add Server to Known Hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
-
       - name: Transfer JAR to VPS
         run: |
           # Vérification de la présence du fichier téléchargé
@@ -71,15 +67,30 @@ jobs:
             echo "File not found, aborting transfer"
             exit 1
           fi
-
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "ls -l ~/service-catalog/service-catalog.jar"
-
+      
+      - name: Show system resources usage after file transfer
+        run: |
+          # Vérifier l'utilisation des ressources sur le serveur après le transfert
+          echo "Utilisation des ressources sur le serveur VPS après transfert :"
+          
+          # Vérification de l'espace disque utilisé
+          echo "Espace disque utilisé :"
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "df -h"
+          
+          # Vérification de l'utilisation de la mémoire
+          echo "Mémoire utilisée :"
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "free -h"
+          
+          # Vérification de l'utilisation du CPU
+          echo "Utilisation du CPU :"
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "top -bn1 | grep 'Cpu(s)'"
+      
       - name: Set execute permissions for the JAR file
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "chmod +x ~/service-catalog/service-catalog.jar"
-
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
         with:
