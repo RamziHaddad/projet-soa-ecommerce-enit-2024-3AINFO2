@@ -48,14 +48,14 @@ jobs:
           name: service-catalog.jar
           path: ./
 
-      - name: Deploy JAR to VM
+      - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USERNAME }}
-          key: ${{ secrets.VM_SSH_KEY }}
+          host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}  # Adresse IP du VPS
+          username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}  # Nom d'utilisateur SSH
+          password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}  # Mot de passe de l'utilisateur
           script: |
             mkdir -p ~/service-catalog
-            scp service-catalog.jar ${{ secrets.VM_USERNAME }}@${{ secrets.VM_HOST }}:~/service-catalog/service-catalog.jar
+            scp service-catalog.jar ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
             pkill -f 'java.*service-catalog.jar' || true
             nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
