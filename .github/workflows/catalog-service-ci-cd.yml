@@ -72,8 +72,13 @@ jobs:
             exit 1
           fi
 
+      - name: Verify if the JAR file exists on the VPS
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "ls -l ~/service-catalog/service-catalog.jar"
+
       - name: Set execute permissions for the JAR file
-        run: chmod +x ~/service-catalog/service-catalog.jar
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} "chmod +x ~/service-catalog/service-catalog.jar"
 
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
@@ -83,15 +88,15 @@ jobs:
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
             mkdir -p ~/service-catalog
-
+          
             # Tuer le processus existant Java si présent
             pkill -f 'java.*service-catalog.jar' || true
-
+          
             # Attendre 5 secondes avant de relancer le service
             sleep 5
-
+          
             # Lancer le service en arrière-plan
             java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
-
+          
             # Vérification des logs pour détecter des erreurs
             tail -n 10 ~/service-catalog/app.log
