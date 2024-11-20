@@ -17,7 +17,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Inject
     PaymentRepository paymentRepository;
-
+    
     @Inject
     PaymentMapper paymentMapper;
 
@@ -27,11 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentMapper.toEntity(paymentRequest);
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setPaymentDate(LocalDateTime.now());
-
-        
         Payment savedPayment = paymentRepository.savePayment(payment);
-
-        
         return paymentMapper.toResponseDTO(savedPayment);
     }
 

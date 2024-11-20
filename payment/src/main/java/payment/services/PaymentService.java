@@ -10,16 +10,16 @@ import payment.api.dto.PaymentResponseDTO;
 public interface PaymentService {
     
     PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest);
-
+ 
     
     Optional<PaymentResponseDTO> getPaymentById(UUID paymentId);
-
+ 
     
     boolean cancelPayment(UUID paymentId);
-
+ 
     
     List<PaymentResponseDTO> getAllPayments();
-
+    
     
     List<PaymentResponseDTO> getPaymentsByDate(LocalDateTime date, UUID customerId);
 }
