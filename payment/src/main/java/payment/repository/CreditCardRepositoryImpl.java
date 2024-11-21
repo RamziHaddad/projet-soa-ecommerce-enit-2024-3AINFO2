@@ -20,10 +20,7 @@ public class CreditCardRepositoryImpl implements CreditCardRepository {
     @Override
     @Transactional
     public CreditCard saveCreditCard(CreditCard creditCard) {
-        if (creditCard.getId() == null) {
-            creditCard.setId(UUID.randomUUID());
-        }
-        entityManager.persist(creditCard);
+        entityManager.merge(creditCard);
         return creditCard;
     }
 

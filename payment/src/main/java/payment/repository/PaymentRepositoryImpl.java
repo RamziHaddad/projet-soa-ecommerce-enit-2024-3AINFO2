@@ -52,10 +52,8 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Transactional
     @Override
     public Payment savePayment(Payment payment) {
-        if (payment.getPaymentId() == null) {
-            payment.setPaymentId(UUID.randomUUID()); 
-        }
-        em.persist(payment);
+        
+        em.merge(payment);
         return payment;
     }
     
