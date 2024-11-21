@@ -37,7 +37,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public List<Payment> findByDate(LocalDateTime date, UUID id) {
         
-        return em.createQuery("SELECT p FROM Payment p WHERE p.timestamp = :date AND p.id = :id", Payment.class)
+        return em.createQuery("SELECT p FROM Payment p WHERE p.paymentDate = :date AND p.id = :id", Payment.class)
                 .setParameter("date", date)
                 .setParameter("id", id)
                 .getResultList();

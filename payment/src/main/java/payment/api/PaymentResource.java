@@ -62,15 +62,11 @@ public class PaymentResource {
     }
      @GET
     @Path("/by-date")
-    public Response getPaymentsByDate(@QueryParam("date") String date, @QueryParam("customerId") UUID customerId) {
-        try {
+    public List<PaymentResponseDTO> getPaymentsByDate(@QueryParam("date") String date, @QueryParam("customerId") UUID customerId) {
+        
             LocalDateTime parsedDate = LocalDateTime.parse(date);
             List<PaymentResponseDTO> payments = paymentService.getPaymentsByDate(parsedDate, customerId);
-            return Response.ok(payments).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Invalid date format. Please use 'YYYY-MM-DDTHH:MM:SS'.")
-                    .build();
-        }
+            return payments ; 
+        
     }
 }

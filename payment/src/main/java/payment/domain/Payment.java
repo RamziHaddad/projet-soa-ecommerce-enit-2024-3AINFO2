@@ -3,6 +3,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +19,7 @@ public class Payment {
     private UUID orderId ;
     private BigDecimal ammount ; 
     private PaymentStatus paymentStatus ; 
+    
     private LocalDateTime paymentDate ; 
     private  UUID transactionId ; 
     private PaymentMethod paymentMethod ; 
