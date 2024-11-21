@@ -30,31 +30,31 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentMapper paymentMapper;
 
     @Override
-    @Transactional
-    public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
-        // 1. Convert DTO to domain entity (Payment)
-        Payment payment = paymentMapper.toEntity(paymentRequest);
-        
-        // 2. Set the payment status to 'PENDING' initially
-        payment.setPaymentStatus(PaymentStatus.PENDING);
-        
-        // 3. Save the payment to the database
-        payment.setPaymentDate(LocalDateTime.now());
-        Payment savedPayment = paymentRepository.savePayment(payment);
-        
-        // 4. Create a PaymentOutBox entry for the Outbox pattern
-        PaymentOutBox paymentOutBox = new PaymentOutBox();
-        paymentOutBox.setPaymentUuid(savedPayment.getPaymentId());
-        paymentOutBox.setPayload(paymentMapper.toJson(savedPayment));  // Convert payment to JSON (you can create a mapper or use an existing one)
-        paymentOutBox.setStatus("PENDING");
-        paymentOutBox.setCreatedAt(LocalDateTime.now());
+@Transactional
+public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
+    // 1. Convert DTO to domain entity (Payment)
+    Payment payment = paymentMapper.toEntity(paymentRequest);
 
-        // 5. Save the PaymentOutBox event to the outbox table
-        boxRepository.save(paymentOutBox);
-        
-        // 6. Return the response DTO
-        return paymentMapper.toResponseDTO(savedPayment);
-    }
+    // 2. Set the payment status to 'PENDING' initially
+    payment.setPaymentStatus(PaymentStatus.PENDING);
+
+    // 3. Save the payment to the database
+    payment.setPaymentDate(LocalDateTime.now());
+    Payment savedPayment = paymentRepository.savePayment(payment);
+
+    // 4. Create a PaymentOutBox entry for the Outbox pattern
+    PaymentOutBox outBoxEvent = new PaymentOutBox();
+    outBoxEvent.setEventType("PAYMENT_CREATED");
+    outBoxEvent.setPayload(String.format("Payment ID: %s, Amount: %.2f", savedPayment.getPaymentId(), savedPayment.getAmmount()));
+    outBoxEvent.setProcessed(false);
+    System.out.println(outBoxEvent.toString());  
+    // 5. Save the PaymentOutBox event to the outbox table
+    boxRepository.save(outBoxEvent);
+
+    // 6. Return the response DTO
+    return paymentMapper.toResponseDTO(savedPayment);
+}
+
 
     @Override
     public Optional<PaymentResponseDTO> getPaymentById(UUID paymentId) {
