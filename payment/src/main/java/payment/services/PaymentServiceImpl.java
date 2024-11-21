@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import payment.api.dto.PaymentRequestDTO;
 import payment.api.dto.PaymentResponseDTO;
 import payment.domain.Payment;
@@ -22,6 +23,7 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentMapper paymentMapper;
 
     @Override
+    @Transactional
     public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
         
         Payment payment = paymentMapper.toEntity(paymentRequest);
@@ -38,6 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public boolean cancelPayment(UUID paymentId) {
         Payment payment = paymentRepository.findById(paymentId);
         if (payment != null && payment.getPaymentStatus() == PaymentStatus.PENDING) {
