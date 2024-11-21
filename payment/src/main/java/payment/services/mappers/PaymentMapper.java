@@ -29,4 +29,9 @@ public class PaymentMapper {
                 payment.getCustomerId()
         );
     }
+
+    public String toJson(Payment savedPayment) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'toJson'");
+    }
 }

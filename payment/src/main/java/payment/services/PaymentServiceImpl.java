@@ -1,4 +1,5 @@
 package payment.services;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +16,15 @@ import payment.domain.objectValues.PaymentStatus;
 import payment.repository.PaymentOutBoxRepository;
 import payment.repository.PaymentRepository;
 import payment.services.mappers.PaymentMapper;
+
 @ApplicationScoped
 public class PaymentServiceImpl implements PaymentService {
 
     @Inject
     PaymentRepository paymentRepository;
+    
     @Inject 
-    PaymentOutBoxRepository boxRepository ; 
+    PaymentOutBoxRepository boxRepository; 
     
     @Inject
     PaymentMapper paymentMapper;
@@ -29,14 +32,27 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
-        
+        // 1. Convert DTO to domain entity (Payment)
         Payment payment = paymentMapper.toEntity(paymentRequest);
+        
+        // 2. Set the payment status to 'PENDING' initially
         payment.setPaymentStatus(PaymentStatus.PENDING);
-        PaymentOutBox paymentOutBox = new PaymentOutBox() ; 
-        //paymentOutBox.set
-        //boxRepository.save()
+        
+        // 3. Save the payment to the database
         payment.setPaymentDate(LocalDateTime.now());
         Payment savedPayment = paymentRepository.savePayment(payment);
+        
+        // 4. Create a PaymentOutBox entry for the Outbox pattern
+        PaymentOutBox paymentOutBox = new PaymentOutBox();
+        paymentOutBox.setPaymentUuid(savedPayment.getPaymentId());
+        paymentOutBox.setPayload(paymentMapper.toJson(savedPayment));  // Convert payment to JSON (you can create a mapper or use an existing one)
+        paymentOutBox.setStatus("PENDING");
+        paymentOutBox.setCreatedAt(LocalDateTime.now());
+
+        // 5. Save the PaymentOutBox event to the outbox table
+        boxRepository.save(paymentOutBox);
+        
+        // 6. Return the response DTO
         return paymentMapper.toResponseDTO(savedPayment);
     }
 
