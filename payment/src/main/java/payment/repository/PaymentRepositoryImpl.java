@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional; 
 import payment.domain.Payment;
-
+@ApplicationScoped
+@Transactional
 public class PaymentRepositoryImpl implements PaymentRepository {
 
     @PersistenceContext

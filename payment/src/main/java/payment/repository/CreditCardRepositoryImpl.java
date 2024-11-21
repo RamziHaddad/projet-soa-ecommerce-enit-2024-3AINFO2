@@ -3,12 +3,15 @@ package payment.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import payment.domain.CreditCard;
-
+@ApplicationScoped
+@Transactional
 public class CreditCardRepositoryImpl implements CreditCardRepository {
 
     @Inject
