@@ -10,7 +10,9 @@ import jakarta.transaction.Transactional;
 import payment.api.dto.PaymentRequestDTO;
 import payment.api.dto.PaymentResponseDTO;
 import payment.domain.Payment;
+import payment.domain.PaymentOutBox;
 import payment.domain.objectValues.PaymentStatus;
+import payment.repository.PaymentOutBoxRepository;
 import payment.repository.PaymentRepository;
 import payment.services.mappers.PaymentMapper;
 @ApplicationScoped
@@ -18,6 +20,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Inject
     PaymentRepository paymentRepository;
+    @Inject 
+    PaymentOutBoxRepository boxRepository ; 
     
     @Inject
     PaymentMapper paymentMapper;
@@ -28,6 +32,9 @@ public class PaymentServiceImpl implements PaymentService {
         
         Payment payment = paymentMapper.toEntity(paymentRequest);
         payment.setPaymentStatus(PaymentStatus.PENDING);
+        PaymentOutBox paymentOutBox = new PaymentOutBox() ; 
+        //paymentOutBox.set
+        //boxRepository.save()
         payment.setPaymentDate(LocalDateTime.now());
         Payment savedPayment = paymentRepository.savePayment(payment);
         return paymentMapper.toResponseDTO(savedPayment);
