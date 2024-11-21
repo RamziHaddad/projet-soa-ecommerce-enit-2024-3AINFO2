@@ -53,7 +53,7 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public Payment savePayment(Payment payment) {
         
-        em.merge(payment);
+        em.persist(payment);
         return payment;
     }
     
