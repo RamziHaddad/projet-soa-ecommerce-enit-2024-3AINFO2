@@ -36,7 +36,19 @@ public class CartService {
         if (cart == null) {
             throw new IllegalArgumentException("Panier non trouvé");
         }
-        cart.getItems().put(item.getItemId(), item);
+
+        Map<UUID, Item> items = cart.getItems();
+        UUID itemId = item.getItemId();
+
+        if (items.containsKey(itemId)) {
+            // Si l'article existe déjà, on incrémente sa quantité
+            Item existingItem = items.get(itemId);
+            existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
+        } else {
+            // Sinon, on ajoute l'article
+            items.put(itemId, item);
+        }
+
         return cart;
     }
 
@@ -46,7 +58,21 @@ public class CartService {
         if (cart == null) {
             throw new IllegalArgumentException("Panier non trouvé");
         }
-        cart.getItems().remove(itemId);
+
+        Map<UUID, Item> items = cart.getItems();
+        if (items.containsKey(itemId)) {
+            Item existingItem = items.get(itemId);
+            if (existingItem.getQuantity() > 1) {
+                // Si la quantité est supérieure à 1, on décrémente
+                existingItem.setQuantity(existingItem.getQuantity() - 1);
+            } else {
+                // Sinon, on retire complètement l'article
+                items.remove(itemId);
+            }
+        } else {
+            throw new IllegalArgumentException("Article non trouvé dans le panier");
+        }
+
         return cart;
     }
 
@@ -56,7 +82,14 @@ public class CartService {
         if (cart == null) {
             throw new IllegalArgumentException("Panier non trouvé");
         }
-        cart.getItems().put(itemId, item);
+
+        Map<UUID, Item> items = cart.getItems();
+        if (!items.containsKey(itemId)) {
+            throw new IllegalArgumentException("Article non trouvé dans le panier");
+        }
+
+        // Mise à jour de l'article
+        items.put(itemId, item);
         return cart;
     }
 }
