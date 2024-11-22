@@ -45,7 +45,9 @@ public class ProductRepository {
 
     @Transactional
     public Product insert(Product product) throws EntityAlreadyExistsException {
-        if (product.getId() == null) {
+        //no need to check null id as it will be imposed from the inventory 
+        //so we wont create it for now and for further implemetations
+        // if (product.getId() == null) {
             product.setId(UUID.randomUUID());
             try {
                 em.persist(product);
@@ -53,8 +55,8 @@ public class ProductRepository {
             } catch (EntityExistsException e) {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
-        }
-        throw new EntityAlreadyExistsException("Product already has an ID");
+        // }
+        // throw new EntityAlreadyExistsException("Product already has an ID");
     }
 
     @Transactional
