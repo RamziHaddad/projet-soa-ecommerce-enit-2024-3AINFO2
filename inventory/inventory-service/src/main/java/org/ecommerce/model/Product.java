@@ -1,27 +1,21 @@
 package org.ecommerce.model;
 
 import java.util.UUID;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
-public class Product extends PanacheEntityBase{
+public class Product extends PanacheEntityBase {
     @Id
     @GeneratedValue
     private UUID id;
     private int totalQuantity;
     private int reservedQuantity;
 
-    
     public Product() {
-    }
-
-    public Product(UUID id, int quantity) {
-        this.id = id;
-        this.totalQuantity = quantity;
-        this.reservedQuantity = 0;
     }
 
     public UUID getId() {

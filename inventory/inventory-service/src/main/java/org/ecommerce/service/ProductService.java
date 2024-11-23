@@ -6,20 +6,15 @@ import java.util.UUID;
 
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 
 @ApplicationScoped
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-
+    
     @Inject
     ProductRepository repo;
 
@@ -55,20 +50,9 @@ public class ProductService {
     @Transactional
     public Product registerReception(UUID productId, int quantity) {
         Product product = repo.getProductByID(productId)
-                .orElse(null);
-        if (product == null) {
-            product = new Product(productId, quantity);
-            try {
-                repo.addProduct(product);
-                logger.info("Product successfully added: " + productId);
-            } catch (OptimisticLockException e) {
-                logger.error("OptimisticLockException occurred while adding product", e);
-            }
-        } else {
-            product.setId(productId);
-            product.setTotalQuantity(product.getTotalQuantity() + quantity);
-            repo.updateProduct(product);
-        }
+                .orElseThrow(() -> new WebApplicationException("Product not found", 404));
+        product.setTotalQuantity(product.getTotalQuantity() + quantity);
+        repo.updateProduct(product);
         return product;
     }
 
