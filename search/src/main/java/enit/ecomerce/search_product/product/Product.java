@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import enit.ecomerce.search_product.consumer.ProductReceived;
+import enit.ecomerce.search_product.consumer.ProductListed;
 
 @Document(indexName = "product")
 public class Product {
@@ -15,6 +15,8 @@ public class Product {
 
     @Field(type = FieldType.Text)   
     private String name;
+
+  
 
     @Field(type = FieldType.Text)  
     private String description;
@@ -29,15 +31,16 @@ public class Product {
        
     }
 
-    // Constructor for transforming ProductReceived data into a Product entity.
+    // Constructor for transforming ProductListeddata into a Product entity.
     // This constructor is not part of the Elasticsearch mapping.
-    public Product(ProductReceived productReceived) { 
-        this.id = productReceived.id();
-        this.name = productReceived.name();
-        this.description = productReceived.description();
-        this.price = productReceived.price();
-        this.category = productReceived.category();
+    public Product(ProductListed productListed) {
+        this.id = productListed.getEventId().toString();
+        this.name = productListed.getProductName();
+        this.description = productListed.getDescription();
+        this.price = (float) productListed.getPrice();  
+        this.category = productListed.getCategoryName();
     }
+
 
     // Getters and Setters
     public String getId() {
@@ -78,5 +81,13 @@ public class Product {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+    @Override
+    public String toString() {
+        return "Product [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price
+                + ", category=" + category + ", getId()=" + getId() + ", getName()=" + getName() + ", getClass()="
+                + getClass() + ", getDescription()=" + getDescription() + ", getPrice()=" + getPrice()
+                + ", getCategory()=" + getCategory() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
+                + "]";
     }
 }
