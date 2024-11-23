@@ -39,8 +39,8 @@ public abstract class Event {
         return result;
     } 
 
-    public  UUID getEventId(){
-        return this.eventId;
+    public  String getAggregateID(){
+        return this.aggregateId;
     }
 
     

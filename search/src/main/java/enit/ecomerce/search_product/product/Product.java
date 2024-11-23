@@ -34,7 +34,7 @@ public class Product {
     // Constructor for transforming ProductListeddata into a Product entity.
     // This constructor is not part of the Elasticsearch mapping.
     public Product(ProductListed productListed) {
-        this.id = productListed.getEventId().toString();
+        this.id = productListed.getAggregateID();
         this.name = productListed.getProductName();
         this.description = productListed.getDescription();
         this.price = (float) productListed.getPrice();  
