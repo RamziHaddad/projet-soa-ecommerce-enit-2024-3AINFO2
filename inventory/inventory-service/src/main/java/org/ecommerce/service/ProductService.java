@@ -3,15 +3,23 @@ package org.ecommerce.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @ApplicationScoped
 public class ProductService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Inject
     ProductRepository repo;
@@ -45,19 +53,28 @@ public class ProductService {
         return Optional.empty();
     }
 
-    public Product registerReception(String productId, int quantity) {
-        UUID productUUID = UUID.fromString(productId);
-        Product product = repo.getProductByID(productUUID)
-                .orElse(repo.addProduct(new Product(productUUID, quantity)));
-        product.setId(productUUID);
-        product.setTotalQuantity(product.getTotalQuantity() + quantity);
-        repo.updateProduct(product);
+    @Transactional
+    public Product registerReception(UUID productId, int quantity) {
+        Product product = repo.getProductByID(productId)
+                .orElse(null);
+        if (product == null) {
+            product = new Product(productId, quantity);
+            try {
+                repo.addProduct(product);
+                logger.info("Product successfully added: " + productId);
+            } catch (OptimisticLockException e) {
+                logger.error("OptimisticLockException occurred while adding product", e);
+            }
+        } else {
+            product.setId(productId);
+            product.setTotalQuantity(product.getTotalQuantity() + quantity);
+            repo.updateProduct(product);
+        }
         return product;
     }
 
-    public Product reserveProduct(String productId, int quantity) {
-        UUID productUUID = UUID.fromString(productId);
-        Product product = repo.getProductByID(productUUID)
+    public Product reserveProduct(UUID productId, int quantity) {
+        Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
         if (product.availableQuantity() < quantity) {
             throw new WebApplicationException("Insufficient stock", 400);
@@ -67,9 +84,8 @@ public class ProductService {
         return product;
     }
 
-    public Product releaseReservation(String productId, int quantity) {
-        UUID productUUID = UUID.fromString(productId);
-        Product product = repo.getProductByID(productUUID)
+    public Product releaseReservation(UUID productId, int quantity) {
+        Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
         product.setReservedQuantity(product.getReservedQuantity() - quantity);
         if (product.getReservedQuantity() < 0) {

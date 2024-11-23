@@ -3,8 +3,12 @@ package org.ecommerce.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.ecommerce.model.Product;
+
+import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -13,6 +17,11 @@ import jakarta.transaction.Transactional;
 public class ProductRepository {
     @Inject
     EntityManager em;
+
+    @Transactional
+    public void onStart(@Observes StartupEvent ev) {
+        em.createQuery("DELETE FROM Product p").executeUpdate();
+   }
 
     @Transactional
     public List<Product> listAll() {

@@ -74,17 +74,20 @@ public class ProductAPI {
 
     @POST
     @Path("/reception")
+    @Produces(MediaType.APPLICATION_JSON)
     public Product registerReception(Map<String, Object> payload) {
-        String productId = (String) payload.get("productId");
+        String productIdStr = (String) payload.get("productId");
+        UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.registerReception(productId, quantity);
     }
-
+   
     @POST
     @Path("/reserve")
     public Product reserveProduct(Map<String, Object> payload) {
-        String productId = (String) payload.get("productId");
+        String productIdStr = (String) payload.get("productId");
+        UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.reserveProduct(productId, quantity);
@@ -93,7 +96,8 @@ public class ProductAPI {
     @POST
     @Path("/release")
     public Product releaseReservation(Map<String, Object> payload) {
-        String productId = (String) payload.get("productId");
+        String productIdStr = (String) payload.get("productId");
+        UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.releaseReservation(productId, quantity);

@@ -4,15 +4,17 @@ import java.util.UUID;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
-public class Product {
+public class Product extends PanacheEntityBase{
     @Id
     @GeneratedValue
     private UUID id;
     private int totalQuantity;
     private int reservedQuantity;
 
+    
     public Product() {
     }
 
