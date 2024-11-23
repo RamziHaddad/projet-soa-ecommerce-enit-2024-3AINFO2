@@ -19,29 +19,28 @@ public class Product {
     @Column
     private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id",nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory category;
     private double basePrice;
-    private double shownPrice=basePrice;
+    private double shownPrice = basePrice;
+    private boolean disponibility;
+
     public Product() {
     }
-    
-    
 
     public Product(String productName, String description, LocalDateTime createdAt, ProductCategory category,
-            double basePrice, double shownPrice) {
+                   double basePrice, double shownPrice, boolean disponibility) {
         this.productName = productName;
         this.description = description;
         this.createdAt = createdAt;
         this.category = category;
         this.basePrice = basePrice;
         this.shownPrice = shownPrice;
+        this.disponibility = disponibility;
     }
 
-
-
     public Product(UUID id, String productName, String description, LocalDateTime createdAt, ProductCategory category,
-            double basePrice, double shownPrice) {
+                   double basePrice, double shownPrice, boolean disponibility) {
         this.id = id;
         this.productName = productName;
         this.description = description;
@@ -49,72 +48,72 @@ public class Product {
         this.category = category;
         this.basePrice = basePrice;
         this.shownPrice = shownPrice;
+        this.disponibility = disponibility;
     }
-
-
 
     public UUID getId() {
         return id;
     }
+
     public void setId(UUID id) {
         this.id = id;
     }
+
     public String getProductName() {
         return productName;
     }
+
     public void setProductName(String productName) {
         this.productName = productName;
     }
+
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-
 
     public ProductCategory getCategory() {
         return category;
     }
 
-
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
 
     public double getBasePrice() {
         return basePrice;
     }
 
-
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
 
     public double getShownPrice() {
         return shownPrice;
     }
 
-
-
-    public void setCategory(ProductCategory category) {
-        this.category = category;
-    }
-
-
-
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-
-
     public void setShownPrice(double shownPrice) {
         this.shownPrice = shownPrice;
     }
 
+    public boolean isDisponibility() {
+        return disponibility;
+    }
 
+    public void setDisponibility(boolean disponibility) {
+        this.disponibility = disponibility;
+    }
 
     @Override
     public int hashCode() {
@@ -130,10 +129,9 @@ public class Product {
         result = prime * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(shownPrice);
         result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + (disponibility ? 1231 : 1237);
         return result;
     }
-
-
 
     @Override
     public boolean equals(Object obj) {
@@ -173,17 +171,15 @@ public class Product {
             return false;
         if (Double.doubleToLongBits(shownPrice) != Double.doubleToLongBits(other.shownPrice))
             return false;
+        if (disponibility != other.disponibility)
+            return false;
         return true;
     }
-
-
 
     @Override
     public String toString() {
         return "Product [id=" + id + ", productName=" + productName + ", description=" + description + ", createdAt="
                 + createdAt + ", category=" + category + ", basePrice=" + basePrice + ", shownPrice=" + shownPrice
-                + "]";
+                + ", disponibility=" + disponibility + "]";
     }
-    
-
 }

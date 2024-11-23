@@ -90,6 +90,8 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-postgresql</artifactId>
         </dependency>
+
+
     </dependencies>
 
     <build>
