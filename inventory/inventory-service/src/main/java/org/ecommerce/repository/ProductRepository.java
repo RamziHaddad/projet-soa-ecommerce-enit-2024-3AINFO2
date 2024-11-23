@@ -38,7 +38,6 @@ public class ProductRepository {
     public Product addProduct(Product product) {
         em.merge(product);
         return product;
-
     }
 
     @Transactional

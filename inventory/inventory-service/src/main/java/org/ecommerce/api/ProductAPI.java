@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.ecommerce.model.Product;
 import org.ecommerce.service.ProductService;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -74,7 +76,6 @@ public class ProductAPI {
 
     @POST
     @Path("/reception")
-    @Produces(MediaType.APPLICATION_JSON)
     public Product registerReception(Map<String, Object> payload) {
         String productIdStr = (String) payload.get("productId");
         UUID productId = UUID.fromString(productIdStr);
@@ -82,7 +83,7 @@ public class ProductAPI {
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.registerReception(productId, quantity);
     }
-   
+
     @POST
     @Path("/reserve")
     public Product reserveProduct(Map<String, Object> payload) {
@@ -101,5 +102,15 @@ public class ProductAPI {
         Object quantityObj = payload.get("quantity");
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.releaseReservation(productId, quantity);
+    }
+
+    @POST
+    @Path("/shipment")
+    public Product recordOrderShipment(Map<String, Object> payload) {
+        String productIdStr = (String) payload.get("productId");
+        UUID productId = UUID.fromString(productIdStr);
+        Object quantityObj = payload.get("quantity");
+        int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
+        return productService.recordOrderShipment(productId, quantity);
     }
 }

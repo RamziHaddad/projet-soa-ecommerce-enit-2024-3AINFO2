@@ -6,15 +6,14 @@ import java.util.UUID;
 
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 @ApplicationScoped
 public class ProductService {
@@ -73,6 +72,7 @@ public class ProductService {
         return product;
     }
 
+    @Transactional
     public Product reserveProduct(UUID productId, int quantity) {
         Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
@@ -84,12 +84,26 @@ public class ProductService {
         return product;
     }
 
+    @Transactional
     public Product releaseReservation(UUID productId, int quantity) {
         Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
         product.setReservedQuantity(product.getReservedQuantity() - quantity);
         if (product.getReservedQuantity() < 0) {
             product.setReservedQuantity(0);
+        }
+        repo.updateProduct(product);
+        return product;
+    }
+
+    @Transactional
+    public Product recordOrderShipment(UUID productId, int quantity) {
+        Product product = repo.getProductByID(productId)
+                .orElseThrow(() -> new WebApplicationException("Produit non trouvé", 404));
+        product.setTotalQuantity(product.getTotalQuantity() - quantity);
+        product.setReservedQuantity(product.getReservedQuantity() - quantity);
+        if (product.getReservedQuantity() < 0 || product.getTotalQuantity() < 0) {
+            throw new WebApplicationException("Stock insuffisant ou non reservé pour la sortie de commande", 400);
         }
         repo.updateProduct(product);
         return product;
