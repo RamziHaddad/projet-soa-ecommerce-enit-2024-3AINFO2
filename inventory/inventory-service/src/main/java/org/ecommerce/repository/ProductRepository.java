@@ -21,7 +21,7 @@ public class ProductRepository {
     @Transactional
     public void onStart(@Observes StartupEvent ev) {
         em.createQuery("DELETE FROM Product p").executeUpdate();
-   }
+    }
 
     @Transactional
     public List<Product> listAll() {
@@ -36,10 +36,10 @@ public class ProductRepository {
 
     @Transactional
     public Product addProduct(Product product) {
-        em.merge(product);
+        em.persist(product);
         return product;
     }
-
+    
     @Transactional
     public Product updateProduct(Product product) {
         return em.merge(product);

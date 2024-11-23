@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.ecommerce.model.Product;
 import org.ecommerce.service.ProductService;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;

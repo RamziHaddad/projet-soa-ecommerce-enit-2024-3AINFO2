@@ -3,28 +3,37 @@ package org.ecommerce.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import org.ecommerce.events.ProductEvent;
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
+import com.google.gson.Gson;
+import io.smallrye.reactive.messaging.annotations.Channel;
+import io.smallrye.reactive.messaging.annotations.Emitter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.PostPersist;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 
 @ApplicationScoped
 public class ProductService {
 
-    
     @Inject
     ProductRepository repo;
+
+    @Inject
+    @Channel("product-events")
+    Emitter<String> productEventEmitter;
 
     public List<Product> getAllProducts() {
         return repo.listAll();
     }
 
     @Transactional
-    public void addNewProduct(Product product) {
+    public Product addNewProduct(Product product) {
         repo.addProduct(product);
+        sendProductEvent(product, "CREATE");
+        return product;
     }
 
     public Optional<Product> getProductById(UUID id) {
@@ -42,6 +51,7 @@ public class ProductService {
         if (existingProduct.isPresent()) {
             updatedProduct.setId(id);
             repo.updateProduct(updatedProduct);
+            sendProductEvent(updatedProduct, "UPDATE");
             return Optional.of(updatedProduct);
         }
         return Optional.empty();
@@ -53,6 +63,7 @@ public class ProductService {
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
         product.setTotalQuantity(product.getTotalQuantity() + quantity);
         repo.updateProduct(product);
+        sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -65,6 +76,7 @@ public class ProductService {
         }
         product.setReservedQuantity(product.getReservedQuantity() + quantity);
         repo.updateProduct(product);
+        sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -77,6 +89,7 @@ public class ProductService {
             product.setReservedQuantity(0);
         }
         repo.updateProduct(product);
+        sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -90,6 +103,23 @@ public class ProductService {
             throw new WebApplicationException("Stock insuffisant ou non reservé pour la sortie de commande", 400);
         }
         repo.updateProduct(product);
+        sendProductEvent(product, "UPDATE");
         return product;
+    }
+
+    @PostPersist
+    private void sendProductEvent(Product product, String eventType) {
+        ProductEvent productEvent = new ProductEvent(
+                product.getId(),
+                product.getTotalQuantity(),
+                product.getReservedQuantity(),
+                eventType);
+        produceProductEvent(productEvent);
+    }
+
+    @PostPersist
+    public void produceProductEvent(ProductEvent productEvent) {
+        String jsonEvent = new Gson().toJson(productEvent);
+        productEventEmitter.send(jsonEvent);
     }
 }
