@@ -28,9 +28,11 @@ import payment.services.PaymentService;
 public class PaymentResource {
     @Inject
     private PaymentService paymentService;
-
+    int i=0 ; 
     @POST
     public Response processPayment(PaymentRequestDTO paymentRequest) {
+        i++ ; 
+        System.out.println(i);
         PaymentResponseDTO response = paymentService.processPayment(paymentRequest);
         return Response.status(Response.Status.CREATED).entity(response).build();
     }
@@ -62,6 +64,7 @@ public class PaymentResource {
     @GET
     public Response getAllPayments() {
         List<PaymentResponseDTO> payments = paymentService.getAllPayments();
+        System.out.println(payments.size());
         return Response.ok(payments).build();
     }
 

@@ -4,9 +4,12 @@ import java.util.UUID;
 
 public class CreditCardRequestDTO {
     private UUID id;
-    private Long cardCode;
+    private int cardCode;
     private UUID customerId;
     private int secretNumber;
+
+    public CreditCardRequestDTO() {
+    }
 
     // Getters and Setters
     public UUID getId() {
@@ -17,11 +20,12 @@ public class CreditCardRequestDTO {
         this.id = id;
     }
 
-    public Long getCardCode() {
+
+    public int getCardCode() {
         return cardCode;
     }
 
-    public void setCardCode(Long cardCode) {
+    public void setCardCode(int cardCode) {
         this.cardCode = cardCode;
     }
 

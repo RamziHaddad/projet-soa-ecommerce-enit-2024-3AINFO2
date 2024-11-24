@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 public class CreditCard {
     @Id
     private UUID id ; 
-    private Long cardCode ;  
+    private int cardCode ;  
     private UUID customerId ;
     private int secretNumber ;
 
@@ -21,11 +21,11 @@ public class CreditCard {
         this.id = id;
     }
 
-    public Long getCardCode() {
+    public int getCardCode() {
         return this.cardCode;
     }
 
-    public void setCardCode(Long cardCode) {
+    public void setCardCode(int cardCode) {
         this.cardCode = cardCode;
     }
 

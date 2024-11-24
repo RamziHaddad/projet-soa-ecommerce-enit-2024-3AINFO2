@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -19,11 +20,12 @@ import jakarta.ws.rs.core.Response;
 @Path("/payments")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-
+@RegisterRestClient(baseUri = "http://localhost:8099/")
 public interface BankClient {
     @POST
-    Response processPayment(BankPaymentRequest bankPaymentRequest);
+    @Transactional
+    Response makeNewPayment(BankPaymentRequest bankPaymentRequest);
     @GET
     @Path("/{id}")
-    Response getPaymentById(@PathParam("id") UUID paymentId);
+    Response paymentById(@PathParam("id") UUID paymentId);
 }

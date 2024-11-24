@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import payment.api.clients.BankClient;
 import payment.api.clients.BankPaymentRequest;
+import payment.api.dto.CreditCardRequestDTO;
 import payment.api.dto.PaymentRequestDTO;
 import payment.api.dto.PaymentResponseDTO;
 import payment.domain.Payment;
@@ -26,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Inject
     PaymentRepository paymentRepository;
     @Inject
+    @RestClient
     BankClient bankClient ; 
     @Inject 
     PaymentOutBoxRepository boxRepository; 
@@ -47,8 +52,12 @@ public class PaymentServiceImpl implements PaymentService {
         // 3. Save the payment to the database
         payment.setPaymentDate(LocalDateTime.now());
         Payment savedPayment = paymentRepository.savePayment(payment);
-        // getting the credit card 
-    
+        // getting the credit card
+        CreditCardRequestDTO creditCardRequest = new CreditCardRequestDTO() ;  
+        creditCardRequest.setCustomerId(paymentRequest.getCustomerId());
+        creditCardRequest.setCardCode(paymentRequest.getCardCode());
+        creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
+        cardServices.registerCreditCard(creditCardRequest) ; 
         // 4. Map the PaymentRequestDTO to BankPaymentRequest
         BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(
             savedPayment.getPaymentId(),
@@ -58,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
         );
 
         // 5. Call the bank service to process the payment
-        Response bankResponse = bankClient.processPayment(bankPaymentRequest);
+        Response bankResponse = bankClient.makeNewPayment(bankPaymentRequest);
 
         if (bankResponse.getStatus() == Response.Status.OK.getStatusCode()) {
             // Update payment status to 'COMPLETED' if payment is successful

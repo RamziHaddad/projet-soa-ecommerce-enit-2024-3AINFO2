@@ -4,12 +4,12 @@ import java.util.UUID;
 
 public class CreditCardResponseDTO {
     private UUID id;
-    private Long cardCode;
+    private int cardCode;
     private UUID customerId;
     private int secretNumber;
 
     // Constructor
-    public CreditCardResponseDTO(UUID id, Long cardCode, UUID customerId, int secretNumber) {
+    public CreditCardResponseDTO(UUID id, int cardCode, UUID customerId, int secretNumber) {
         this.id = id;
         this.cardCode = cardCode;
         this.customerId = customerId;
@@ -21,7 +21,7 @@ public class CreditCardResponseDTO {
         return id;
     }
 
-    public Long getCardCode() {
+    public int getCardCode() {
         return cardCode;
     }
 

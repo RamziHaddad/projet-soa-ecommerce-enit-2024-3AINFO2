@@ -13,6 +13,9 @@ public class PaymentRequestDTO {
     private int cardCode ; 
 
 
+    public PaymentRequestDTO() {
+    }
+
     public PaymentRequestDTO(UUID orderId, BigDecimal amount, UUID customerId, PaymentMethod paymentMethod, int cardNumber, int cardCode) {
         this.orderId = orderId;
         this.amount = amount;
