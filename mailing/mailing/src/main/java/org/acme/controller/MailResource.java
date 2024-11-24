@@ -1,8 +1,10 @@
-package org.acme;
+package org.acme.controller;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import org.acme.service.MailtrapService;
+
 import java.io.IOException;
 
 @Path("/mail")
