@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.enit.pricing.domain.TieredDiscount;
+import com.enit.pricing.domain.TieredPromotion;
 import com.enit.pricing.repositories.TieredDiscountRepository;
 
 @Service
@@ -17,14 +17,14 @@ public class TieredDsicountService {
         this.tieredDiscountRepository=tieredDiscountRepository;
     }
     //gets the current discount
-    TieredDiscount getCurrentDiscountThresold(){
-        Optional<TieredDiscount> discount =tieredDiscountRepository.getCurrentDiscount();
+    TieredPromotion getCurrentDiscountThresold(){
+        Optional<TieredPromotion> discount =tieredDiscountRepository.getCurrentDiscount();
         return discount.orElse(null);
     }
     
     //calculates the total price after the tiered discount
     BigDecimal calculatePriceAfterDiscount(BigDecimal totalPrice){
-        TieredDiscount discount = getCurrentDiscountThresold();
+        TieredPromotion discount = getCurrentDiscountThresold();
         if(discount!=null){
             if(totalPrice .compareTo(discount.getThresholdAmount()) > 0){
                 BigDecimal reductionAmount = totalPrice.multiply(discount.getReductionPercentage()).divide(BigDecimal.valueOf(100));

@@ -19,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -56,10 +59,11 @@ public class PricingController {
     }
 
     // Returns the base price of a product
-    @PostMapping("/base-price")
-    public ResponseEntity<BigDecimal> returnBasePrice(@RequestBody UUID prodId) {
-        BigDecimal basePrice = productService.getProductBasePrice(prodId);
+    @GetMapping("/base-price/{productId}")
+    public ResponseEntity<BigDecimal> returnBasePrice(@RequestParam UUID productId) {
+        BigDecimal basePrice = productService.getProductBasePrice(productId);
         return ResponseEntity.ok(basePrice);
     }
+    
 
 }

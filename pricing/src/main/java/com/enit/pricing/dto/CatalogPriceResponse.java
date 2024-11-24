@@ -7,6 +7,8 @@ public class CatalogPriceResponse {
     private UUID productId;
     private BigDecimal price;
 
+    public CatalogPriceResponse() {
+    }
     public CatalogPriceResponse(UUID productId, BigDecimal price) {
         this.productId = productId;
         this.price = price;

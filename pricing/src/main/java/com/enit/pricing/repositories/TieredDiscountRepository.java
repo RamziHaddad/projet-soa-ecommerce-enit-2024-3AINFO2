@@ -12,19 +12,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.enit.pricing.domain.TieredDiscount;
+import com.enit.pricing.domain.TieredPromotion;
 
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface TieredDiscountRepository  extends JpaRepository<TieredDiscount, UUID>  {
+public interface TieredDiscountRepository  extends JpaRepository<TieredPromotion, UUID>  {
 
    // @Query("SELECT p.thresholdAmount from  TieredDiscount p where ( currDate >= p.startDate AND currDate <= p.endDate) ")
     @Query("SELECT p FROM TieredDiscount p "+
     "WHERE  p.startDate <= CURRENT_DATE "  + 
      "AND p.endDate >= CURRENT_DATE " 
     )
-    Optional<TieredDiscount> getCurrentDiscount();
+    Optional<TieredPromotion> getCurrentDiscount();
 
     // delete expired discounts
     @Modifying
