@@ -1,5 +1,5 @@
 package payment.services;
 
-public class PaymentOutBoxProcessor {
-    
+public interface PaymentOutBoxProcessor {
+    void processOutboxEvents(); 
 }

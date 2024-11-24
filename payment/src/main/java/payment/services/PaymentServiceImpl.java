@@ -10,6 +10,8 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import payment.api.clients.BankClient;
@@ -31,17 +33,18 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentRepository paymentRepository;
     @Inject
     @RestClient
-    BankClient bankClient ; 
-    @Inject 
-    PaymentOutBoxRepository boxRepository; 
-    
+    BankClient bankClient;
+    @Inject
+    PaymentOutBoxRepository boxRepository;
+
     @Inject
     PaymentMapper paymentMapper;
 
     @Inject
-    CreditCardServices cardServices ; 
+    CreditCardServices cardServices;
+
     @Override
-@Transactional
+    @Transactional
     public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
         // 1. Change the payment DTO to an entity
         Payment payment = paymentMapper.toEntity(paymentRequest);
@@ -52,46 +55,35 @@ public class PaymentServiceImpl implements PaymentService {
         // 3. Save the payment to the database
         payment.setPaymentDate(LocalDateTime.now());
         Payment savedPayment = paymentRepository.savePayment(payment);
-        // getting the credit card
-        CreditCardRequestDTO creditCardRequest = new CreditCardRequestDTO() ;  
+
+        // 4. Register the credit card (external call)
+        CreditCardRequestDTO creditCardRequest = new CreditCardRequestDTO();
         creditCardRequest.setCustomerId(paymentRequest.getCustomerId());
         creditCardRequest.setCardCode(paymentRequest.getCardCode());
         creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
-        cardServices.registerCreditCard(creditCardRequest) ; 
-        // 4. Map the PaymentRequestDTO to BankPaymentRequest
-        BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(
-            savedPayment.getPaymentId(),
-            paymentRequest.getAmount(),
-            paymentRequest.getCardNumber(),
-            paymentRequest.getCardCode()
-        );
+        cardServices.registerCreditCard(creditCardRequest);
 
-        // 5. Call the bank service to process the payment
-        Response bankResponse = bankClient.makeNewPayment(bankPaymentRequest);
-
-        if (bankResponse.getStatus() == Response.Status.OK.getStatusCode()) {
-            // Update payment status to 'COMPLETED' if payment is successful
-            savedPayment.setPaymentStatus(PaymentStatus.COMPLETED);
-        } else {
-            // Update payment status to 'FAILED' if there was an error
-            savedPayment.setPaymentStatus(PaymentStatus.FAILED);
-        }
+        // 5. Create a JSON payload for the PaymentOutBox event
+        JsonObject payload = Json.createObjectBuilder()
+                .add("paymentId", savedPayment.getPaymentId().toString())
+                .add("amount", savedPayment.getAmmount())
+                .add("cardCode", creditCardRequest.getCardCode())
+                .add("secretCode", creditCardRequest.getSecretNumber())
+                .build();
 
         // 6. Create a PaymentOutBox entry for the Outbox pattern
         PaymentOutBox outBoxEvent = new PaymentOutBox();
         outBoxEvent.setEventType("PAYMENT_CREATED");
-        outBoxEvent.setPayload(String.format("Payment ID: %s, Amount: %.2f, Status: %s", 
-            savedPayment.getPaymentId(), savedPayment.getAmmount(), savedPayment.getPaymentStatus()));
+        outBoxEvent.setPayload(payload.toString()); // Convert JsonObject to string
         outBoxEvent.setProcessed(false);
-        System.out.println(outBoxEvent.toString());
 
-        // 7. Save the PaymentOutBox event to the outbox table
+        // 7. Save the PaymentOutBox event to the outbox table (part of the same
+        // transaction)
         boxRepository.save(outBoxEvent);
 
         // 8. Return the response DTO
         return paymentMapper.toResponseDTO(savedPayment);
     }
-
 
     @Override
     public Optional<PaymentResponseDTO> getPaymentById(UUID paymentId) {

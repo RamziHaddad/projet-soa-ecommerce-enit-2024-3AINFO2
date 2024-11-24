@@ -2,10 +2,13 @@ package payment.domain;
 
 
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
+
 import java.util.Objects;
 
 @Entity
@@ -16,10 +19,19 @@ public class PaymentOutBox {
     private Long id;
 
     private String eventType;
+    
     private String payload;
     private boolean processed;
 
-    
+    public PaymentOutBox() {
+    }
+
+    public PaymentOutBox(Long id, String eventType, String payload, boolean processed) {
+        this.id = id;
+        this.eventType = eventType;
+        this.payload = payload;
+        this.processed = processed;
+    }
 
     public Long getId() {
         return this.id;
@@ -29,13 +41,8 @@ public class PaymentOutBox {
         this.id = id;
     }
 
-    public boolean getProcessed() {
-        return this.processed;
-    }
-
-
     public String getEventType() {
-        return eventType;
+        return this.eventType;
     }
 
     public void setEventType(String eventType) {
@@ -43,7 +50,7 @@ public class PaymentOutBox {
     }
 
     public String getPayload() {
-        return payload;
+        return this.payload;
     }
 
     public void setPayload(String payload) {
@@ -51,20 +58,14 @@ public class PaymentOutBox {
     }
 
     public boolean isProcessed() {
-        return processed;
+        return this.processed;
+    }
+
+    public boolean getProcessed() {
+        return this.processed;
     }
 
     public void setProcessed(boolean processed) {
-        this.processed = processed;
-    }
-
-    public PaymentOutBox() {
-    }
-
-    public PaymentOutBox(Long id, String eventType, String payload, boolean processed) {
-        this.id = id;
-        this.eventType = eventType;
-        this.payload = payload;
         this.processed = processed;
     }
 
@@ -113,4 +114,7 @@ public class PaymentOutBox {
             ", processed='" + isProcessed() + "'" +
             "}";
     }
+
+    
+
 }
