@@ -64,4 +64,10 @@ public class CreditCardServicesImpl implements CreditCardServices {
                 .map(creditCardMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Optional<CreditCardResponseDTO> getCreditCardByCustomerId(UUID customerId) {
+        return creditCardRepository.findByCustomerId(customerId)
+                .map(creditCardMapper::toResponseDTO);
+    }
 }

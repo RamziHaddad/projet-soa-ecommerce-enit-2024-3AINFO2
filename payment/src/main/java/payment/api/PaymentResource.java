@@ -28,12 +28,14 @@ import payment.services.PaymentService;
 public class PaymentResource {
     @Inject
     private PaymentService paymentService;
-     @POST
+
+    @POST
     public Response processPayment(PaymentRequestDTO paymentRequest) {
         PaymentResponseDTO response = paymentService.processPayment(paymentRequest);
         return Response.status(Response.Status.CREATED).entity(response).build();
     }
-     @GET
+
+    @GET
     @Path("/{id}")
     public Response getPaymentById(@PathParam("id") UUID paymentId) {
         Optional<PaymentResponseDTO> response = paymentService.getPaymentById(paymentId);
@@ -43,7 +45,8 @@ public class PaymentResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
-     @DELETE
+
+    @DELETE
     @Path("/{id}")
     public Response cancelPayment(@PathParam("id") UUID paymentId) {
         boolean isCancelled = paymentService.cancelPayment(paymentId);
@@ -55,18 +58,21 @@ public class PaymentResource {
                     .build();
         }
     }
+
     @GET
     public Response getAllPayments() {
         List<PaymentResponseDTO> payments = paymentService.getAllPayments();
         return Response.ok(payments).build();
     }
-     @GET
+
+    @GET
     @Path("/by-date")
-    public List<PaymentResponseDTO> getPaymentsByDate(@QueryParam("date") String date, @QueryParam("customerId") UUID customerId) {
-        
-            LocalDateTime parsedDate = LocalDateTime.parse(date);
-            List<PaymentResponseDTO> payments = paymentService.getPaymentsByDate(parsedDate, customerId);
-            return payments ; 
-        
+    public List<PaymentResponseDTO> getPaymentsByDate(@QueryParam("date") String date,
+            @QueryParam("customerId") UUID customerId) {
+
+        LocalDateTime parsedDate = LocalDateTime.parse(date);
+        List<PaymentResponseDTO> payments = paymentService.getPaymentsByDate(parsedDate, customerId);
+        return payments;
+
     }
 }

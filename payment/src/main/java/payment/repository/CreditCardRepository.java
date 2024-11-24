@@ -9,6 +9,7 @@ public interface CreditCardRepository {
     CreditCard saveCreditCard(CreditCard creditCard);
     void deleteCreditCardById(UUID id);
     CreditCard updateCreditCard(CreditCard creditCard);
-    Optional<CreditCard> findById(UUID id);  
+    Optional<CreditCard> findById(UUID id); 
+    Optional<CreditCard> findByCustomerId(UUID customerId); 
     List<CreditCard> listCreditCards();
 }

@@ -18,6 +18,7 @@ public interface CreditCardServices {
 
     
     Optional<CreditCardResponseDTO> getCreditCardById(UUID id);
+    Optional<CreditCardResponseDTO> getCreditCardByCustomerId(UUID customerId);
 
     
     List<CreditCardResponseDTO> getAllCreditCards();

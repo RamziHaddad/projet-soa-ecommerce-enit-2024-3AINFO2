@@ -48,6 +48,6 @@ public class PaymentOutBoxRepositoryImpl implements PaymentOutBoxRepository {
     @Override
     public List<PaymentOutBox> findUnprocessedEvents() {
         return em.createQuery("SELECT p FROM PaymentOutBox p WHERE p.processed = false", PaymentOutBox.class)
-                .getResultList(); // Fetch all unprocessed events
+                .getResultList(); 
     }
 }
