@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import payment.api.clients.BankClient;
 import payment.api.clients.BankPaymentRequest;
+
 import payment.api.dto.CreditCardRequestDTO;
 import payment.api.dto.PaymentRequestDTO;
 import payment.api.dto.PaymentResponseDTO;
@@ -62,19 +63,20 @@ public class PaymentServiceImpl implements PaymentService {
         creditCardRequest.setCardCode(paymentRequest.getCardCode());
         creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
         cardServices.registerCreditCard(creditCardRequest);
-
-        // 5. Create a JSON payload for the PaymentOutBox event
-        JsonObject payload = Json.createObjectBuilder()
-                .add("paymentId", savedPayment.getPaymentId().toString())
-                .add("amount", savedPayment.getAmmount())
-                .add("cardCode", creditCardRequest.getCardCode())
-                .add("secretCode", creditCardRequest.getSecretNumber())
-                .build();
+        BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(
+            savedPayment.getPaymentId(),
+            paymentRequest.getAmount(),
+            paymentRequest.getCardNumber(),
+            paymentRequest.getCardCode()
+        );
 
         // 6. Create a PaymentOutBox entry for the Outbox pattern
         PaymentOutBox outBoxEvent = new PaymentOutBox();
         outBoxEvent.setEventType("PAYMENT_CREATED");
-        outBoxEvent.setPayload(payload.toString()); // Convert JsonObject to string
+        outBoxEvent.setPaymentId(savedPayment.getPaymentId());
+        outBoxEvent.setAmount(paymentRequest.getAmount());
+        outBoxEvent.setCardNumber(paymentRequest.getCardNumber());
+        outBoxEvent.setCardCode(paymentRequest.getCardCode());        // Convert JsonObject to string
         outBoxEvent.setProcessed(false);
 
         // 7. Save the PaymentOutBox event to the outbox table (part of the same

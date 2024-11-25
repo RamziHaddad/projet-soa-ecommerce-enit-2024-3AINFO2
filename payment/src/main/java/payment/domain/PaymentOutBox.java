@@ -8,8 +8,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-
+import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class PaymentOutBox {
@@ -19,17 +20,24 @@ public class PaymentOutBox {
     private Long id;
 
     private String eventType;
+    private UUID paymentId;
+    private BigDecimal amount;
+    private int cardNumber;
+    private int cardCode;
     
-    private String payload;
     private boolean processed;
+
 
     public PaymentOutBox() {
     }
 
-    public PaymentOutBox(Long id, String eventType, String payload, boolean processed) {
+    public PaymentOutBox(Long id, String eventType, UUID paymentId, BigDecimal amount, int cardNumber, int cardCode, boolean processed) {
         this.id = id;
         this.eventType = eventType;
-        this.payload = payload;
+        this.paymentId = paymentId;
+        this.amount = amount;
+        this.cardNumber = cardNumber;
+        this.cardCode = cardCode;
         this.processed = processed;
     }
 
@@ -49,12 +57,36 @@ public class PaymentOutBox {
         this.eventType = eventType;
     }
 
-    public String getPayload() {
-        return this.payload;
+    public UUID getPaymentId() {
+        return this.paymentId;
     }
 
-    public void setPayload(String payload) {
-        this.payload = payload;
+    public void setPaymentId(UUID paymentId) {
+        this.paymentId = paymentId;
+    }
+
+    public BigDecimal getAmount() {
+        return this.amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public int getCardNumber() {
+        return this.cardNumber;
+    }
+
+    public void setCardNumber(int cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public int getCardCode() {
+        return this.cardCode;
+    }
+
+    public void setCardCode(int cardCode) {
+        this.cardCode = cardCode;
     }
 
     public boolean isProcessed() {
@@ -79,8 +111,23 @@ public class PaymentOutBox {
         return this;
     }
 
-    public PaymentOutBox payload(String payload) {
-        setPayload(payload);
+    public PaymentOutBox paymentId(UUID paymentId) {
+        setPaymentId(paymentId);
+        return this;
+    }
+
+    public PaymentOutBox amount(BigDecimal amount) {
+        setAmount(amount);
+        return this;
+    }
+
+    public PaymentOutBox cardNumber(int cardNumber) {
+        setCardNumber(cardNumber);
+        return this;
+    }
+
+    public PaymentOutBox cardCode(int cardCode) {
+        setCardCode(cardCode);
         return this;
     }
 
@@ -97,12 +144,12 @@ public class PaymentOutBox {
             return false;
         }
         PaymentOutBox paymentOutBox = (PaymentOutBox) o;
-        return Objects.equals(id, paymentOutBox.id) && Objects.equals(eventType, paymentOutBox.eventType) && Objects.equals(payload, paymentOutBox.payload) && processed == paymentOutBox.processed;
+        return Objects.equals(id, paymentOutBox.id) && Objects.equals(eventType, paymentOutBox.eventType) && Objects.equals(paymentId, paymentOutBox.paymentId) && Objects.equals(amount, paymentOutBox.amount) && cardNumber == paymentOutBox.cardNumber && cardCode == paymentOutBox.cardCode && processed == paymentOutBox.processed;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventType, payload, processed);
+        return Objects.hash(id, eventType, paymentId, amount, cardNumber, cardCode, processed);
     }
 
     @Override
@@ -110,11 +157,13 @@ public class PaymentOutBox {
         return "{" +
             " id='" + getId() + "'" +
             ", eventType='" + getEventType() + "'" +
-            ", payload='" + getPayload() + "'" +
+            ", paymentId='" + getPaymentId() + "'" +
+            ", amount='" + getAmount() + "'" +
+            ", cardNumber='" + getCardNumber() + "'" +
+            ", cardCode='" + getCardCode() + "'" +
             ", processed='" + isProcessed() + "'" +
             "}";
     }
-
-    
+      
 
 }
