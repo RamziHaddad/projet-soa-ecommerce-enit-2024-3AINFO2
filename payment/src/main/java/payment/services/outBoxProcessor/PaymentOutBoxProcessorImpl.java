@@ -39,6 +39,7 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
 
             // 3. Update the event's processed status based on success or failure
             event.setProcessed(success);
+            System.out.println(event.toString());
             boxRepository.save(event);
         }
     }
@@ -48,8 +49,7 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
             // Step 1: Get the payload as a string
         BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(event.getPaymentId(),event.getAmount(), event.getCardNumber(),event.getCardCode()) ; 
             bankClient.makeNewPayment(bankPaymentRequest) ; 
-            System.out.println(event.toString());
-
+                
             return true ; 
         } catch (Exception e) {
             // TODO: handle exception
