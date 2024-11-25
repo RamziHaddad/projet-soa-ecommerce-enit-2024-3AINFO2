@@ -48,12 +48,12 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
             // Step 1: Get the payload as a string
         BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(event.getPaymentId(),event.getAmount(), event.getCardNumber(),event.getCardCode()) ; 
             bankClient.makeNewPayment(bankPaymentRequest) ; 
-            
+
             return true ; 
         } catch (Exception e) {
             // TODO: handle exception
             event.setProcessed(true);
-            event.setEventType("failed to do payment");
+            event.setEventType("FAILED");
             return false ; 
             
         }
