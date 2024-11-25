@@ -1,4 +1,4 @@
-package payment.services;
+package payment.services.outBoxProcessor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +15,8 @@ import jakarta.transaction.Transactional;
 import payment.api.clients.BankClient;
 import payment.api.clients.BankPaymentRequest;
 import payment.domain.PaymentOutBox;
-import payment.repository.PaymentOutBoxRepository;
+import payment.repository.outBoxRepository.PaymentOutBoxRepository;
+import payment.services.outBoxProcessor.PaymentOutBoxProcessor;
 
 @ApplicationScoped
 public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {

@@ -1,4 +1,4 @@
-package payment.services;
+package payment.services.outBoxProcessor;
 
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;

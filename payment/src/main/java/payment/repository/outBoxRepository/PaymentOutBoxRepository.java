@@ -1,4 +1,4 @@
-package payment.repository;
+package payment.repository.outBoxRepository;
 
 import payment.domain.PaymentOutBox;
 import java.util.List;

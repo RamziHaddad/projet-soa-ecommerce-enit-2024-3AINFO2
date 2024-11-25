@@ -22,8 +22,8 @@ import payment.api.dto.PaymentResponseDTO;
 import payment.domain.Payment;
 import payment.domain.PaymentOutBox;
 import payment.domain.objectValues.PaymentStatus;
-import payment.repository.PaymentOutBoxRepository;
 import payment.repository.PaymentRepository;
+import payment.repository.outBoxRepository.PaymentOutBoxRepository;
 import payment.services.mappers.PaymentMapper;
 
 @ApplicationScoped

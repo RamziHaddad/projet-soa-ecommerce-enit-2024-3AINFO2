@@ -1,4 +1,4 @@
-package payment.repository;
+package payment.repository.outBoxRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
