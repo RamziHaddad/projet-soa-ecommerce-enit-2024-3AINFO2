@@ -87,7 +87,7 @@ jobs:
             sleep 5
 
             echo "Starting Java service..."
-            nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > ~/service-catalog/app.log 2>&1 &
+            java -jar ~/service-catalog/service-catalog.jar --server.port=8082
 
             echo "Waiting for service to initialize..."
             sleep 10
