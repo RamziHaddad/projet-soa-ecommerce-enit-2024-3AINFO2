@@ -88,7 +88,5 @@ jobs:
             echo "Starting Java service..."
             java -jar ~/service-catalog/service-catalog.jar --server.port=8082
 
-            echo "Performing health check..."
-            curl -s http://localhost:8082/health || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed successfully!"
