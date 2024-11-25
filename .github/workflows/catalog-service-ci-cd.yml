@@ -81,7 +81,7 @@ jobs:
           script: |
 
             echo "Stopping any running instance of the Java service..."
-            pkill -f 'java.*service-catalog.jar' || echo "No existing service to stop."
+            sudo pkill -f 'java.*service-catalog.jar' || echo "No existing service to stop."
 
             sleep 5
 
