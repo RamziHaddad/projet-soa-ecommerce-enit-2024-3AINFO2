@@ -79,10 +79,7 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
+           echo "Starting Java service..."
+           nohup java -jar ~/service-catalog/service-catalog.jar --server.port=8082 > service-catalog.log 2>&1 &
+           echo "Service deployed successfully!"
 
-
-            echo "Starting Java service..."
-            java -jar ~/service-catalog/service-catalog.jar --server.port=8082
-
-
-            echo "Service deployed successfully!"
