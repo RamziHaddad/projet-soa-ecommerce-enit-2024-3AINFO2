@@ -12,4 +12,5 @@ public interface PaymentRepository {
     public Boolean deletePayment (UUID id); 
     public List<Payment> findAll ();
     public List<Payment> findByDate (LocalDateTime date , UUID id ); 
+    
 }

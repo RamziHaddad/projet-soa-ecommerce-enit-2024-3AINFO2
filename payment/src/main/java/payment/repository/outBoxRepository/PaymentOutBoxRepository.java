@@ -1,5 +1,6 @@
 package payment.repository.outBoxRepository;
 
+import payment.domain.Payment;
 import payment.domain.PaymentOutBox;
 import java.util.List;
 
@@ -16,4 +17,7 @@ public interface PaymentOutBoxRepository {
     void deleteById(Long id);
 
     List<PaymentOutBox> findUnprocessedEvents();
+    List<PaymentOutBox> findCompletedEvents() ; 
+    List<Payment> findCompletedPayments() ; 
+    List<Payment> findFailedPayments() ; 
 }

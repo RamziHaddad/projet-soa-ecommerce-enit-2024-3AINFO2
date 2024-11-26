@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import payment.domain.objectValues.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -18,26 +19,25 @@ public class PaymentOutBox {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String eventType;
     private UUID paymentId;
     private BigDecimal amount;
     private int cardNumber;
     private int cardCode;
-    
+    private PaymentStatus paymentStatus ; 
     private boolean processed;
-
 
     public PaymentOutBox() {
     }
 
-    public PaymentOutBox(Long id, String eventType, UUID paymentId, BigDecimal amount, int cardNumber, int cardCode, boolean processed) {
+    public PaymentOutBox(Long id, String eventType, UUID paymentId, BigDecimal amount, int cardNumber, int cardCode, PaymentStatus paymentStatus, boolean processed) {
         this.id = id;
         this.eventType = eventType;
         this.paymentId = paymentId;
         this.amount = amount;
         this.cardNumber = cardNumber;
         this.cardCode = cardCode;
+        this.paymentStatus = paymentStatus;
         this.processed = processed;
     }
 
@@ -89,6 +89,14 @@ public class PaymentOutBox {
         this.cardCode = cardCode;
     }
 
+    public PaymentStatus getPaymentStatus() {
+        return this.paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     public boolean isProcessed() {
         return this.processed;
     }
@@ -131,6 +139,11 @@ public class PaymentOutBox {
         return this;
     }
 
+    public PaymentOutBox paymentStatus(PaymentStatus paymentStatus) {
+        setPaymentStatus(paymentStatus);
+        return this;
+    }
+
     public PaymentOutBox processed(boolean processed) {
         setProcessed(processed);
         return this;
@@ -144,12 +157,12 @@ public class PaymentOutBox {
             return false;
         }
         PaymentOutBox paymentOutBox = (PaymentOutBox) o;
-        return Objects.equals(id, paymentOutBox.id) && Objects.equals(eventType, paymentOutBox.eventType) && Objects.equals(paymentId, paymentOutBox.paymentId) && Objects.equals(amount, paymentOutBox.amount) && cardNumber == paymentOutBox.cardNumber && cardCode == paymentOutBox.cardCode && processed == paymentOutBox.processed;
+        return Objects.equals(id, paymentOutBox.id) && Objects.equals(eventType, paymentOutBox.eventType) && Objects.equals(paymentId, paymentOutBox.paymentId) && Objects.equals(amount, paymentOutBox.amount) && cardNumber == paymentOutBox.cardNumber && cardCode == paymentOutBox.cardCode && Objects.equals(paymentStatus, paymentOutBox.paymentStatus) && processed == paymentOutBox.processed;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventType, paymentId, amount, cardNumber, cardCode, processed);
+        return Objects.hash(id, eventType, paymentId, amount, cardNumber, cardCode, paymentStatus, processed);
     }
 
     @Override
@@ -161,9 +174,10 @@ public class PaymentOutBox {
             ", amount='" + getAmount() + "'" +
             ", cardNumber='" + getCardNumber() + "'" +
             ", cardCode='" + getCardCode() + "'" +
+            ", paymentStatus='" + getPaymentStatus() + "'" +
             ", processed='" + isProcessed() + "'" +
             "}";
     }
-      
+    
 
 }

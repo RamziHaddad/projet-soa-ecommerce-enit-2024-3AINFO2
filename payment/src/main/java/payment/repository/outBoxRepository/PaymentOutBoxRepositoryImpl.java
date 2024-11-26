@@ -4,7 +4,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import payment.domain.Payment;
 import payment.domain.PaymentOutBox;
+import payment.domain.objectValues.PaymentStatus;
 
 import java.util.List;
 
@@ -49,5 +51,32 @@ public class PaymentOutBoxRepositoryImpl implements PaymentOutBoxRepository {
     public List<PaymentOutBox> findUnprocessedEvents() {
         return em.createQuery("SELECT p FROM PaymentOutBox p WHERE p.processed = false", PaymentOutBox.class)
                 .getResultList(); 
+    }
+
+    @Override
+    public List<PaymentOutBox> findCompletedEvents() {
+        return em.createQuery("SELECT p FROM PaymentOutBox p WHERE p.processed = true", PaymentOutBox.class)
+                .getResultList();
+    }
+
+    @Override
+    public List<Payment> findCompletedPayments() {
+
+       return em.createQuery(
+            "SELECT p FROM Payment p WHERE p.paymentId IN " +
+            "(SELECT po.paymentId FROM PaymentOutBox po WHERE po.paymentStatus = :status AND po.processed = true)", 
+            Payment.class)
+            .setParameter("status", PaymentStatus.COMPLETED)
+            .getResultList();
+    }
+
+    @Override
+    public List<Payment> findFailedPayments() {
+        return em.createQuery(
+            "SELECT p FROM Payment p WHERE p.paymentId IN " +
+            "(SELECT po.paymentId FROM PaymentOutBox po WHERE po.paymentStatus = :status AND po.processed = true)", 
+            Payment.class)
+            .setParameter("status", PaymentStatus.FAILED)
+            .getResultList();
     }
 }
