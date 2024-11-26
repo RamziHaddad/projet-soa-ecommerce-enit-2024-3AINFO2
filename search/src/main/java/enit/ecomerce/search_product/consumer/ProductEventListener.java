@@ -6,6 +6,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import enit.ecomerce.search_product.emitter.EventsEmitter;
 import enit.ecomerce.search_product.product.Product;
 import enit.ecomerce.search_product.service.ProductService;
 
@@ -24,11 +25,8 @@ public class ProductEventListener {
 
     @Autowired
     private ProductService productService;
-
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private EventsEmitter eventsEmitter;
 
     @KafkaListener(topics = "products-created", containerFactory = "kafkaListenerContainerFactory", groupId = "my-consumer-group")
        public void handleProductListedEvent(ConsumerRecord<String, Object> record) {
@@ -44,8 +42,7 @@ public class ProductEventListener {
         logger.info("Product indexed successfully: {}", productToAdd);
     } catch (Exception e) {
         logger.error("Error processing event from topic 'products-created': {}", e.getMessage(), e);
-        // Send to Dead Letter Topic
-        sendToDeadLetterTopic("products-created", record, e.getMessage());
+        eventsEmitter.sendToDeadLetterTopic("products-created", record, e.getMessage());
     }
 }
 
@@ -67,33 +64,11 @@ public class ProductEventListener {
             logger.error("Error processing event from topic 'products-updated': {}", e.getMessage(), e);
 
           
-            sendToDeadLetterTopic("products-updated", record, e.getMessage());
+            eventsEmitter.sendToDeadLetterTopic("products-updated", record, e.getMessage());
         }
     }
 
-    private void sendToDeadLetterTopic(String sourceTopic, ConsumerRecord<String, Object> record, String errorMessage) {
-        String deadLetterTopic = "dead-letter-topic";
-
-        try {
-            Map<String, Object> deadLetterEvent = new HashMap<>();
-            deadLetterEvent.put("sourceTopic", sourceTopic);
-            deadLetterEvent.put("partition", record.partition());
-            deadLetterEvent.put("offset", record.offset());
-            deadLetterEvent.put("key", record.key());
-            deadLetterEvent.put("value", record.value());
-            deadLetterEvent.put("error", errorMessage);
-
-            // Convert to JSON
-            String deadLetterJson = objectMapper.writeValueAsString(deadLetterEvent);
-
-            // Send to Dead Letter Topic
-            kafkaTemplate.send(deadLetterTopic, record.key(), deadLetterJson);
-            logger.info("Malformed event sent to Dead Letter Topic: {}", deadLetterJson);
-
-        } catch (Exception e) {
-            logger.error("Failed to send malformed event to Dead Letter Topic: {}", e.getMessage(), e);
-        }
-    }
+    
 
     @KafkaListener(topics = "products-created", containerFactory = "kafkaListenerContainerFactory")
     public void handleProductCreatedEvent(String key, ProductListed value) {
