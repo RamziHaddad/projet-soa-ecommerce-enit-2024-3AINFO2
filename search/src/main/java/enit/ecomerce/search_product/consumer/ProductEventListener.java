@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import enit.ecomerce.search_product.emitter.EventsEmitter;
 import enit.ecomerce.search_product.product.Product;
+import enit.ecomerce.search_product.product.ProductEntity;
+import enit.ecomerce.search_product.repository.ProducteEntityRepository;
 import enit.ecomerce.search_product.service.ProductService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +28,9 @@ public class ProductEventListener {
     @Autowired
     private ProductService productService;
     @Autowired
-    private EventsEmitter eventsEmitter;
+    private EventsEmitter eventsEmitter; 
+    @Autowired 
+    private ProducteEntityRepository producteEntityRepository;  
 
     @KafkaListener(topics = "products-created", containerFactory = "kafkaListenerContainerFactory", groupId = "my-consumer-group")
        public void handleProductListedEvent(ConsumerRecord<String, Object> record) {
@@ -35,12 +39,23 @@ public class ProductEventListener {
         if (record.value() == null || !(record.value() instanceof ProductListed)) {
             throw new IllegalArgumentException("Invalid or malformed event: " + record.value());
         }
-
+        
         ProductListed event = (ProductListed) record.value();
+        if(this.producteEntityRepository.findById(event.aggregateId)!=null){return;} //we already treated the indexation no need to recreate 
+
         Product productToAdd = new Product(event);
         productService.createProduct(productToAdd);
         logger.info("Product indexed successfully: {}", productToAdd);
-    } catch (Exception e) {
+        this.producteEntityRepository.save(new ProductEntity(event,true));
+    } catch (Exception e) {   // this  takes care of all types of exceptions, should all exceptions 
+                                //be sent to the deadletter topic or should we partition them . 
+                                // for example if the data base is not connected the erreur will just be sent into 
+                                //the dead topic , but we can just treat it withtin an inbox pattern 
+                                //maybe we subcribe our selves to the dead letter and treat the exceptions ourselves but oer people could send 
+                                //events into this topic ..... maybe we send  to the dead leter only if the erreur is caused 
+                                //by sender. 
+        ProductListed event = (ProductListed) record.value();
+        this.producteEntityRepository.save(new ProductEntity(event,false)); //if the message is malformed , the inbox value can never be treated.
         logger.error("Error processing event from topic 'products-created': {}", e.getMessage(), e);
         eventsEmitter.sendToDeadLetterTopic("products-created", record, e.getMessage());
     }
@@ -60,7 +75,7 @@ public class ProductEventListener {
             productService.updateProduct(productToUpdate.getId(), productToUpdate);
             logger.info("Product updated successfully: {}", productToUpdate);
 
-        } catch (Exception e) {
+        } catch (Exception e) {  
             logger.error("Error processing event from topic 'products-updated': {}", e.getMessage(), e);
 
           

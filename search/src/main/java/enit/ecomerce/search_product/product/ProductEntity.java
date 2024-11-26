@@ -1,46 +1,52 @@
 package enit.ecomerce.search_product.product;
+import jakarta.persistence.Id;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import enit.ecomerce.search_product.consumer.ProductListed;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 //the reason to have 2 producst is that this one is specialy for a postre data base 
 //in order ti implmeent the inbox, class product is mapped to elastic saerch 
 //we cant map one class to 2 data bases
-@Document(indexName = "product")
-public class Product {
+ 
+ @Entity
+ @Table(name = "inbox")
+public class ProductEntity {
 
     @Id
     private String id;
 
-    @Field(type = FieldType.Text)   
+   
     private String name;
 
-  
-
-    @Field(type = FieldType.Text)  
     private String description;
 
-    @Field(type = FieldType.Float)   
     private Float price;
 
-    @Field(type = FieldType.Text)   
     private String category; 
+ 
+    private boolean isIndex;
+    public boolean isIndex() {
+        return isIndex;
+    }
 
-    public Product( ) { 
+
+
+    public void setisIndex(boolean isIndex){
+        this.isIndex=isIndex;
+    }
+    public ProductEntity( ) { 
        
     }
 
-    // Constructor for transforming ProductListeddata into a Product entity.
-    // This constructor is not part of the Elasticsearch mapping.
-    public Product(ProductListed productListed) {
+        public ProductEntity(ProductListed productListed,boolean isIndexed) {
         this.id = productListed.getAggregateID();
         this.name = productListed.getProductName();
         this.description = productListed.getDescription();
         this.price = (float) productListed.getPrice();  
         this.category = productListed.getCategoryName();
+        this.isIndex = isIndexed;  
     }
 
 
@@ -91,5 +97,12 @@ public class Product {
                 + getClass() + ", getDescription()=" + getDescription() + ", getPrice()=" + getPrice()
                 + ", getCategory()=" + getCategory() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
                 + "]";
+    }
+
+
+
+
+    public void setIndex(boolean isIndex) {
+        this.isIndex = isIndex;
     }
 }
