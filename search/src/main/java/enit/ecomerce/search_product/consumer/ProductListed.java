@@ -1,5 +1,4 @@
 package enit.ecomerce.search_product.consumer;
-import java.util.UUID;
 
 import enit.ecomerce.search_product.product.Product;
 

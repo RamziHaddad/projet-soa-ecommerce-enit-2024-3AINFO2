@@ -3,11 +3,13 @@ package enit.ecomerce.search_product.consumer;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 public abstract class Event {
-    protected UUID eventId ;
-    protected String eventType;
-    protected String aggregateType;
-    protected String aggregateId;
+
+    protected UUID eventId ; 
+    protected String eventType;  //deleted ,updated,..
+    protected String aggregateType;  //product 
+    protected String aggregateId;//productID 
     protected LocalDateTime createdAt = LocalDateTime.now();
     public Event(){};
     public Event(String eventType, String aggregateType, String aggregateId) {
