@@ -68,11 +68,9 @@ public class ProductResource {
     }
 
     @PUT
-    @Path("/{id}")
     @Operation(summary = "Update a product", description = "Updates an existing product.")
-    public Response updateProduct(@PathParam("id") UUID id, Product product) {
+    public Response updateProduct(Product product) throws EntityNotFoundException{
         try {
-            product.setId(id);
             Product updatedProduct = productService.updateProduct(product);
             return Response.ok(updatedProduct).build();
         } catch (EntityNotFoundException e) {
