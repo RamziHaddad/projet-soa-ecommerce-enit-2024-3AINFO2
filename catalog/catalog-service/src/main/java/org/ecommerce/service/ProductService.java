@@ -15,8 +15,8 @@ import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductCategoryRepository;
 import org.ecommerce.repository.ProductRepository;
 
-import io.quarkus.scheduler.Scheduled;
-import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
+//import io.quarkus.scheduler.Scheduled;
+//import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -59,27 +59,27 @@ public class ProductService {
         return productRepo.insert(product);
     }
 
-    @Scheduled(every = "12h", concurrentExecution = ConcurrentExecution.SKIP)
-    public void checkPriceUpdates(){
-        int page = 0;
-        int maxResults = 10; // Adjust the range as needed
-        List<Product> products;
-        do {
-            products = findByRange(page, maxResults);
-            products.forEach(product -> {
-                double newPrice = pricingService.getProductPrice(product.getId());
-                if (product.getShownPrice() != newPrice) {
-                    product.setShownPrice(newPrice);
-                    try {
-                        productRepo.update(product);
-                    } catch (EntityNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            page++;
-        } while (!products.isEmpty());
-    }
+    // @Scheduled(every = "12h", concurrentExecution = ConcurrentExecution.SKIP)
+    // public void checkPriceUpdates(){
+    //     int page = 0;
+    //     int maxResults = 10; // Adjust the range as needed
+    //     List<Product> products;
+    //     do {
+    //         products = findByRange(page, maxResults);
+    //         products.forEach(product -> {
+    //             double newPrice = pricingService.getProductPrice(product.getId());
+    //             if (product.getShownPrice() != newPrice) {
+    //                 product.setShownPrice(newPrice);
+    //                 try {
+    //                     productRepo.update(product);
+    //                 } catch (EntityNotFoundException e) {
+    //                     e.printStackTrace();
+    //                 }
+    //             }
+    //         });
+    //         page++;
+    //     } while (!products.isEmpty());
+    // }
 
     public Product updateProduct(Product product) throws EntityNotFoundException {
         return productRepo.update(product);      
