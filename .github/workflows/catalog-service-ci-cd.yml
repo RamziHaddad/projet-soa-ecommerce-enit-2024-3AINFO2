@@ -93,3 +93,5 @@ jobs:
             curl -X 'GET'   'http://localhost:8082/products'   -H 'accept: /' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed successfully!"
+            
+            tail -n 50 ~/service-catalog/service-catalog.log
