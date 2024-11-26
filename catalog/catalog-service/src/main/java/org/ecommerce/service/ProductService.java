@@ -1,5 +1,6 @@
 package org.ecommerce.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,6 @@ import org.ecommerce.domain.events.Event;
 import org.ecommerce.domain.events.ProductListed;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
-import org.ecommerce.repository.ProductCategoryRepository;
 import org.ecommerce.repository.ProductRepository;
 
 //import io.quarkus.scheduler.Scheduled;
@@ -26,7 +26,7 @@ public class ProductService {
     @Inject
     ProductRepository productRepo;
     @Inject
-    ProductCategoryRepository categoryRepo;
+    ProductCategoryService categoryService;
     @RestClient
     PricingService pricingService;
     @Inject
@@ -46,12 +46,16 @@ public class ProductService {
     }
 
     public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
+        product.setId(UUID.randomUUID());
+
         //waiting for pricing 
         //product.setBasePrice(pricingService.getProductPrice(product.getId()));
-        product.setId(UUID.randomUUID());
-        product.setBasePrice(1200);
+        BigDecimal temp = new BigDecimal("10506");
+        product.setBasePrice(temp);
         product.setShownPrice(product.getBasePrice());
-        ProductCategory category = categoryRepo.findByName(categoryName);
+        /// temporary for testing 
+        
+        ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
         ProductListed productListed = new ProductListed(product);
         productsEmitter.send(productListed);
@@ -67,7 +71,7 @@ public class ProductService {
     //     do {
     //         products = findByRange(page, maxResults);
     //         products.forEach(product -> {
-    //             double newPrice = pricingService.getProductPrice(product.getId());
+    //             BigDecimal newPrice = pricingService.getProductPrice(product.getId());
     //             if (product.getShownPrice() != newPrice) {
     //                 product.setShownPrice(newPrice);
     //                 try {

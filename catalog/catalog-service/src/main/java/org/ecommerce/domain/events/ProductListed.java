@@ -1,12 +1,14 @@
 package org.ecommerce.domain.events;
 
+import java.math.BigDecimal;
+
 import org.ecommerce.domain.Product;
 
 public class ProductListed extends Event {
     private final String productName;
     private final String categoryName;
     private final String description;
-    private final double price;
+    private final BigDecimal price;
 
     public ProductListed(Product product) {
         super("productListed", "Product", product.getId().toString());
@@ -28,7 +30,7 @@ public class ProductListed extends Event {
         return description;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 }

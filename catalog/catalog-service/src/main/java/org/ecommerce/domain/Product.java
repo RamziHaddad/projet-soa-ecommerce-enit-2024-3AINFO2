@@ -1,5 +1,6 @@
 package org.ecommerce.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,15 +22,15 @@ public class Product {
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private ProductCategory category;
-    private double basePrice;
-    private double shownPrice = basePrice;
-    private boolean disponibility;
+    private BigDecimal basePrice;
+    private BigDecimal shownPrice = basePrice;
+    private boolean disponibility=false;
 
     public Product() {
     }
 
     public Product(String productName, String description, LocalDateTime createdAt, ProductCategory category,
-                   double basePrice, double shownPrice, boolean disponibility) {
+                   BigDecimal basePrice, BigDecimal shownPrice, boolean disponibility) {
         this.productName = productName;
         this.description = description;
         this.createdAt = createdAt;
@@ -40,7 +41,7 @@ public class Product {
     }
 
     public Product(UUID id, String productName, String description, LocalDateTime createdAt, ProductCategory category,
-                   double basePrice, double shownPrice, boolean disponibility) {
+                   BigDecimal basePrice, BigDecimal shownPrice, boolean disponibility) {
         this.id = id;
         this.productName = productName;
         this.description = description;
@@ -91,19 +92,19 @@ public class Product {
         this.category = category;
     }
 
-    public double getBasePrice() {
+    public BigDecimal getBasePrice() {
         return basePrice;
     }
 
-    public void setBasePrice(double basePrice) {
+    public void setBasePrice(BigDecimal basePrice) {
         this.basePrice = basePrice;
     }
 
-    public double getShownPrice() {
+    public BigDecimal getShownPrice() {
         return shownPrice;
     }
 
-    public void setShownPrice(double shownPrice) {
+    public void setShownPrice(BigDecimal shownPrice) {
         this.shownPrice = shownPrice;
     }
 
@@ -124,11 +125,6 @@ public class Product {
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
         result = prime * result + ((category == null) ? 0 : category.hashCode());
-        long temp;
-        temp = Double.doubleToLongBits(basePrice);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
-        temp = Double.doubleToLongBits(shownPrice);
-        result = prime * result + (int) (temp ^ (temp >>> 32));
         result = prime * result + (disponibility ? 1231 : 1237);
         return result;
     }
@@ -167,9 +163,9 @@ public class Product {
                 return false;
         } else if (!category.equals(other.category))
             return false;
-        if (Double.doubleToLongBits(basePrice) != Double.doubleToLongBits(other.basePrice))
+        if (basePrice != other.basePrice)
             return false;
-        if (Double.doubleToLongBits(shownPrice) != Double.doubleToLongBits(other.shownPrice))
+        if (shownPrice != other.shownPrice)
             return false;
         if (disponibility != other.disponibility)
             return false;
