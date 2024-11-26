@@ -7,10 +7,9 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.ecommerce.domain.Product;
 import org.ecommerce.domain.ProductCategory;
 import org.ecommerce.dto.InventoryEvent;
+import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
-import org.ecommerce.repository.ProductCategoryRepository;
 import org.ecommerce.repository.ProductRepository;
-
 import java.util.UUID;
 
 @ApplicationScoped
@@ -20,7 +19,7 @@ public class KafkaProductConsumer {
     ProductService productService;
 
     @Inject
-    ProductCategoryRepository categoryRepo;
+    ProductCategoryService categoryService;
 
     @Inject
     ProductRepository productRepo;
@@ -56,13 +55,11 @@ public class KafkaProductConsumer {
             ProductCategory category = getOrCreateCategory(event.getCategory());
             Product product = new Product(
                     UUID.fromString(event.getProductId()),
-                    event.getDescription(),
+                    event.getName(),
                     event.getDescription(),
                     java.time.LocalDateTime.now(),
                     category,
-                    event.getBasePrice(),
-                    event.getBasePrice(),
-                    event.isDisponibility()
+                    null, null, event.isDisponibility()
             );
             productService.add(product, event.getCategory());
         } catch (Exception e) {
@@ -76,7 +73,6 @@ public class KafkaProductConsumer {
             Product product = productRepo.findById(UUID.fromString(event.getProductId()));
             if (product != null) {
                 product.setDescription(event.getDescription());
-                product.setBasePrice(event.getBasePrice());
                 product.setDisponibility(event.isDisponibility());
                 ProductCategory category = getOrCreateCategory(event.getCategory());
                 product.setCategory(category);
@@ -100,12 +96,16 @@ public class KafkaProductConsumer {
     }
 
     private ProductCategory getOrCreateCategory(String categoryName) {
-        ProductCategory category = null;
+        ProductCategory category = new ProductCategory();
         try {
-            category = categoryRepo.findByName(categoryName);
+            category = categoryService.getCategoryByName(categoryName);
         } catch (EntityNotFoundException e) {
-            category = new ProductCategory(UUID.randomUUID(), categoryName);
-            categoryRepo.insert(category);
+            category.setCategoryName(categoryName);
+            try {
+                categoryService.addCategory(category);
+            } catch (EntityAlreadyExistsException e1) {
+                e1.printStackTrace();
+            }
         }
         return category;
     }
