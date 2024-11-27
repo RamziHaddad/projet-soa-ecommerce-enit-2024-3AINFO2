@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -23,10 +24,10 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "idCart")
-    private Long idCart;  // Updated to idCart
+    private UUID idCart;  // Updated to idCart
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch type
     @JoinColumn(name = "id") // Foreign key in the Item table

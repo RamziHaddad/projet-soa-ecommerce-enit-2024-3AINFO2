@@ -5,22 +5,12 @@ import com.microservices.order_service.model.Item;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record OrderRequest(
-        Long idCart,                        // Cart ID
+        UUID id,         // Cart ID
         List<Item> items,            // List of items (nested record for items)
-        String orderStatus,                 // Order status
-        BigDecimal price,                   // Total price
-        Long idClient,                      // Client ID
-        Integer quantity,                   // Total quantity
-        String orderNumber,                 // Order number
-        Boolean paymentVerification,        // Payment verification status
-        Boolean priceVerification,          // Price verification status
-        Boolean deliveryVerification,       // Delivery verification status
-        Boolean stockVerification,          // Stock verification status
-        LocalDateTime sentToShipmentAt,     // Shipment sent timestamp
-        LocalDateTime receivedAt,           // Order received timestamp
-        String coupon                       // Coupon code
+        String orderStatus                   // jj
 ) {
 }
 

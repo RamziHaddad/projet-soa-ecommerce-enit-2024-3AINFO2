@@ -21,73 +21,37 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository; // For fetching associated Client
 
-    public void placeOrder(OrderRequest orderRequest) {
+    public void placeOrder(Order order) {
         // Map OrderRequest to Order object
-        Order order = new Order();
-        order.setOrderNumber(UUID.randomUUID().toString()); // Generate unique order number
-        order.setPrice(orderRequest.price());
-        order.setQuantity(orderRequest.quantity());
-        order.setOrderStatus(orderRequest.orderStatus());
-        order.setCoupon(orderRequest.coupon());
-        order.setSentToShipmentAt(orderRequest.sentToShipmentAt());
-        order.setReceivedAt(orderRequest.receivedAt());
-        order.setPaymentVerification(orderRequest.paymentVerification());
-        order.setPriceVerification(orderRequest.priceVerification());
-        order.setDeliveryVerification(orderRequest.deliveryVerification());
-        order.setStockVerification(orderRequest.stockVerification());
 
         // Set Client from idClient in OrderRequest
-        Client client = clientRepository.findById(orderRequest.idClient())
-                .orElseThrow(() -> new RuntimeException("Client not found"));
-        order.setClient(client);
-
-
-        // Map items from OrderRequest
-        List<Item> items = orderRequest.items().stream().map(itemRequest -> {
-            Item item = new Item();
-            item.setId(itemRequest.getId());
-            item.setPrice(itemRequest.getPrice());
-            item.setQuantity(itemRequest.getQuantity());
-            return item;
-        }).toList();
-        order.setItems(items);
-
         // Save order to the database
         orderRepository.save(order);
     }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(UUID id) {
         orderRepository.deleteById(id);
     }
 
-    public void updateOrder(Long id, OrderRequest orderRequest) {
+    public void updateOrder(UUID id, Order orderToUpdate) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         // Update fields from OrderRequest
-        order.setPrice(orderRequest.price());
-        order.setQuantity(orderRequest.quantity());
-        order.setOrderStatus(orderRequest.orderStatus());
-        order.setCoupon(orderRequest.coupon());
-        order.setSentToShipmentAt(orderRequest.sentToShipmentAt());
-        order.setReceivedAt(orderRequest.receivedAt());
-        order.setPaymentVerification(orderRequest.paymentVerification());
-        order.setPriceVerification(orderRequest.priceVerification());
-        order.setDeliveryVerification(orderRequest.deliveryVerification());
-        order.setStockVerification(orderRequest.stockVerification());
-
-        // Update items
-        List<Item> items = orderRequest.items().stream().map(itemRequest -> {
-            Item item = new Item();
-            item.setId(itemRequest.getId());
-            item.setPrice(itemRequest.getPrice());
-            item.setQuantity(itemRequest.getQuantity());
-            return item;
-        }).toList();
-        order.setItems(items);
+        order.setPrice(orderToUpdate.getPrice());
+        order.setQuantity(orderToUpdate.getQuantity());
+        order.setOrderStatus(orderToUpdate.getOrderStatus());
+        order.setCoupon(orderToUpdate.getCoupon());
+        order.setSentToShipmentAt(orderToUpdate.getSentToShipmentAt());
+        order.setReceivedAt(orderToUpdate.getReceivedAt());
+        order.setPaymentVerification(orderToUpdate.getPaymentVerification());
+        order.setPriceVerification(orderToUpdate.getPriceVerification());
+        order.setDeliveryVerification(orderToUpdate.getDeliveryVerification());
+        order.setStockVerification(orderToUpdate.getStockVerification());
+        order.setItems(orderToUpdate.getItems());
 
         // Update Client
-        Client client = clientRepository.findById(orderRequest.idClient())
+        Client client = clientRepository.findById(orderToUpdate.getClient().getIdClient())
                 .orElseThrow(() -> new RuntimeException("Client not found"));
         order.setClient(client);
 
@@ -95,7 +59,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public Order getOrderById(Long id) {
+    public Order getOrderById(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }

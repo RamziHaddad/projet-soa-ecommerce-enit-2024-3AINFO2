@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "items")
 @Getter
@@ -16,13 +18,10 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "quantity")
     private int quantity;
-
-    @Column(name = "price")
-    private double price;
 
     // Override equals() method to compare items based on their attributes
     @Override
@@ -30,8 +29,8 @@ public class Item {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return quantity == item.quantity &&
-                Double.compare(item.price, price) == 0 &&
+        return quantity == item.quantity
+                 &&
                 id.equals(item.id);
     }
 }
