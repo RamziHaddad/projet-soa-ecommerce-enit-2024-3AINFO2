@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: db_order         # Database name
       POSTGRES_USER: postgres        # Username for PostgreSQL
-      POSTGRES_PASSWORD: fadizoe1212    # Password for PostgreSQL
+      POSTGRES_PASSWORD: nebras2001    # Password for PostgreSQL
       PGDATA: /var/lib/postgresql/data # Location to store database data
     ports:
       - "5433:5432"                  # Map PostgreSQL default port 5432 to host's 5437

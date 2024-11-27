@@ -46,8 +46,12 @@ public class OrderController {
         Map<String, Object> response = inventoryService.checkOrderAvailability(availabilityCheckDTO);
 
         if ("ok".equals(response.get("status"))) {
+            Order order = orderService.getOrderById(availabilityCheckDTO.getOrderId());
+            order.setStockVerification(true);
+            orderService.updateOrder(availabilityCheckDTO.getOrderId(), order);
             return ResponseEntity.ok(Map.of("message", "Order placed successfully"));
         } else {
+            // we have to communicate with cart microservice
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Some items are out of stock", "details", response));
         }
