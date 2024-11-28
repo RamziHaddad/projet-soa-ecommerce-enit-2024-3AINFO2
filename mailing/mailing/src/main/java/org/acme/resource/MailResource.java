@@ -42,7 +42,7 @@ public class MailResource {
         }
     }
 
-    // Endpoint to fetch an email template by ID
+    // End point to fetch an email template by ID
     @GET
     @Path("/templates/{id}")
     public Response getTemplate(@PathParam("id") String templateId) {
