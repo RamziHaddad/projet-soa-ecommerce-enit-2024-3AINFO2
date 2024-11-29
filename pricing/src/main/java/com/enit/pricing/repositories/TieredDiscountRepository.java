@@ -19,26 +19,24 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface TieredDiscountRepository  extends JpaRepository<TieredPromotion, UUID>  {
 
-   // @Query("SELECT p.thresholdAmount from  TieredDiscount p where ( currDate >= p.startDate AND currDate <= p.endDate) ")
-    @Query("SELECT p FROM TieredDiscount p "+
-    "WHERE  p.startDate <= CURRENT_DATE "  + 
-     "AND p.endDate >= CURRENT_DATE " 
-    )
-    Optional<TieredPromotion> getCurrentDiscount();
+@Query("SELECT p FROM TieredPromotion p " +
+       "WHERE p.startDate <= CURRENT_DATE " + 
+       "AND p.endDate >= CURRENT_DATE")
+    Optional<TieredPromotion> getCurrentTieredDiscount();
 
     // delete expired discounts
     @Modifying
     @Transactional
-    @Query("DELETE FROM TieredDiscount t " +
+    @Query("DELETE FROM TieredPromotion t " +
            "WHERE t.endDate < CURRENT_DATE")
     void deleteExpiredDiscounts();
 
     // modify reduction percentage
     @Modifying
     @Transactional
-    @Query("UPDATE TieredDiscount t " +
+    @Query("UPDATE TieredPromotion t " +
            "SET t.reductionPercentage = :newPercentage " +
-           "WHERE t.tieredDiscountId = :promotionId")
+           "WHERE t.promotionId = :promotionId")
     void updateReductionPercentage(@Param("promotionId") UUID promotionId, @Param("newPercentage") BigDecimal newPercentage
     );
 

@@ -18,7 +18,7 @@ public class TieredDsicountService {
     }
     //gets the current discount
     TieredPromotion getCurrentDiscountThresold(){
-        Optional<TieredPromotion> discount =tieredDiscountRepository.getCurrentDiscount();
+        Optional<TieredPromotion> discount =tieredDiscountRepository.getCurrentTieredDiscount();
         return discount.orElse(null);
     }
     

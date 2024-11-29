@@ -1,13 +1,17 @@
-package com.enit.pricing.InventoryEvent;
+package com.enit.pricing.InventoryKafkaEvent.dto;
 
 import java.util.UUID;
 
 public class InventoryEvent {
 
-        private UUID productId;
+    private int productId;
     private String category;
+
+    public InventoryEvent() {
+    }
+
     
-    public InventoryEvent(UUID productId, String category) {
+    public InventoryEvent(int productId, String category) {
         this.productId = productId;
         this.category = category;
     }
@@ -20,12 +24,16 @@ public class InventoryEvent {
         this.category = category;
     }
 
-        public UUID getProductId() {
+        public int getProductId() {
         return productId;
     }
 
-    public void setProductId(UUID productId) {
+    public void setProductId(int productId) {
         this.productId = productId;
+    }
+        @Override
+    public String toString() {
+        return "InventoryEvent [productId=" + productId + ", category=" + category + "]";
     }
 
 

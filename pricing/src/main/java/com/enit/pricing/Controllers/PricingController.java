@@ -43,9 +43,9 @@ public class PricingController {
 
     // Calculate the cart total
     @PostMapping("/cart-total")
-    public ResponseEntity <CartResponse> calculateCartTotal(@RequestBody List<CartItem> prodId) {
-        BigDecimal totalBefore= pricingService.calculateCartTotal(prodId);
-        BigDecimal total=pricingService.calculateCartTotalFinal(prodId);
+    public ResponseEntity <CartResponse> calculateCartTotal(@RequestBody List<CartItem> cartItems) {
+        BigDecimal totalBefore= pricingService.calculateCartTotal(cartItems);
+        BigDecimal total=pricingService.calculateCartTotalFinal(cartItems);
         CartResponse cartResponse = new CartResponse(totalBefore, total);
         return ResponseEntity.ok(cartResponse);
     }

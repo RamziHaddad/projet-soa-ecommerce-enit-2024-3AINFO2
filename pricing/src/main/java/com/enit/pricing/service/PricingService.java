@@ -6,9 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.enit.pricing.dto.CartItem;
-
+@Service
 public class PricingService {
     private final ProductPromotionService productPromotionService;
     private final TieredDsicountService tieredDsicountService;

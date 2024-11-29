@@ -6,10 +6,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.enit.pricing.domain.Product;
 import com.enit.pricing.repositories.ProductRepository;
 
+@Service
 public class ProductService {
     private final ProductRepository productRepository;
     
