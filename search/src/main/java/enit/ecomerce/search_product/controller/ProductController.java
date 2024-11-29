@@ -15,11 +15,7 @@ public class ProductController {
     @Autowired
     private ProductService ProductService;
 
-    @PostMapping
-    public Product create(@RequestBody Product Product) {
-        return ProductService.createProduct(Product);
-    }
-
+ 
     @GetMapping("/{id}")
     public Optional<Product> findById(@PathVariable String id) {
         return ProductService.findProductById(id);
@@ -30,11 +26,7 @@ public class ProductController {
         return ProductService.findAllProducts();
     }
 
-    @PutMapping("/{id}")
-    public Product update(@PathVariable String id, @RequestBody Product Product) {
-
-        return ProductService.updateProduct(id, Product);
-    }
+  
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
