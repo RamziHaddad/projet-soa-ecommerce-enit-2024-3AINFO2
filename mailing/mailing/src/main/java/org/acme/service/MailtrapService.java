@@ -3,7 +3,7 @@ package org.acme.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.client.MailTrapClient;
 import org.acme.model.EmailRequest;
-import org.acme.model.TemplateRequest;
+import org.acme.model.Template;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class MailtrapService {
 
     public String sendEmail(EmailRequest emailRequest) throws IOException {
         // Retrieve the template by ID
-        String templateBody = mailtrapClient.getTemplateById(emailRequest.getTemplateId());
+        String templateBody = mailtrapClient.getTemplateById(emailRequest.getTemplateId()); //get Template by ID not implemented
 
         // Replace placeholders with dynamic content
         String body = replacePlaceholders(templateBody, emailRequest.getTemplateParams());
@@ -65,10 +65,10 @@ public class MailtrapService {
         return templateBody;
     }
 
-    public String createTemplate(TemplateRequest templateRequest) {
+   /* public String createTemplate(Template Template) {
         // Logic for creating a new email template
         return null;
-    }
+    }*/
 
     public String getTemplate(String templateId) {
         // Logic for fetching a template by ID
