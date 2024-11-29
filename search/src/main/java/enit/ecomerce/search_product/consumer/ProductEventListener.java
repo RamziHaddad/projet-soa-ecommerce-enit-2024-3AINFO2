@@ -37,7 +37,8 @@ public class ProductEventListener {
     logger.info("Raw event from topic: {}", record.value());
     try {
         if (record.value() == null || !(record.value() instanceof ProductListed)) {
-            throw new IllegalArgumentException("Invalid or malformed event: " + record.value());
+            throw new IllegalArgumentException("Invalid or malformed event: " + record.value()); //we configured a default error handler , we should see how  
+                                                                                                //prevent the default handler to execute on certain erreurs
         }
         
         ProductListed event = (ProductListed) record.value();

@@ -16,6 +16,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import enit.ecomerce.search_product.consumer.ProductListed;
 import org.apache.kafka.common.errors.SerializationException;
@@ -24,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.backoff.FixedBackOff;
 
 @EnableKafka
+@EnableRetry
+@EnableScheduling
 @Configuration
 public class KafkaConsumerConfig {
 
@@ -61,7 +65,7 @@ public class KafkaConsumerConfig {
 
    @Bean
 public DefaultErrorHandler errorHandler() {
-    // Retry twice with a fixed backoff of 1 second
+   
     FixedBackOff fixedBackOff = new FixedBackOff(1000L, 2);
 
     DefaultErrorHandler errorHandler = new DefaultErrorHandler((record, exception) -> {

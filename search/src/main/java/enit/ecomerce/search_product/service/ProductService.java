@@ -7,6 +7,8 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +22,11 @@ public class ProductService {
 
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
-
+        @Retryable(
+        value = {Exception.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 2000, multiplier = 1.5)
+    )
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }

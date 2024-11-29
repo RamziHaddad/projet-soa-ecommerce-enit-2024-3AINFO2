@@ -42,7 +42,14 @@ public class Product {
         this.price = (float) productListed.getPrice();  
         this.category = productListed.getCategoryName();
     }
-
+   
+    public Product(ProductEntity productEntity) {
+        this.id = productEntity.getId();
+        this.name = productEntity.getName();
+        this.description = productEntity.getDescription();
+        this.price = (float) productEntity.getPrice();  
+        this.category = productEntity.getCategory();
+    }
 
     // Getters and Setters
     public String getId() {
