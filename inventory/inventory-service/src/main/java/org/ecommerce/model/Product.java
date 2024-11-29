@@ -14,7 +14,6 @@ public class Product extends PanacheEntityBase {
     private UUID id;
     private int totalQuantity;
     private int reservedQuantity;
-
     public Product() {
     }
 

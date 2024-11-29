@@ -2,18 +2,27 @@ package org.ecommerce.events;
 import java.util.UUID;
 
 public class ProductEvent {
+    private UUID eventID;
     private UUID productId;
     private int totalQuantity;
     private int reservedQuantity;
-    private String eventType; 
-
+    private String eventType;
     public ProductEvent(UUID productId, int totalQuantity, int reservedQuantity, String eventType) {
+
         this.productId = productId;
         this.totalQuantity = totalQuantity;
         this.reservedQuantity = reservedQuantity;
         this.eventType = eventType;
     }
 
+
+    public UUID getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(UUID eventID) {
+        this.eventID = eventID;
+    }
     public UUID getProductId() {
         return productId;
     }

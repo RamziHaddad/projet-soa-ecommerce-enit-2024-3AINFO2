@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ecommerce.model.Product;
 import org.ecommerce.service.ProductService;
 import jakarta.inject.Inject;
@@ -32,7 +33,7 @@ public class ProductAPI {
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addNewProduct(Product product) {
+    public Response addNewProduct(Product product) throws JsonProcessingException {
         productService.addNewProduct(product);
         return Response.status(Response.Status.OK).build();
     }
@@ -63,7 +64,7 @@ public class ProductAPI {
     @PUT
     @Path("/update/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProductById(@PathParam("id") UUID id, Product updatedProduct) {
+    public Response updateProductById(@PathParam("id") UUID id, Product updatedProduct) throws JsonProcessingException {
         Optional<Product> product = productService.getProductById(id);
         updatedProduct.setId(id);
         if (product.isPresent()) {
@@ -74,7 +75,7 @@ public class ProductAPI {
 
     @POST
     @Path("/reception")
-    public Product registerReception(Map<String, Object> payload) {
+    public Product registerReception(Map<String, Object> payload) throws JsonProcessingException {
         String productIdStr = (String) payload.get("productId");
         UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
@@ -84,7 +85,7 @@ public class ProductAPI {
 
     @POST
     @Path("/reserve")
-    public Product reserveProduct(Map<String, Object> payload) {
+    public Product reserveProduct(Map<String, Object> payload) throws JsonProcessingException {
         String productIdStr = (String) payload.get("productId");
         UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
@@ -92,9 +93,11 @@ public class ProductAPI {
         return productService.reserveProduct(productId, quantity);
     }
 
+
+
     @POST
     @Path("/release")
-    public Product releaseReservation(Map<String, Object> payload) {
+    public Product releaseReservation(Map<String, Object> payload) throws JsonProcessingException {
         String productIdStr = (String) payload.get("productId");
         UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
@@ -104,7 +107,7 @@ public class ProductAPI {
 
     @POST
     @Path("/shipment")
-    public Product recordOrderShipment(Map<String, Object> payload) {
+    public Product recordOrderShipment(Map<String, Object> payload) throws JsonProcessingException {
         String productIdStr = (String) payload.get("productId");
         UUID productId = UUID.fromString(productIdStr);
         Object quantityObj = payload.get("quantity");
