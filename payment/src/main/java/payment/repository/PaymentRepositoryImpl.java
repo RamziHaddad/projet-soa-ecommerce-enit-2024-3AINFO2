@@ -56,6 +56,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
         em.persist(payment);
         return payment;
     }
+
+    @Override
+    public Payment updatePayment(Payment payment) {
+        em.merge(payment) ; 
+        return payment ; 
+    }
     
     
 }
