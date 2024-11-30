@@ -79,8 +79,6 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
-            echo "Stopping any running service..."
-            pkill -f "java -jar service-catalog.jar" || echo "No service to stop."
             sleep 10
 
             echo "Starting Java service..."
