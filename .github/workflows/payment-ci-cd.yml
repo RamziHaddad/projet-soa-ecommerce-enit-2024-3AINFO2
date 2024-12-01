@@ -28,6 +28,16 @@ jobs:
           cd payment/
           mvn clean package -Dquarkus.package.type=uber-jar
 
+      - name: Archive test reports
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: surefire-reports
+          path: payment/target/surefire-reports
+
+      - name: Display test results
+        if: failure()
+        run: cat payment/target/surefire-reports/*.txt
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
