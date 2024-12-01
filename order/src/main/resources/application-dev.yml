@@ -2,9 +2,9 @@ spring:
   application:
     name: SpringAPI
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_service
+    url: jdbc:postgresql://localhost:5433/db_order
     username: postgres
-    password: SQL_2023test
+    password: fadizoe1212
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -16,7 +16,7 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false
+    enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
 logging:

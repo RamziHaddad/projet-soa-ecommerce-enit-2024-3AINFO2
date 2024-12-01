@@ -1,7 +1,9 @@
 package com.microservices.order_service.controller;
 
 import com.microservices.order_service.dto.AvailabilityCheckDTO;
+import com.microservices.order_service.dto.OrderEventDTO;
 import com.microservices.order_service.dto.OrderRequest;
+import com.microservices.order_service.kafka.OrderCreationProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
 import com.microservices.order_service.service.OrderService;
@@ -22,8 +24,11 @@ public class OrderController {
 
     private final InventoryService inventoryService;
 
+    private final OrderCreationProducer orderCreationProducer;
+
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
+
         orderService.placeOrder(order);
         return ResponseEntity.ok("Order placed successfully");
     }
@@ -41,14 +46,22 @@ public class OrderController {
         return ResponseEntity.ok("Order updated successfully");
     }
 
-    @PostMapping("/placeOrder")
-    public ResponseEntity<Map<String, Object>> placeOrder(@RequestBody AvailabilityCheckDTO availabilityCheckDTO) {
+    @PostMapping("/sendOrder")
+    public ResponseEntity<Map<String, Object>> sendOrderToInventory(@RequestBody AvailabilityCheckDTO availabilityCheckDTO) {
         Map<String, Object> response = inventoryService.checkOrderAvailability(availabilityCheckDTO);
 
         if ("ok".equals(response.get("status"))) {
             Order order = orderService.getOrderById(availabilityCheckDTO.getOrderId());
             order.setStockVerification(true);
+            order.setOrderStatus("Order Created");
             orderService.updateOrder(availabilityCheckDTO.getOrderId(), order);
+
+            OrderEventDTO orderEventDTO = new OrderEventDTO();
+            orderEventDTO.setOrderId(order.getId());
+            orderEventDTO.setItems(order.getItems());
+            orderEventDTO.setOrderStatus("Order Created");
+            orderCreationProducer.sendMessage(orderEventDTO);
+
             return ResponseEntity.ok(Map.of("message", "Order placed successfully"));
         } else {
             // we have to communicate with cart microservice
@@ -61,6 +74,13 @@ public class OrderController {
     public ResponseEntity<Order> getOrder(@PathVariable("id") UUID id){
         Order order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
+    }
+
+    @PostMapping("/publish")
+    public ResponseEntity<String> publishOrder(@RequestBody OrderEventDTO orderEventDTO){
+        orderCreationProducer.sendMessage(orderEventDTO);
+        return ResponseEntity.ok("Order published");
+
     }
 }
 
