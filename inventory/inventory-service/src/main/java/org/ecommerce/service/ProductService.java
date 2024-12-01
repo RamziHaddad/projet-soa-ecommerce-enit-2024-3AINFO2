@@ -1,20 +1,13 @@
 package org.ecommerce.service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ecommerce.events.MinimalEvent;
-import org.ecommerce.events.ProductEvent;
+import org.ecommerce.model.Item;
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
-import com.google.gson.Gson;
-import io.smallrye.reactive.messaging.annotations.Channel;
-import io.smallrye.reactive.messaging.annotations.Emitter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.PostPersist;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 
@@ -110,6 +103,14 @@ public class ProductService {
         repo.updateProduct(product);
         eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
+    }
+
+    @Transactional
+    public Boolean checkAvailibilityProduct(Item item){
+        Product product = repo.getProductByID(item.getId())
+                .orElseThrow(() -> new WebApplicationException("Product not found", 404));
+
+        return product.availableQuantity() >= item.getQuantity();
     }
 
 

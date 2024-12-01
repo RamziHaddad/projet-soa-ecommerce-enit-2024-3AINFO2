@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.ecommerce.model.Item;
 import org.ecommerce.model.Product;
 import org.ecommerce.service.ProductService;
 import jakarta.inject.Inject;
@@ -113,5 +114,12 @@ public class ProductAPI {
         Object quantityObj = payload.get("quantity");
         int quantity = (quantityObj instanceof BigDecimal) ? ((BigDecimal) quantityObj).intValue() : (int) quantityObj;
         return productService.recordOrderShipment(productId, quantity);
+    }
+
+    @POST
+    @Path("/checkItem")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Boolean checkAvailibilityItem(Item item){
+        return productService.checkAvailibilityProduct(item);
     }
 }
