@@ -24,11 +24,7 @@ public class ProductService {
     @Inject
     ProductRepository repo;
     @Inject
-    ObjectMapper objectMapper;
-
-    @Inject
-    @Channel("product-events")
-    Emitter<String> productEventEmitter;
+    EventProducerService eventProducerService;
 
     public List<Product> getAllProducts() {
         return repo.listAll();
@@ -37,7 +33,7 @@ public class ProductService {
     @Transactional
     public Product addNewProduct(Product product) throws JsonProcessingException {
         repo.addProduct(product);
-        sendProductEvent(product, "CREATE");
+        eventProducerService.sendProductEvent(product, "CREATE");
         return product;
     }
 
@@ -56,7 +52,7 @@ public class ProductService {
         if (existingProduct.isPresent()) {
             updatedProduct.setId(id);
             repo.updateProduct(updatedProduct);
-            sendProductEvent(updatedProduct, "UPDATE");
+            eventProducerService.sendProductEvent(updatedProduct, "UPDATE");
             return Optional.of(updatedProduct);
         }
         return Optional.empty();
@@ -66,9 +62,10 @@ public class ProductService {
     public Product registerReception(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
+        if(product.getTotalQuantity()==0 && quantity>0) eventProducerService.sendMinimalEvent(productId,"IN_STOCK");
         product.setTotalQuantity(product.getTotalQuantity() + quantity);
         repo.updateProduct(product);
-        sendProductEvent(product, "UPDATE");
+        eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -81,7 +78,7 @@ public class ProductService {
         }
         product.setReservedQuantity(product.getReservedQuantity() + quantity);
         repo.updateProduct(product);
-        sendProductEvent(product, "UPDATE");
+        eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -94,7 +91,7 @@ public class ProductService {
             product.setReservedQuantity(0);
         }
         repo.updateProduct(product);
-        sendProductEvent(product, "UPDATE");
+        eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
@@ -105,54 +102,15 @@ public class ProductService {
         product.setTotalQuantity(product.getTotalQuantity() - quantity);
         product.setReservedQuantity(product.getReservedQuantity() - quantity);
         if(product.getTotalQuantity()==0){
-            sendOUT_OF_STOCK_Event(productId);
+            eventProducerService.sendMinimalEvent(productId,"OUT_Of_STOCK");
         }
         if (product.getReservedQuantity() < 0 || product.getTotalQuantity() < 0) {
             throw new WebApplicationException("Stock insuffisant ou non reservé pour la sortie de commande", 400);
         }
         repo.updateProduct(product);
-        sendProductEvent(product, "UPDATE");
+        eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
-    @PostPersist
-    private void sendProductEvent(Product product, String eventType) throws JsonProcessingException {
-        ProductEvent productEvent = new ProductEvent(
-                product.getId(),
-                product.getTotalQuantity(),
-                product.getReservedQuantity(),
-                eventType);
-        produceProductEvent(productEvent);
-    }
 
-    @PostPersist
-    private void sendOUT_OF_STOCK_Event(UUID idProduct) throws JsonProcessingException {
-        MinimalEvent productEvent=new MinimalEvent(
-                idProduct,
-                "OUT_OF_STOCK"
-        );
-        produceProductEvent(productEvent);
-    }
-
-
-    @PostPersist
-    public void produceProductEvent(ProductEvent productEvent) throws JsonProcessingException {
-        try{
-        //String jsonEvent = new Gson().toJson(productEvent);
-        String productJSON=objectMapper.writeValueAsString(productEvent);
-        productEventEmitter.send(productJSON);}
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-    @PostPersist
-    public void produceProductEvent(MinimalEvent productEvent) throws JsonProcessingException {
-        try{
-            //String jsonEvent = new Gson().toJson(productEvent);
-            String productJSON=objectMapper.writeValueAsString(productEvent);
-            productEventEmitter.send(productJSON);}
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 }

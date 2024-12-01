@@ -1,34 +1,17 @@
 package org.ecommerce.events;
 import java.util.UUID;
 
-public class ProductEvent {
-    private UUID eventID;
-    private UUID productId;
+public class ProductEvent extends  MinimalEvent {
+
     private int totalQuantity;
     private int reservedQuantity;
-    private String eventType;
-    public ProductEvent(UUID productId, int totalQuantity, int reservedQuantity, String eventType) {
 
-        this.productId = productId;
+    public ProductEvent(UUID productId, int totalQuantity, int reservedQuantity, String eventType) {
+        super(productId,eventType);
+
         this.totalQuantity = totalQuantity;
         this.reservedQuantity = reservedQuantity;
-        this.eventType = eventType;
-    }
 
-
-    public UUID getEventID() {
-        return eventID;
-    }
-
-    public void setEventID(UUID eventID) {
-        this.eventID = eventID;
-    }
-    public UUID getProductId() {
-        return productId;
-    }
-
-    public void setProductId(UUID productId) {
-        this.productId = productId;
     }
 
     public int getTotalQuantity() {
@@ -47,11 +30,5 @@ public class ProductEvent {
         this.reservedQuantity = reservedQuantity;
     }
 
-    public String getEventType() {
-        return eventType;
-    }
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 }
