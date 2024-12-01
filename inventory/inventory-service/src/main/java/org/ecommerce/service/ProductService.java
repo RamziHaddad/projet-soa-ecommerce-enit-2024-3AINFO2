@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ecommerce.model.Item;
+import org.ecommerce.model.Order;
+import org.ecommerce.model.OrderDTO;
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -111,6 +113,14 @@ public class ProductService {
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
 
         return product.availableQuantity() >= item.getQuantity();
+    }
+
+    @Transactional
+    public Boolean checkAvailibilityOrder(OrderDTO order){
+        for(Item item :order.getItems()){
+            if(!checkAvailibilityProduct(item)) return false;
+        }
+        return true;
     }
 
 
