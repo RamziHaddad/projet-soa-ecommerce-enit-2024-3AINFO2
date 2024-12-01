@@ -47,44 +47,51 @@ public class KafkaConsumerConfig {
         return factory;
     }
 
-    @Bean
-    public DefaultKafkaConsumerFactory<String, ProductListed> consumerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "my-consumer-group");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-
-        JsonDeserializer<ProductListed> deserializer = new JsonDeserializer<>(ProductListed.class);
-        deserializer.addTrustedPackages("enit.ecomerce.search_product.consumer");
-
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
-    }
-
    @Bean
-public DefaultErrorHandler errorHandler() {
-   
-    FixedBackOff fixedBackOff = new FixedBackOff(1000L, 2);
+public DefaultKafkaConsumerFactory<String, ProductListed> consumerFactory() {
+    Map<String, Object> props = new HashMap<>();
+    
+    // Kafka server details
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "my-consumer-group");
 
-    DefaultErrorHandler errorHandler = new DefaultErrorHandler((record, exception) -> {
-        try {
-            // Convert the value to a String if possible
-            String valueAsString = record.value() != null ? record.value().toString() : "null";
+    // Configure the ErrorHandlingDeserializer
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
 
-            // Log the error and send the record to the dead-letter topic
-            logger.error("Failed to process record: {}", valueAsString, exception);
-            kafkaTemplate.send("dead-letter-topic", valueAsString);
-        } catch (Exception e) {
-            logger.error("Failed to send record to dead-letter-topic: {}", e.getMessage(), e);
-        }
-    }, fixedBackOff);
+    // Configure the actual deserializers
+    props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
+    props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
 
-    // Handle SerializationException directly
-    errorHandler.addNotRetryableExceptions(SerializationException.class);
+    // Additional JsonDeserializer properties
+    props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "enit.ecomerce.search_product.consumer.ProductListed");
+    props.put(JsonDeserializer.TRUSTED_PACKAGES, "enit.ecomerce.search_product.consumer");
+    props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
-    return errorHandler;
+
+    return new DefaultKafkaConsumerFactory<>(props);
 }
 
+    @Bean
+    public DefaultErrorHandler errorHandler() {
+        FixedBackOff fixedBackOff = new FixedBackOff(1000L, 3);
+
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler((record, exception) -> {
+            try {
+                // Convert the value to a String if possible
+                String valueAsString = record.value() != null ? record.value().toString() : "null";
+
+                // Log the error and send the record to the dead-letter topic
+                logger.error("Failed to process record: {}", valueAsString, exception);
+                kafkaTemplate.send("dead-letter-topic", valueAsString);
+            } catch (Exception e) {
+                logger.error("Failed to send record to dead-letter-topic: {}", e.getMessage(), e);
+            }
+        }, fixedBackOff);
+
+        // Handle SerializationException directly
+        errorHandler.addNotRetryableExceptions(SerializationException.class);
+
+        return errorHandler;
+    }
 }
