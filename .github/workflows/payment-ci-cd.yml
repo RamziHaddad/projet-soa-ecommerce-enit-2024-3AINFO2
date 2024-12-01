@@ -1,10 +1,13 @@
 name: Payment CI/CD Pipeline
 
 on:
+  push:
+    branches:
+      - payment
   pull_request:
     branches:
       - payment
-
+      
 jobs:
   build:
     runs-on: ubuntu-latest
