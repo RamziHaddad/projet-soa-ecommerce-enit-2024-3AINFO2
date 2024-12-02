@@ -28,6 +28,8 @@ public class EventProducerService {
                 product.getId(),
                 product.getTotalQuantity(),
                 product.getReservedQuantity(),
+                product.getName(),
+                product.getCategory(),
                 eventType);
         produceProductEvent(productEvent);
     }

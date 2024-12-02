@@ -3,9 +3,7 @@ package org.ecommerce.model;
 import java.util.UUID;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Product extends PanacheEntityBase {
@@ -14,6 +12,10 @@ public class Product extends PanacheEntityBase {
     private UUID id;
     private int totalQuantity;
     private int reservedQuantity;
+    private String name;
+    @ManyToOne
+    @JoinColumn(name="idCategory")
+    private  Category category;
     public Product() {
     }
 
@@ -43,5 +45,21 @@ public class Product extends PanacheEntityBase {
 
     public int availableQuantity() {
         return totalQuantity - reservedQuantity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
