@@ -3,8 +3,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.ecommerce.model.AvailabilityCheckDTO;
 import org.ecommerce.model.Item;
-import org.ecommerce.model.Order;
 import org.ecommerce.model.OrderDTO;
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
@@ -59,6 +59,7 @@ public class ProductService {
     public Product registerReception(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
+        //Send an event "IN_STOCK" to the topic "product-events"
         if(product.getTotalQuantity()==0 && quantity>0) eventProducerService.sendMinimalEvent(productId,"IN_STOCK");
         product.setTotalQuantity(product.getTotalQuantity() + quantity);
         repo.updateProduct(product);
@@ -127,7 +128,7 @@ public class ProductService {
 
     //function to the order-service to check if the products' quantities of an order are available or not
     @Transactional
-    public Boolean checkAvailibilityOrder(OrderDTO order){
+    public Boolean checkAvailibilityOrder(AvailabilityCheckDTO order){
         for(Item item :order.getItems()){
             if(!checkAvailibilityProduct(item)) return false;
         }

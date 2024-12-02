@@ -5,10 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.ecommerce.model.Item;
-import org.ecommerce.model.Order;
-import org.ecommerce.model.OrderDTO;
-import org.ecommerce.model.Product;
+import org.ecommerce.model.*;
 import org.ecommerce.service.ProductService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -133,7 +130,7 @@ public class ProductAPI {
     @POST
     @Path("/checkOrder")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Boolean checkAvailibilityOrder(OrderDTO order){
+    public Boolean checkAvailibilityOrder(AvailabilityCheckDTO order){
         return productService.checkAvailibilityOrder(order);
     }
 

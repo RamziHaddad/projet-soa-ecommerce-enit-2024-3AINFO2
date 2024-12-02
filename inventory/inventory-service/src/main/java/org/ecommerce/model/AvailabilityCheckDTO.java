@@ -3,11 +3,10 @@ package org.ecommerce.model;
 import java.util.List;
 import java.util.UUID;
 
-public class   OrderDTO {
-
+public class AvailabilityCheckDTO {
     private UUID orderId;
 
-    private String status;
+    private List<Item> items;
 
 
     public UUID getOrderId() {
@@ -18,11 +17,12 @@ public class   OrderDTO {
         this.orderId = orderId;
     }
 
-    public String getStatus() {
-        return status;
+    public List<Item> getItems() {
+        return items;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 }
+
