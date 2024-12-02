@@ -4,14 +4,13 @@ import java.util.UUID;
 
 public class InventoryEvent {
 
-    private int productId;
+    private UUID productId;
     private String category;
 
     public InventoryEvent() {
     }
 
-    
-    public InventoryEvent(int productId, String category) {
+    public InventoryEvent(UUID productId, String category) {
         this.productId = productId;
         this.category = category;
     }
@@ -24,18 +23,11 @@ public class InventoryEvent {
         this.category = category;
     }
 
-        public int getProductId() {
+        public UUID getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(UUID productId) {
         this.productId = productId;
-    }
-        @Override
-    public String toString() {
-        return "InventoryEvent [productId=" + productId + ", category=" + category + "]";
-    }
-
-
-    
+    }    
 }

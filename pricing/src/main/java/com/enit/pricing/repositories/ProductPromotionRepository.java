@@ -1,6 +1,5 @@
 package com.enit.pricing.repositories;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,16 +19,6 @@ public interface ProductPromotionRepository extends JpaRepository<ProductPromoti
 
     long count();
 
-    //void deletePromotionByProductId(UUID productId);
-
-/*    @Query("SELECT p FROM ProductPromotion p " +
-       "WHERE p.startDate <= CURRENT_DATE " +
-       "AND p.endDate >= CURRENT_DATE " +
-       "AND p.product.productId = :prodId")
-   List<ProductPromotion> findActivePromotions(@Param("prodId") UUID prodId); */
-
-
- 
    @Query("SELECT p FROM ProductPromotion p " +
         "WHERE p.product.productId = :prodId "+
            "AND p.startDate <= :currentDate " +
@@ -53,7 +42,5 @@ public interface ProductPromotionRepository extends JpaRepository<ProductPromoti
    @Query("DELETE FROM ProductPromotion p WHERE p.endDate < CURRENT_DATE")
    void deleteExpiredPromotions();
 
-
-   
     
-    }
+}

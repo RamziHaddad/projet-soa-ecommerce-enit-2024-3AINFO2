@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +33,6 @@ public class PricingController {
     private final ProductService productService;
     private final PricingService pricingService;
 
-    @Autowired
     public PricingController(ProductService productService, PricingService pricingService) {
 
         this.productService = productService;
@@ -50,13 +48,16 @@ public class PricingController {
         return ResponseEntity.ok(cartResponse);
     }
 
-    // Calculate product price after promotion
+//Calculate product price after promotion
     @PostMapping("/product-price")
     public ResponseEntity<CatalogPriceResponse> calculateProductPrice(@RequestBody UUID prodId) {
-        BigDecimal price = pricingService.calculateProductPrice(prodId);
+        //BigDecimal price = pricingService.calculateProductPrice(prodId);
+        System.out.println("im in");
+        BigDecimal price = BigDecimal.valueOf(19.99);
         CatalogPriceResponse catalogPriceResponse = new CatalogPriceResponse(prodId, price);
         return ResponseEntity.ok(catalogPriceResponse);
-    }
+    } 
+
 
     // Returns the base price of a product
     @GetMapping("/base-price/{productId}")

@@ -4,16 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import org.hibernate.annotations.GenericGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 
@@ -21,14 +17,12 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name= "promotions")
 @Inheritance(strategy=InheritanceType.JOINED)
-@DiscriminatorColumn(name="discount_type") //going to hold the promotion type name
+@DiscriminatorColumn(name="discount_type") 
+
 public abstract class Promotion {
 	
-	
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "promotion_id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
+    @Column(updatable = false, nullable = false)
     private UUID promotionId;
 
     @Column(name = "start_date")
@@ -75,9 +69,6 @@ public abstract class Promotion {
 	public void setDescription(String type) {
 		this.description = type;
 	}
-   
-	
-
 
 }
 	

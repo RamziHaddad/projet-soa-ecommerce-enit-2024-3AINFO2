@@ -1,8 +1,6 @@
 package com.enit.pricing.repositories;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,13 +22,15 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("SELECT p from Product p WHERE p.productId= :productId")
     Optional<Product> getProductByProductId(@Param("productId") UUID productId);
-
-    // Update base price
-    /* @Modifying
+/*
+   @Modifying
     @Transactional
-    @Query("UPDATE Product p SET p.basePrice = :newBasePrice WHERE p.productId = :productId")
-    int  updateProductBasePrice(@Param("productId") UUID productId, @Param("newBasePrice") BigDecimal newBasePrice);
- */
+    @Query("UPDATE Product p SET p.category = :category WHERE p.productId = :productId")
+    void updateProdCategory(@Param("productId") UUID productId, @Param("category") String category);
+    
+
+     @Query("delete from Product p where p.productId= :prodId")
+    void deleteProduct(@Param("prodId") UUID prodId); */
 
 
 }

@@ -2,14 +2,10 @@ package com.enit.pricing.domain;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
-
-import org.hibernate.annotations.GenericGenerator;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -17,14 +13,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "products")
 
-
 public class Product {
 	
-
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "product_id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
+    @Column(updatable = false, nullable = false)
     private UUID productId;
 
     @Column(name = "base_price", nullable = false)
@@ -38,7 +30,13 @@ public class Product {
 
 
 
-	public UUID getProductId() {
+	public Product(UUID productId, BigDecimal basePrice, String category) {
+        this.productId = productId;
+        this.basePrice = basePrice;
+        this.category = category;
+    }
+
+    public UUID getProductId() {
         return productId;
     }
 
