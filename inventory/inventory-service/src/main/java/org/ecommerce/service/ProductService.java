@@ -28,6 +28,7 @@ public class ProductService {
     @Transactional
     public Product addNewProduct(Product product) throws JsonProcessingException {
         repo.addProduct(product);
+        //Send an event "CREATE" to the topic "product-events"
         eventProducerService.sendProductEvent(product, "CREATE");
         return product;
     }
@@ -47,12 +48,13 @@ public class ProductService {
         if (existingProduct.isPresent()) {
             updatedProduct.setId(id);
             repo.updateProduct(updatedProduct);
+            //Send an event "UPDATE" to the topic "product-events"
             eventProducerService.sendProductEvent(updatedProduct, "UPDATE");
             return Optional.of(updatedProduct);
         }
         return Optional.empty();
     }
-
+    //Implement the stock with a product
     @Transactional
     public Product registerReception(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
@@ -60,10 +62,12 @@ public class ProductService {
         if(product.getTotalQuantity()==0 && quantity>0) eventProducerService.sendMinimalEvent(productId,"IN_STOCK");
         product.setTotalQuantity(product.getTotalQuantity() + quantity);
         repo.updateProduct(product);
+        //Send an event "UPDATE" to the topic "product-events"
         eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
+    //Reserve a quantity of a product
     @Transactional
     public Product reserveProduct(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
@@ -73,10 +77,12 @@ public class ProductService {
         }
         product.setReservedQuantity(product.getReservedQuantity() + quantity);
         repo.updateProduct(product);
+        //Send an event "UPDATE" to the topic "product-events"
         eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
+    //When the reservation is canceled, free the quantity reserved
     @Transactional
     public Product releaseReservation(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
@@ -86,16 +92,19 @@ public class ProductService {
             product.setReservedQuantity(0);
         }
         repo.updateProduct(product);
+        //Send an event "UPDATE" to the topic "product-events"
         eventProducerService.sendProductEvent(product, "UPDATE");
         return product;
     }
 
+    //When the reservation is completed and the order is paid, remove the quantity from the stock
     @Transactional
     public Product recordOrderShipment(UUID productId, int quantity) throws JsonProcessingException {
         Product product = repo.getProductByID(productId)
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
         product.setTotalQuantity(product.getTotalQuantity() - quantity);
         product.setReservedQuantity(product.getReservedQuantity() - quantity);
+        //Send an event "OUT_Of_STOCK" to the topic "product-events"  for the catalogue-service
         if(product.getTotalQuantity()==0){
             eventProducerService.sendMinimalEvent(productId,"OUT_Of_STOCK");
         }
@@ -107,6 +116,7 @@ public class ProductService {
         return product;
     }
 
+    //function to the order-service to check if the quantity of a product is available or not
     @Transactional
     public Boolean checkAvailibilityProduct(Item item){
         Product product = repo.getProductByID(item.getId())
@@ -115,6 +125,7 @@ public class ProductService {
         return product.availableQuantity() >= item.getQuantity();
     }
 
+    //function to the order-service to check if the products' quantities of an order are available or not
     @Transactional
     public Boolean checkAvailibilityOrder(OrderDTO order){
         for(Item item :order.getItems()){

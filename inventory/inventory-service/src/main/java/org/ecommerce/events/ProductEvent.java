@@ -1,6 +1,6 @@
 package org.ecommerce.events;
 import java.util.UUID;
-
+//The ProductEvent will be sent for the events that require knowing the hole product
 public class ProductEvent extends  MinimalEvent {
 
     private int totalQuantity;

@@ -38,7 +38,7 @@ public class EventProducerService {
                 idProduct,
                 eventType
         );
-        produceProductEvent(productEvent);
+        produceMinimalEvent(productEvent);
     }
 
 
@@ -53,7 +53,7 @@ public class EventProducerService {
         }
     }
     @PostPersist
-    public void produceProductEvent(MinimalEvent productEvent) throws JsonProcessingException {
+    public void produceMinimalEvent(MinimalEvent productEvent) throws JsonProcessingException {
         try{
             //String jsonEvent = new Gson().toJson(productEvent);
             String productJSON=objectMapper.writeValueAsString(productEvent);

@@ -76,6 +76,7 @@ public class ProductAPI {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    //api to implement the stock with product
     @POST
     @Path("/reception")
     public Product registerReception(Map<String, Object> payload) throws JsonProcessingException {
@@ -86,6 +87,7 @@ public class ProductAPI {
         return productService.registerReception(productId, quantity);
     }
 
+    //api to make a reservation of a product
     @POST
     @Path("/reserve")
     public Product reserveProduct(Map<String, Object> payload) throws JsonProcessingException {
@@ -97,7 +99,7 @@ public class ProductAPI {
     }
 
 
-
+    //api to cancel a reservation of a product
     @POST
     @Path("/release")
     public Product releaseReservation(Map<String, Object> payload) throws JsonProcessingException {
@@ -108,6 +110,7 @@ public class ProductAPI {
         return productService.releaseReservation(productId, quantity);
     }
 
+    //api to complete a reservation of a product and delete it from stock
     @POST
     @Path("/shipment")
     public Product recordOrderShipment(Map<String, Object> payload) throws JsonProcessingException {
@@ -118,6 +121,7 @@ public class ProductAPI {
         return productService.recordOrderShipment(productId, quantity);
     }
 
+    //api for the order-service to check if the quantity of a product is available or not
     @POST
     @Path("/checkItem")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -125,6 +129,7 @@ public class ProductAPI {
         return productService.checkAvailibilityProduct(item);
     }
 
+    //api for the order-service to check if the products' quantities of an order are available or not
     @POST
     @Path("/checkOrder")
     @Consumes(MediaType.APPLICATION_JSON)

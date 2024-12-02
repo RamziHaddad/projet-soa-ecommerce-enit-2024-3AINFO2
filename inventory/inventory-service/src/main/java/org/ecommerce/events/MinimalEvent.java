@@ -2,6 +2,7 @@ package org.ecommerce.events;
 
 import java.util.UUID;
 
+//The MinimalEvent will be sent for the events that require knowing only the id product
 public class MinimalEvent {
     private UUID eventID;
     private UUID productId;
