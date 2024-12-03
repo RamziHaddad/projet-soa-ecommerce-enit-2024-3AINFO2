@@ -3,13 +3,13 @@ package org.acme.service;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.client.MailTrapClient;
 import org.acme.model.EmailRequest;
-import org.acme.model.Template;
+//import org.acme.model.Template;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
+//import java.util.Map;
 
 @ApplicationScoped
 public class MailtrapService {
@@ -30,22 +30,22 @@ public class MailtrapService {
     String fromName;
 
     private final MailTrapClient mailtrapClient;
-
-    public MailtrapService(MailTrapClient mailtrapClient) {
+    private final TemplateService templateService;
+    public MailtrapService(MailTrapClient mailtrapClient, TemplateService templateService) {
         this.mailtrapClient = mailtrapClient;
+        this.templateService = templateService;
     }
+   
 
     public String sendEmail(EmailRequest emailRequest) throws IOException {
-        // Retrieve the template by ID
-        String templateBody = mailtrapClient.getTemplateById(emailRequest.getTemplateId()); //get Template by ID not implemented
-
-        // Replace placeholders with dynamic content
-        String body = replacePlaceholders(templateBody, emailRequest.getTemplateParams());
-
+        // Retrieve the template body using the template ID
+        String templateBody = templateService.processTemplate(emailRequest.getTemplateId(), emailRequest.getTemplateParams());
+    
+        // Retry logic for sending email
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                // Send the email using the Mailtrap API
-                return mailtrapClient.sendEmail(emailRequest.getSubject(), body, emailRequest.getRecipient());
+                // Use the Mailtrap client to send the email
+                return mailtrapClient.sendEmail(emailRequest.getSubject(), templateBody, emailRequest.getRecipient());
             } catch (IOException e) {
                 if (attempt == MAX_RETRIES) {
                     LOGGER.error("All retry attempts failed. Unable to send email.", e);
@@ -56,14 +56,7 @@ public class MailtrapService {
         }
         throw new IllegalStateException("Email sending retries exceeded.");
     }
-
-    private String replacePlaceholders(String templateBody, Map<String, String> templateParams) {
-        // Replace placeholders with actual dynamic content
-        for (Map.Entry<String, String> entry : templateParams.entrySet()) {
-            templateBody = templateBody.replace("{" + entry.getKey() + "}", entry.getValue());
-        }
-        return templateBody;
-    }
+    
 
    /* public String createTemplate(Template Template) {
         // Logic for creating a new email template

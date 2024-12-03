@@ -62,7 +62,17 @@
             <version>2.3.32</version>
         </dependency>
 
+        <!-- Hibernate ORM with Panache -->
+    <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-hibernate-orm-panache</artifactId>
+    </dependency>
 
+    <!-- Database driver (PostgreSQL) -->
+    <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-mailer</artifactId>
