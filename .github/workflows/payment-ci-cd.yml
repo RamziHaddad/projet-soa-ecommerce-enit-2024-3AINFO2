@@ -1,0 +1,79 @@
+name: Payment CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - payment
+  pull_request:
+    branches:
+      - payment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '21'
+
+      - name: Build with Maven
+        run: |
+          cd payment/
+          mvn clean package -Dquarkus.package.type=uber-jar
+
+      - name: Archive test reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: surefire-reports
+          path: payment/target/surefire-reports
+
+      - name: Display test results
+        if: failure()
+        run: cat payment/target/surefire-reports/*.txt
+
+      - name: Verify if the correct JAR file exists
+        run: |
+          ls payment/target/payment-1.0.0-SNAPSHOT-runner.jar || (echo "JAR file not found!" && exit 1)
+
+      - name: Add Server to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Transfer JAR to VPS
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp payment/target/payment-1.0.0-SNAPSHOT-runner.jar \
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/payment/payment.jar
+
+      - name: Verify if the JAR file exists on the VPS
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "ls -l ~/payment/payment.jar"
+
+      - name: Show system resources usage after file transfer
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
+
+      - name: Deploy JAR to VPS
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}
+          username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
+          password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
+          script: |
+            sleep 10
+
+            echo "Starting Java service..."
+            cd ~/payment
+            nohup java -jar payment.jar --server.port=8082 > payment.log 2>&1 &
+            echo "Service deployed successfully!"
+            
+            sleep 30
