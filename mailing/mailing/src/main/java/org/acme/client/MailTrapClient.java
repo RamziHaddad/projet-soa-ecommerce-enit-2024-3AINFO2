@@ -1,12 +1,23 @@
 package org.acme.client;
 
-import okhttp3.*;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+//import org.acme.model.Template;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+import java.util.Map;
 
 @ApplicationScoped
 public class MailTrapClient {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailTrapClient.class);
 
     @ConfigProperty(name = "mailtrap.api.base-url")
     String apiBaseUrl;
@@ -14,39 +25,77 @@ public class MailTrapClient {
     @ConfigProperty(name = "mailtrap.api.token")
     String apiToken;
 
-    @ConfigProperty(name = "mailtrap.from.email")
-    String fromEmail;
+    private final Client client = ClientBuilder.newClient();
 
-    private final OkHttpClient client = new OkHttpClient.Builder().build();
-
-    // Get an email template by ID
+    /**
+     * Fetch a template by its ID from the Mailtrap API.
+     * 
+     * @param templateId The ID of the template to fetch.
+     * @return The template content as a String.
+     * @throws IOException If the template cannot be fetched.
+     */
     public String getTemplateById(String templateId) throws IOException {
-        // In a real-world scenario, you'd fetch the template from Mailtrap or your database
-        // Here we'll just simulate returning a basic template string
-        return "Dear Customer, your price is {price} and the arrival date is {arrivalDate}.";
+        String url = String.format("%s/templates/%s", apiBaseUrl, templateId);
+
+        Response response = client.target(url)
+                .request(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + apiToken)
+                .get();
+
+        if (response.getStatus() == 200) {
+            return response.readEntity(String.class);
+        } else {
+            LOGGER.error("Failed to fetch template. Status: {}, Error: {}",
+                    response.getStatus(),
+                    response.readEntity(String.class));
+            throw new IOException("Failed to fetch template with ID: " + templateId);
+        }
     }
 
-    // Send an email through Mailtrap API
+    /**
+     * Send an email using the Mailtrap API.
+     * 
+     * @param subject The subject of the email.
+     * @param body The body/content of the email.
+     * @param recipient The recipient's email address.
+     * @return The Mailtrap API response as a String.
+     * @throws IOException If the email cannot be sent.
+     */
     public String sendEmail(String subject, String body, String recipient) throws IOException {
-        String jsonPayload = String.format(
-                "{\"from\":{\"email\":\"%s\",\"name\":\"Your Name\"},\"to\":[{\"email\":\"%s\"}],\"subject\":\"%s\",\"text\":\"%s\"}",
-                fromEmail, recipient, subject, body
+        String url = String.format("%s/send", apiBaseUrl);
+
+        // Construct email payload
+        Map<String, Object> payload = Map.of(
+                "from", Map.of(
+                        "email", "your-email@example.com",
+                        "name", "Your Service"
+                ),
+                "to", new Map[]{
+                        Map.of("email", recipient)
+                },
+                "subject", subject,
+                "html", body
         );
 
-        RequestBody requestBody = RequestBody.create(jsonPayload, MediaType.parse("application/json"));
-        Request request = new Request.Builder()
-                .url(apiBaseUrl + "/send")
-                .post(requestBody)
-                .addHeader("Authorization", "Bearer " + apiToken)
-                .addHeader("Content-Type", "application/json")
-                .build();
+        Response response = client.target(url)
+                .request(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + apiToken)
+                .post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                return response.body().string();
-            } else {
-                throw new IOException("Failed to send email: " + response.code());
-            }
+        if (response.getStatus() == 200 || response.getStatus() == 202) {
+            return response.readEntity(String.class);
+        } else {
+            LOGGER.error("Failed to send email. Status: {}, Error: {}",
+                    response.getStatus(),
+                    response.readEntity(String.class));
+            throw new IOException("Failed to send email to: " + recipient);
         }
+    }
+
+    /**
+     * Clean up resources.
+     */
+    public void close() {
+        client.close();
     }
 }

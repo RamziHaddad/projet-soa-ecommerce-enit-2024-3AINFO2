@@ -4,13 +4,17 @@ import java.util.Map;
 
 public class EmailRequest {
 
-    private String recipient; // Email recipient
+    private String recipient; // The email recipient
     private String subject;   // Subject of the email
-    private String templateId; // ID to select the email template
-    private Map<String, String> templateParams; // Dynamic content for placeholders
+    private Long templateId;  // ID of the template to use (changed to Long)
+    private Map<String, String> templateParams; // Dynamic values for template placeholders
 
-    // Constructor
-    public EmailRequest(String recipient, String subject, String templateId, Map<String, String> templateParams) {
+    // Default Constructor
+    public EmailRequest() {
+    }
+
+    // Constructor with parameters
+    public EmailRequest(String recipient, String subject, Long templateId, Map<String, String> templateParams) {
         this.recipient = recipient;
         this.subject = subject;
         this.templateId = templateId;
@@ -18,6 +22,7 @@ public class EmailRequest {
     }
 
     // Getters and Setters
+
     public String getRecipient() {
         return recipient;
     }
@@ -34,11 +39,11 @@ public class EmailRequest {
         this.subject = subject;
     }
 
-    public String getTemplateId() {
+    public Long getTemplateId() {
         return templateId;
     }
 
-    public void setTemplateId(String templateId) {
+    public void setTemplateId(Long templateId) {
         this.templateId = templateId;
     }
 
@@ -48,5 +53,15 @@ public class EmailRequest {
 
     public void setTemplateParams(Map<String, String> templateParams) {
         this.templateParams = templateParams;
+    }
+
+    @Override
+    public String toString() {
+        return "EmailRequest{" +
+                "recipient='" + recipient + '\'' +
+                ", subject='" + subject + '\'' +
+                ", templateId=" + templateId +
+                ", templateParams=" + templateParams +
+                '}';
     }
 }

@@ -3,8 +3,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.acme.model.Template;
 import org.acme.repository.TemplateRepository;
-import java.util.Optional;
-import java.util.NoSuchElementException;
 import java.util.List;
 import java.util.Map;
 @ApplicationScoped
@@ -20,10 +18,11 @@ public class TemplateService {
      * @param templateData Map of placeholder keys to their replacement values.
      * @return Processed template content.
      */
-    public String processTemplate(String templateId, Map<String, String> templateData) {
-        Optional<Template> template = templateRepository.findById(Long.parseLong(templateId))
-                        .orElseThrow(() -> new NoSuchElementException("Template not found for ID: " + templateId));
-
+    public String processTemplate(Long templateId, Map<String, String> templateData) {
+        Template template = templateRepository.findById(templateId);
+        if (template == null) {
+            throw new IllegalArgumentException("Template not found for ID: " + templateId);
+        }
         String content = template.getContent();
         for (Map.Entry<String, String> entry : templateData.entrySet()) {
             content = content.replace("{" + entry.getKey() + "}", entry.getValue());
@@ -37,9 +36,12 @@ public class TemplateService {
      * @param templateId The database ID of the template.
      * @return The corresponding Template object.
      */
-    public Template getTemplateById(String templateId) {
-        return templateRepository.findById(templateId)
-                .orElseThrow(() -> new IllegalArgumentException("Template not found for ID: " + templateId));
+    public Template getTemplateById(Long templateId) {
+        Template template = templateRepository.findById(templateId);
+        if (template == null) {
+            throw new IllegalArgumentException("Template not found for ID: " + templateId);
+        }
+        return template;
     }
 
     /**
@@ -84,9 +86,10 @@ public class TemplateService {
      * @return The updated Template object.
      */
     public Template updateTemplate(Long id, Template updatedTemplate) {
-        Template existingTemplate = templateRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Template not found for ID: " + id));
-
+        Template existingTemplate = templateRepository.findById(id);
+        if (existingTemplate == null) {
+            throw new IllegalArgumentException("Template not found for ID: " + id);
+        }
         existingTemplate.setContent(updatedTemplate.getContent());
         existingTemplate.setTemplateParams(updatedTemplate.getTemplateParams());
         return existingTemplate;
