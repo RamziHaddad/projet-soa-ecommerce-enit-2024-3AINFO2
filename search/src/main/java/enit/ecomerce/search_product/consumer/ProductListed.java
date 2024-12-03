@@ -1,4 +1,5 @@
 package enit.ecomerce.search_product.consumer;
+import java.util.UUID;
 
 import enit.ecomerce.search_product.product.Product;
 
@@ -8,7 +9,11 @@ public class ProductListed extends Event {
     private   String description;
     private   double price;
 
-    public ProductListed() {
+    public ProductListed(String eventType, String aggregateType, String aggregateId) {
+        super(eventType,aggregateType,aggregateId);
+    }
+    public ProductListed( ) {
+        super( );
     }
     public ProductListed(Product product) {
         super("productListed", "Product", product.getId().toString());
@@ -30,16 +35,27 @@ public class ProductListed extends Event {
         return description;
     }
 
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
     public double getPrice() {
         return price;
     } 
     @Override
     public String toString() {
         return "ProductListed{" +
-                "productId='" + this.eventId + '\'' +
+                "productId='" + super.aggregateType + '\'' +
                 ", productName='" + productName + '\'' +
                 ", price=" + price +
                 '}';
     }
 }
-

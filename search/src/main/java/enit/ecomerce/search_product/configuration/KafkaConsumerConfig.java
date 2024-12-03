@@ -56,8 +56,8 @@ public DefaultKafkaConsumerFactory<String, ProductListed> consumerFactory() {
     props.put(ConsumerConfig.GROUP_ID_CONFIG, "my-consumer-group");
 
     // Configure the ErrorHandlingDeserializer
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
     // Configure the actual deserializers
     props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
