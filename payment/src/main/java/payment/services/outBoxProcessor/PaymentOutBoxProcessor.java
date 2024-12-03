@@ -1,6 +1,6 @@
 package payment.services.outBoxProcessor;
 
 public interface PaymentOutBoxProcessor {
-    void processOutboxEvents(); 
-     
+    public  void processOutboxEvents(); 
+    // public void processFailedEvents() ; 
 }

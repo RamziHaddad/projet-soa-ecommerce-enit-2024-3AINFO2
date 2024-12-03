@@ -18,12 +18,14 @@ public class PaymentOutBoxRepositoryImpl implements PaymentOutBoxRepository {
     private EntityManager em;
 
     @Override
+    @Transactional
     public PaymentOutBox save(PaymentOutBox paymentOutBox) {
         em.persist(paymentOutBox); // Persist the entity into the database
         return paymentOutBox;
     }
 
     @Override
+    @Transactional
     public PaymentOutBox update(PaymentOutBox paymentOutBox) {
         return em.merge(paymentOutBox); // Update the entity in the database
     }

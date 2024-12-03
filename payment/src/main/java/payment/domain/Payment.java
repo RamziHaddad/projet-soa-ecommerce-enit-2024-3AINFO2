@@ -22,9 +22,23 @@ public class Payment {
     private PaymentStatus paymentStatus ; 
     
     private LocalDateTime paymentDate ; 
-    private  UUID transactionId ; 
+    
     private PaymentMethod paymentMethod ; 
     private UUID customerId ; 
+
+
+    public Payment() {
+    }
+
+    public Payment(UUID paymentId, UUID orderId, BigDecimal ammount, PaymentStatus paymentStatus, LocalDateTime paymentDate, PaymentMethod paymentMethod, UUID customerId) {
+        this.paymentId = paymentId;
+        this.orderId = orderId;
+        this.ammount = ammount;
+        this.paymentStatus = paymentStatus;
+        this.paymentDate = paymentDate;
+        this.paymentMethod = paymentMethod;
+        this.customerId = customerId;
+    }
 
     public UUID getPaymentId() {
         return this.paymentId;
@@ -66,14 +80,6 @@ public class Payment {
         this.paymentDate = paymentDate;
     }
 
-    public UUID getTransactionId() {
-        return this.transactionId;
-    }
-
-    public void setTransactionId(UUID transactionId) {
-        this.transactionId = transactionId;
-    }
-
     public PaymentMethod getPaymentMethod() {
         return this.paymentMethod;
     }
@@ -87,20 +93,6 @@ public class Payment {
     }
 
     public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
-    }
-
-    public Payment() {
-    }
-
-    public Payment(UUID paymentId, UUID orderId, BigDecimal ammount, PaymentStatus paymentStatus, LocalDateTime paymentDate, UUID transactionId, PaymentMethod paymentMethod, UUID customerId) {
-        this.paymentId = paymentId;
-        this.orderId = orderId;
-        this.ammount = ammount;
-        this.paymentStatus = paymentStatus;
-        this.paymentDate = paymentDate;
-        this.transactionId = transactionId;
-        this.paymentMethod = paymentMethod;
         this.customerId = customerId;
     }
 
@@ -129,11 +121,6 @@ public class Payment {
         return this;
     }
 
-    public Payment transactionId(UUID transactionId) {
-        setTransactionId(transactionId);
-        return this;
-    }
-
     public Payment paymentMethod(PaymentMethod paymentMethod) {
         setPaymentMethod(paymentMethod);
         return this;
@@ -152,12 +139,12 @@ public class Payment {
             return false;
         }
         Payment payment = (Payment) o;
-        return Objects.equals(paymentId, payment.paymentId) && Objects.equals(orderId, payment.orderId) && Objects.equals(ammount, payment.ammount) && Objects.equals(paymentStatus, payment.paymentStatus) && Objects.equals(paymentDate, payment.paymentDate) && Objects.equals(transactionId, payment.transactionId) && Objects.equals(paymentMethod, payment.paymentMethod) && Objects.equals(customerId, payment.customerId);
+        return Objects.equals(paymentId, payment.paymentId) && Objects.equals(orderId, payment.orderId) && Objects.equals(ammount, payment.ammount) && Objects.equals(paymentStatus, payment.paymentStatus) && Objects.equals(paymentDate, payment.paymentDate) && Objects.equals(paymentMethod, payment.paymentMethod) && Objects.equals(customerId, payment.customerId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(paymentId, orderId, ammount, paymentStatus, paymentDate, transactionId, paymentMethod, customerId);
+        return Objects.hash(paymentId, orderId, ammount, paymentStatus, paymentDate, paymentMethod, customerId);
     }
 
     @Override
@@ -168,7 +155,6 @@ public class Payment {
             ", ammount='" + getAmmount() + "'" +
             ", paymentStatus='" + getPaymentStatus() + "'" +
             ", paymentDate='" + getPaymentDate() + "'" +
-            ", transactionId='" + getTransactionId() + "'" +
             ", paymentMethod='" + getPaymentMethod() + "'" +
             ", customerId='" + getCustomerId() + "'" +
             "}";

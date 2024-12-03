@@ -63,12 +63,7 @@ public class PaymentServiceImpl implements PaymentService {
         creditCardRequest.setCardCode(paymentRequest.getCardCode());
         creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
         cardServices.registerCreditCard(creditCardRequest);
-        BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(
-            savedPayment.getPaymentId(),
-            paymentRequest.getAmount(),
-            paymentRequest.getCardNumber(),
-            paymentRequest.getCardCode()
-        );
+        
 
         // 6. Create a PaymentOutBox entry for the Outbox pattern
         PaymentOutBox outBoxEvent = new PaymentOutBox();
