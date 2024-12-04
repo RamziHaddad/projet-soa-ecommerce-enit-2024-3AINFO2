@@ -122,16 +122,27 @@ public class ProductAPI {
     @POST
     @Path("/checkItem")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Boolean checkAvailibilityItem(Item item){
-        return productService.checkAvailibilityProduct(item);
+    public Map<String, Object> checkAvailibilityItem(Item item){
+
+        Boolean status = productService.checkAvailibilityProduct(item);
+        if(status){
+            return Map.of("status","OK");
+        }else{
+            return Map.of("status", "Out of Stock");
+        }
     }
 
     //api for the order-service to check if the products' quantities of an order are available or not
     @POST
     @Path("/checkOrder")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Boolean checkAvailibilityOrder(AvailabilityCheckDTO order){
-        return productService.checkAvailibilityOrder(order);
+    public Map<String, Object> checkAvailibilityOrder(AvailabilityCheckDTO order){
+        Boolean status = productService.checkAvailibilityOrder(order);
+        if(status){
+            return Map.of("status","OK");
+        }else{
+            return Map.of("status", "Out of Stock");
+        }
     }
 
 
