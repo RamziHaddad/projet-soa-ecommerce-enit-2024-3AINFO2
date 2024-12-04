@@ -79,7 +79,6 @@ jobs:
           username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
           password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
           script: |
-
             sleep 10
 
             echo "Starting Java service..."
@@ -87,9 +86,11 @@ jobs:
             nohup java -jar service-catalog.jar --server.port=8082 > service-catalog.log 2>&1 &
             echo "Service deployed successfully!"
             
-            sleep 10
+            sleep 30
 
             echo "Performing health check..."
             curl -X 'GET'   'http://localhost:8082/products'   -H 'accept: /' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed successfully!"
+            
+            tail -n 50 ~/service-catalog/service-catalog.log
