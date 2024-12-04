@@ -19,12 +19,12 @@ public class InventoryService {
     private final WebClient webClient;
 
     public InventoryService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8083/api/inventory/checkOrder").build();
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8083/products/checkOrder").build();
     }
 
 
     public Map<String, Object> checkOrderAvailability(AvailabilityCheckDTO availabilityCheckDTO) {
-        String url = "http://localhost:8083/api/inventory/checkOrder";
+        String url = "http://localhost:8083/products/checkOrder";
 
         return webClient.post()
                 .uri(url)

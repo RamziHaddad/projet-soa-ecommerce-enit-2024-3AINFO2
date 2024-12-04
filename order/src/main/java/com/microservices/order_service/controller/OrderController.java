@@ -80,6 +80,13 @@ public class OrderController {
     public ResponseEntity<String> publishOrder(@RequestBody OrderEventDTO orderEventDTO){
         orderCreationProducer.sendMessage(orderEventDTO);
         return ResponseEntity.ok("Order published");
+    }
+
+    @PostMapping("/checkOrder")
+    public ResponseEntity<Map<String, Object>> CheckOrder(@RequestBody AvailabilityCheckDTO availabilityCheckDTO){
+        Map<String, Object> response = inventoryService.checkOrderAvailability(availabilityCheckDTO);
+        return ResponseEntity.ok(response);
+
 
     }
 }
