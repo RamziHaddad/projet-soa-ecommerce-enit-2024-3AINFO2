@@ -6,10 +6,14 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.ecommerce.domain.Product;
 import org.ecommerce.domain.ProductCategory;
+import org.ecommerce.domain.events.ProductAvailabilityEvent;
 import org.ecommerce.dto.InventoryEvent;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.UUID;
 
 @ApplicationScoped
@@ -23,6 +27,8 @@ public class KafkaProductConsumer {
 
     @Inject
     ProductRepository productRepo;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
     @Incoming("products-created")
@@ -108,5 +114,27 @@ public class KafkaProductConsumer {
             }
         }
         return category;
+    }
+
+    @Transactional
+    @Incoming("product-availability")
+    public void updateAvailabilityOfProduct(String payload) {
+        try {
+            ProductAvailabilityEvent event = objectMapper.readValue(payload, ProductAvailabilityEvent.class);
+            UUID productId = UUID.fromString(event.getAggregateId());
+            Product product = productService.getProductDetails(productId);
+
+            if (product != null) {
+                boolean isAvailable = "IN_STOCK".equals(event.getAvailability());
+                product.setDisponibility(isAvailable);
+                productService.updateProduct(product);
+                System.out.println("Product availability updated: " + product.getId() + " to " + isAvailable);
+            } else {
+                System.err.println("Product not found for availability update: " + productId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Failed to process product availability event: " + payload);
+        }
     }
 }
