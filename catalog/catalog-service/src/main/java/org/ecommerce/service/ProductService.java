@@ -3,6 +3,7 @@ package org.ecommerce.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -19,7 +20,10 @@ import org.ecommerce.repository.ProductRepository;
 //import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class ProductService {
 
@@ -32,6 +36,7 @@ public class ProductService {
     @Inject
     @Channel("products-out")
     Emitter<Event> productsEmitter;
+    private final Logger logger= LoggerFactory.getLogger(ProductService.class);
 
     public List<Product> findByRange(int page , int maxResults) {
         return productRepo.findByRange(page , maxResults);
@@ -58,7 +63,17 @@ public class ProductService {
         ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
         ProductListed productListed = new ProductListed(product);
-        productsEmitter.send(productListed);
+        try {
+            CompletionStage<Void> ack = productsEmitter.send(productListed);
+            ack.thenAccept(result -> {
+                logger.info("Product listed and sent via Kafka "+ack );
+            }).exceptionally(error -> {
+                logger.error("Error when sending the productlisted event");
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("Error when Serializing JSON ");
+        }
         System.out.println(productListed);
         return productRepo.insert(product);
     }
