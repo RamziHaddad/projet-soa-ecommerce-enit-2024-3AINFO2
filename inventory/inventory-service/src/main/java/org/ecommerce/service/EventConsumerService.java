@@ -8,7 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.ecommerce.model.Item;
-import org.ecommerce.model.Order;
+import org.ecommerce.model.Orders;
 import org.ecommerce.model.OrderDTO;
 import org.ecommerce.repository.OrderRepository;
 
@@ -28,7 +28,7 @@ public class EventConsumerService {
     @Transactional
     public void consumeOrderCreationEvent(String orderEventJSON)throws JsonProcessingException {
         try{
-            Order order= objectMapper.readValue(orderEventJSON,Order.class);
+            Orders order= objectMapper.readValue(orderEventJSON,Orders.class);
             System.out.println("orderEventJSON:\t"+orderEventJSON);
             orderRepository.addOrder(order);
             for(Item item :order.getItems()){
@@ -46,7 +46,7 @@ public class EventConsumerService {
         try{
             OrderDTO orderDTO= objectMapper.readValue(orderEventJSON,OrderDTO.class);
             System.out.println("orderEventJSON:\t"+orderEventJSON);
-            Order order=orderRepository.getOrderByID(orderDTO.getOrderId())
+            Orders order=orderRepository.getOrderByID(orderDTO.getOrderId())
                     .orElseThrow(() -> new WebApplicationException("Product not found", 404));
             if(Objects.equals(orderDTO.getStatus(), "canceled")){
                 order.setStatus("canceled");

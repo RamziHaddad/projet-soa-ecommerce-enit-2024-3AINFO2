@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.ecommerce.model.Order;
+import org.ecommerce.model.Orders;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -15,19 +15,19 @@ public class OrderRepository {
     EntityManager em;
 
     @Transactional
-    public Optional<Order> getOrderByID(UUID id) {
-        Order order = em.find(Order.class, id);
+    public Optional<Orders> getOrderByID(UUID id) {
+        Orders order = em.find(Orders.class, id);
         return Optional.ofNullable(order);
     }
 
     @Transactional
-    public Order addOrder(Order order) {
+    public Orders addOrder(Orders order) {
         em.persist(order);
         return order;
     }
 
     @Transactional
-    public Order updateOrder(Order order) {
+    public Orders updateOrder(Orders order) {
         return em.merge(order);
     }
 }
