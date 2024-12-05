@@ -13,8 +13,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
-//import java.util.Map;
-
+import java.util.HashMap;
+import java.util.Map;
 @Path("/emails")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -24,25 +24,32 @@ public class EmailController {
     MailtrapService mailtrapService;
 
     @Inject
-    TemplateService templateService;  // Inject TemplateService to process templates
+    TemplateService templateService;
+
     @POST
     @Path("/{templateId}")
     @Transactional
     public Response sendEmail(@PathParam("templateId") Long templateId, EmailRequest emailRequest) {
-        // Set the template ID in the email request
         emailRequest.setTemplateId(templateId);
-    
+
         try {
-            // Delegate the email sending process to the service
-            String result = mailtrapService.sendEmail(emailRequest);
-            return Response.ok(result).build();
+            // Generate the email content
+            String processedContent = templateService.processTemplate(templateId, emailRequest.getTemplateParams());
+
+            // Send the email and get the result from MailtrapService
+            String mailtrapResult = mailtrapService.sendEmail(emailRequest);
+
+            // Return the result along with the processed email content
+            Map<String, Object> responsePayload = new HashMap<>();
+            responsePayload.put("mailtrapResult", mailtrapResult);
+            responsePayload.put("processedContent", processedContent);
+
+            return Response.ok(responsePayload).build();
         } catch (IllegalArgumentException e) {
-            // Handle validation or missing template issues
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (IOException e) {
-            // Handle email sending issues
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to send email: " + e.getMessage()).build();
         }
     }
-    
 }
+
