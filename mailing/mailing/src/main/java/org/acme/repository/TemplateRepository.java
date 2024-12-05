@@ -35,8 +35,9 @@ public class TemplateRepository implements PanacheRepository<Template> {
      * @param template The template to persist or update.
      */
     public void saveOrUpdate(Template template) {
-        if (template.getId() != null) {
-            Template existingTemplate = findById(Long.parseLong(template.getId()));
+        if (template.getId()> 0) {
+            long longId= (long) template.getId();
+            Template existingTemplate = findById(longId);
             if (existingTemplate != null) {
                 // Update existing template
                 existingTemplate.setContent(template.getContent());

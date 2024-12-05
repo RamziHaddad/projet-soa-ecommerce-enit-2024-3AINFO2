@@ -6,7 +6,7 @@ public class EmailRequest {
 
     private String recipient; // The email recipient
     private String subject;   // Subject of the email
-    private Long templateId;  // ID of the template to use (changed to Long)
+    private int templateId;  // ID of the template to use (changed to Long)
     private Map<String, String> templateParams; // Dynamic values for template placeholders
 
     // Default Constructor
@@ -14,7 +14,7 @@ public class EmailRequest {
     }
 
     // Constructor with parameters
-    public EmailRequest(String recipient, String subject, Long templateId, Map<String, String> templateParams) {
+    public EmailRequest(String recipient, String subject, int templateId, Map<String, String> templateParams) {
         this.recipient = recipient;
         this.subject = subject;
         this.templateId = templateId;
@@ -39,11 +39,11 @@ public class EmailRequest {
         this.subject = subject;
     }
 
-    public Long getTemplateId() {
+    public int getTemplateId() {
         return templateId;
     }
 
-    public void setTemplateId(Long templateId) {
+    public void setTemplateId(int templateId) {
         this.templateId = templateId;
     }
 

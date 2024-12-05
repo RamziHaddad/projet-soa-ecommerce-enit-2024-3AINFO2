@@ -26,7 +26,7 @@ public class TemplateController {
 
     @GET
     @Path("/{id}")
-    public Response getTemplateById(@PathParam("id") Long id) {
+    public Response getTemplateById(@PathParam("id") int id) {
         Template template = templateService.getTemplateById(id);
         if (template == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Template not found").build();
@@ -37,14 +37,14 @@ public class TemplateController {
     @POST
     @Transactional
     public Response createTemplate(Template template) {
-        Template createdTemplate = templateService.createTemplate(template);
+        Template createdTemplate = templateService.createTemplate();
         return Response.status(Response.Status.CREATED).entity(createdTemplate).build();
     }
 
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response updateTemplate(@PathParam("id") Long id, Template updatedTemplate) {
+    public Response updateTemplate(@PathParam("id") int id, Template updatedTemplate) {
         try {
             Template template = templateService.updateTemplate(id, updatedTemplate);
             return Response.ok(template).build();
@@ -56,7 +56,7 @@ public class TemplateController {
     @DELETE
     @Path("/{id}")
     @Transactional
-    public Response deleteTemplate(@PathParam("id") Long id) {
+    public Response deleteTemplate(@PathParam("id") int id) {
         if (templateService.deleteTemplate(id)) {
             return Response.noContent().build();
         } else {

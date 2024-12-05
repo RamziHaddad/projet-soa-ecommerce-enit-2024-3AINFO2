@@ -1,7 +1,79 @@
-# 1 mvn io.quarkus.platform:quarkus-maven-plugin:3.16.2:create `
-    -DprojectGroupId="org.acme" `
-    -DprojectArtifactId="mailing" `
-    -Dextensions="resteasy-reactive,quarkus-mailer,qute" `
-    -DnoCode
+Build Docker image via quarkus steps :
+Step-by-Step Instructions
+1. Build the Application
+Ensure your application is built before creating the container image. Run the following command in your project's root directory:
 
-# 2 ./mvnw quarkus:add-extension -Dextensions='mailer'
+bash
+Copy code
+./mvnw package
+This will generate the necessary JAR files or native executable in the target directory.
+
+2. Configure Application Properties (Optional)
+If required, configure your application.properties file with custom settings like JVM options, debugging, or custom entry points. For example:
+
+properties
+Copy code
+# Example: Enable debugging on port 5005
+quarkus.jib.jvm-additional-arguments=-agentlib:jdwp=transport=dt_socket\\,server=y\\,suspend=n\\,address=*:5005
+3. Build the Container Image
+Depending on the container image extension you're using:
+
+For Jib:
+
+bash
+Copy code
+./mvnw compile quarkus:build -Dquarkus.container-image.build=true
+This will build the container image and store it locally. You can customize the build process using properties in your application.properties file.
+
+For Docker: Add the container-image-docker extension:
+
+bash
+Copy code
+./mvnw quarkus:add-extension -Dextensions='container-image-docker'
+Then, build the image using Docker:
+
+bash
+Copy code
+./mvnw compile quarkus:build -Dquarkus.container-image.build=true
+4. Verify the Built Image
+After building the image, verify it using:
+
+bash
+Copy code
+docker images
+You should see the built image listed.
+
+5. Run the Container
+Run the containerized application using Docker:
+
+bash
+Copy code
+docker run -p 8080:8080 your-image-name
+Replace your-image-name with the name of the image you built. If you configured environment variables in application.properties, they will be applied automatically.
+
+6. Use Docker Compose (Optional)
+If you want to use Docker Compose for orchestrating multiple services, create a docker-compose.yml file in your project directory. Here's an example configuration:
+
+yaml
+Copy code
+version: "3.9"
+services:
+  quarkus-app:
+    image: your-image-name
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Dquarkus.http.host=0.0.0.0
+Start the services with:
+
+bash
+Copy code
+docker-compose up
+Next Steps
+Test your application by accessing it at http://localhost:8080.
+Optionally, push the image to a container registry (e.g., Docker Hub) using:
+bash
+Copy code
+docker tag your-image-name registry/your-image-name
+docker push registry/your-image-name
+Let me know if you'd like help with specific commands or debugging any issues!

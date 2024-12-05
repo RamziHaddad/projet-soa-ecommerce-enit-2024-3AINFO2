@@ -1,0 +1,28 @@
+
+
+services:
+  mailing:
+    image: quarkus/mailing-jvm
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS_APPEND=-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://postgres:5432/mailingdb
+      - QUARKUS_DATASOURCE_USERNAME=mailinguser
+      - QUARKUS_DATASOURCE_PASSWORD=mailingpassword
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=mailingdb
+      - POSTGRES_USER=mailinguser
+      - POSTGRES_PASSWORD=mailingpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

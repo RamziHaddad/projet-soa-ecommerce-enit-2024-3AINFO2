@@ -1,10 +1,12 @@
 
 package org.acme.controller;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.acme.model.EmailRequest;
 //import org.acme.model.Template;
 import org.acme.service.MailtrapService;
 import org.acme.service.TemplateService;
+
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,11 +26,12 @@ public class EmailController {
     MailtrapService mailtrapService;
 
     @Inject
+
     TemplateService templateService;  // Inject TemplateService to process templates
     @POST
     @Path("/{templateId}")
     @Transactional
-    public Response sendEmail(@PathParam("templateId") Long templateId, EmailRequest emailRequest) {
+    public Response sendEmail(@PathParam("templateId") int templateId, EmailRequest emailRequest) {
         // Set the template ID in the email request
         emailRequest.setTemplateId(templateId);
     

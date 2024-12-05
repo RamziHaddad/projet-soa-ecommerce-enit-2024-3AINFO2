@@ -1,4 +1,5 @@
 package org.acme.model;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
 
@@ -43,5 +44,13 @@ public class Template extends PanacheEntity {
 
     public void setTemplateParams(Map<String, String> templateParams) {
         this.templateParams = templateParams;
+    }
+
+    public void setId(int templateId) {
+        this.id = (long)templateId;
+    }
+
+    public int getId() {
+        return this.id.intValue();
     }
 }
