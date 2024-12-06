@@ -50,7 +50,7 @@ public class OrderController {
     public ResponseEntity<Map<String, Object>> sendOrderToInventory(@RequestBody AvailabilityCheckDTO availabilityCheckDTO) {
         Map<String, Object> response = inventoryService.checkOrderAvailability(availabilityCheckDTO);
 
-        if ("ok".equals(response.get("status"))) {
+        if ("OK".equals(response.get("status"))) {
             Order order = orderService.getOrderById(availabilityCheckDTO.getOrderId());
             order.setStockVerification(true);
             order.setOrderStatus("Order Created");
@@ -86,7 +86,6 @@ public class OrderController {
     public ResponseEntity<Map<String, Object>> CheckOrder(@RequestBody AvailabilityCheckDTO availabilityCheckDTO){
         Map<String, Object> response = inventoryService.checkOrderAvailability(availabilityCheckDTO);
         return ResponseEntity.ok(response);
-
 
     }
 }
