@@ -5,12 +5,12 @@ services:
     container_name: db_order
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: fadizoe1212
+      POSTGRES_PASSWORD: nebras2001
       POSTGRES_DB: db_order
       PGDATA: /var/lib/postgresql/data
 
     ports:
-      - "5433:5432"
+      - "5437:5432"
     volumes:
       - db_order_data:/var/lib/postgresql/data
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,17 +1,17 @@
 package com.microservices.order_service.controller;
 
-import com.microservices.order_service.dto.AvailabilityCheckDTO;
-import com.microservices.order_service.dto.OrderEventDTO;
-import com.microservices.order_service.dto.OrderRequest;
+import com.microservices.order_service.dto.*;
 import com.microservices.order_service.kafka.OrderCreationProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
 import com.microservices.order_service.service.OrderService;
+import com.microservices.order_service.service.PricingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +25,8 @@ public class OrderController {
     private final InventoryService inventoryService;
 
     private final OrderCreationProducer orderCreationProducer;
+
+    private final PricingService pricingService;
 
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
@@ -88,6 +90,11 @@ public class OrderController {
         return ResponseEntity.ok(response);
 
 
+    }
+    @PostMapping("/checkPrice")
+    public ResponseEntity<cartResponse> CheckPrice(@RequestBody List<CartItem> cartItems){
+        cartResponse response = pricingService.checkPrice(cartItems);
+        return ResponseEntity.ok(response);
     }
 }
 
