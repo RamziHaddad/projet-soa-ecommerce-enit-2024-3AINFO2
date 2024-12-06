@@ -18,9 +18,9 @@ public class InventoryConsumer {
         this.productService = productService;
     }
 
-    @KafkaListener(topics = "product-added", groupId = "pricing-service")
+    @KafkaListener(topics = "add-product", groupId = "pricing-service")
     public void productAdded(InventoryEvent product) {
-        logger.info("Received product event ", product.getProductId());
+        logger.info("Received product ", product.getProductId());
         try{
             productService.addProduct(product.getProductId() , product.getCategory());
         }catch(Exception e){
@@ -29,9 +29,9 @@ public class InventoryConsumer {
         
     }
 
-     @KafkaListener(topics = "product-updated", groupId = "pricing-service")
+     @KafkaListener(topics = "update-product", groupId = "pricing-service")
     public void productUpdated(InventoryEvent product) {
-        logger.info("Received product event", product.getProductId());
+        logger.info("Received product ", product.getProductId());
         try{
             productService.updateProduct(product.getProductId() ,product.getCategory());
         }catch(Exception e){
@@ -39,9 +39,9 @@ public class InventoryConsumer {
         }
     }
 
-    @KafkaListener(topics = "product-deleted", groupId = "pricing-service")
+    @KafkaListener(topics = "delete-product", groupId = "pricing-service")
     public void productDeleted(InventoryEvent product) {
-         logger.info("Received product event", product.getProductId());
+         logger.info("Received product", product.getProductId());
         try{
             productService.deleteProduct(product.getProductId());
         }catch(Exception e){

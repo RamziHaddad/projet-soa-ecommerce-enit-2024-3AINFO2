@@ -3,7 +3,6 @@ package com.enit.pricing.Controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enit.pricing.dto.CartItem;
-import com.enit.pricing.dto.CatalogPriceResponse;
 import com.enit.pricing.dto.CartResponse;
 import com.enit.pricing.service.PricingService;
 import com.enit.pricing.service.ProductService;
@@ -39,7 +38,8 @@ public class PricingController {
         this.pricingService = pricingService;
     }
 
-    // Calculate the cart total
+    // Calculate the total
+    //will be used by order and cart to calculate the total price of all the products
     @PostMapping("/cart-total")
     public ResponseEntity <CartResponse> calculateCartTotal(@RequestBody List<CartItem> cartItems) {
         BigDecimal totalBefore= pricingService.calculateCartTotal(cartItems);
@@ -47,16 +47,6 @@ public class PricingController {
         CartResponse cartResponse = new CartResponse(totalBefore, total);
         return ResponseEntity.ok(cartResponse);
     }
-
-//Calculate product price after promotion
-    @PostMapping("/product-price")
-    public ResponseEntity<CatalogPriceResponse> calculateProductPrice(@RequestBody UUID prodId) {
-        //BigDecimal price = pricingService.calculateProductPrice(prodId);
-        System.out.println("im in");
-        BigDecimal price = BigDecimal.valueOf(19.99);
-        CatalogPriceResponse catalogPriceResponse = new CatalogPriceResponse(prodId, price);
-        return ResponseEntity.ok(catalogPriceResponse);
-    } 
 
 
     // Returns the base price of a product

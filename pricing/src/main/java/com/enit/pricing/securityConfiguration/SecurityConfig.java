@@ -18,7 +18,6 @@ public class SecurityConfig {
             .cors(cors -> cors.disable())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/pricing/**").permitAll()
-                .requestMatchers("/inventory/**").permitAll() 
                 .anyRequest().permitAll()
             )
             .httpBasic(Customizer.withDefaults())
