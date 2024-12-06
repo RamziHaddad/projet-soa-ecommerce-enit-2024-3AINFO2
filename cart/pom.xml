@@ -61,6 +61,11 @@
             <artifactId>redisson</artifactId>
             <version>3.22.1</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-kafka-client</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
