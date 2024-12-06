@@ -18,18 +18,21 @@ public class TemplateService {
      * @param templateData Map of placeholder keys to their replacement values.
      * @return Processed template content.
      */
-    public String processTemplate(Long templateId, Map<String, String> templateData) {
+    public String processTemplate(Long templateId, Map<String, String> templateParams) {
         Template template = templateRepository.findById(templateId);
         if (template == null) {
             throw new IllegalArgumentException("Template not found for ID: " + templateId);
         }
+    
+        // Replace placeholders in the template content
         String content = template.getContent();
-        for (Map.Entry<String, String> entry : templateData.entrySet()) {
+        for (Map.Entry<String, String> entry : templateParams.entrySet()) {
             content = content.replace("{" + entry.getKey() + "}", entry.getValue());
         }
+    
         return content;
     }
-
+    
     /**
      * Retrieves a template by its ID.
      *
@@ -44,20 +47,7 @@ public class TemplateService {
         return template;
     }
 
-    /**
-     * Validates that all required placeholders have corresponding values.
-     *
-     * @param requiredPlaceholders List of required placeholder keys.
-     * @param providedParams       Map of provided placeholder keys to values.
-     */
-    public void validateParams(List<String> requiredPlaceholders, Map<String, String> providedParams) {
-        for (String placeholder : requiredPlaceholders) {
-            if (!providedParams.containsKey(placeholder)) {
-                throw new IllegalArgumentException("Missing parameter: " + placeholder);
-            }
-        }
-    }
-
+   
     /**
      * Creates a new template in the database.
      *
@@ -91,7 +81,6 @@ public class TemplateService {
             throw new IllegalArgumentException("Template not found for ID: " + id);
         }
         existingTemplate.setContent(updatedTemplate.getContent());
-        existingTemplate.setTemplateParams(updatedTemplate.getTemplateParams());
         return existingTemplate;
     }
 
