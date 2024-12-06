@@ -2,7 +2,6 @@ package org.soa.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.soa.model.Cart;
@@ -40,16 +39,18 @@ public class CartService {
     public void addItem(UUID userId, Item item) {
         RMap<UUID, Cart> carts = getCartsMap();
         Cart cart = carts.get(userId);
-
+    
         if (cart == null) {
             throw new IllegalArgumentException("Cart not found for userId: " + userId);
         }
 
         cart.getItems().compute(item.getItemId(), (key, existingItem) -> {
             if (existingItem != null) {
+                // Si l'item existe déjà, on incrémente la quantité
                 existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
                 return existingItem;
             }
+            // Sinon on ajoute l'item
             return item;
         });
 
@@ -75,12 +76,21 @@ public class CartService {
     public void removeItem(UUID userId, UUID productId) {
         RMap<UUID, Cart> carts = getCartsMap();
         Cart cart = carts.get(userId);
-
+    
         if (cart == null) {
             throw new IllegalArgumentException("Cart not found for userId: " + userId);
         }
+    
+        cart.getItems().computeIfPresent(productId, (key, existingItem) -> {
+            if (existingItem.getQuantity() > 1) {
+                // Si la quantité est supérieure à 1, on décrémente
+                existingItem.setQuantity(existingItem.getQuantity() - 1);
+                return existingItem;
+            }
+            // Sinon on supprime l'item
+            return null;
+        });
 
-        cart.getItems().remove(productId);
         carts.put(userId, cart); // Mise à jour explicite
     }
 

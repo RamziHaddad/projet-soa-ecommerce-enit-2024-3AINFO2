@@ -31,18 +31,21 @@ public class CartResource {
     @Path("/create/{userId}")
     public Response createCart(@PathParam("userId") UUID userId) {
         Cart cart = cartService.createCart(userId); // Appelle createCart pour créer le panier
-        return Response.status(Response.Status.CREATED).entity("New Cart created with cartId : " + cart.getCartId())
+        return Response.status(Response.Status.CREATED)
+                .entity("New Cart created with cartId: " + cart.getCartId())
                 .build();
     }
     
     @GET
     @Path("/get/{userId}")
-    public Cart getCart(@PathParam("userId") UUID userId) {
+    public Response getCart(@PathParam("userId") UUID userId) {
         Cart cart = cartService.getCart(userId);
-        return cart;
+        if (cart == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Cart not found").build();
+        }
+        return Response.ok(cart).build();
     }
 
-    // Récupérer les articles du panier de l'utilisateur par son ID
     @GET
     @Path("/{userId}/items")
     public Response getItems(@PathParam("userId") UUID userId) {
@@ -53,7 +56,6 @@ public class CartResource {
         return Response.ok(cart.getItems()).build();
     }
 
-    // Ajouter un article au panier de l'utilisateur
     @POST
     @Path("/{userId}/add-item")
     public Response addItem(@PathParam("userId") UUID userId, Item cartItem) {
@@ -68,27 +70,25 @@ public class CartResource {
         return Response.ok("Item updated in cart").build();
     }
 
-    // Supprimer un article du panier de l'utilisateur
     @DELETE
     @Path("/{userId}/remove-item/{productId}")
     public Response removeItem(@PathParam("userId") UUID userId, @PathParam("productId") UUID productId) {
-        Cart cart = cartService.getCart(userId);
-        if (cart == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Cart not found").build();
+        try {
+            cartService.removeItem(userId, productId);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        cartService.removeItem(userId, productId);
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    // Vider le panier de l'utilisateur
     @DELETE
     @Path("/{userId}/clear")
     public Response clearCart(@PathParam("userId") UUID userId) {
-        Cart cart = cartService.getCart(userId);
-        if (cart == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Cart not found").build();
+        try {
+            cartService.clearCart(userId);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        cartService.clearCart(userId);
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }
