@@ -41,7 +41,6 @@ public class TemplateRepository implements PanacheRepository<Template> {
             if (existingTemplate != null) {
                 // Update existing template
                 existingTemplate.setContent(template.getContent());
-                existingTemplate.setTemplateParams(template.getTemplateParams());
                 persist(existingTemplate);
                 return;
             }
