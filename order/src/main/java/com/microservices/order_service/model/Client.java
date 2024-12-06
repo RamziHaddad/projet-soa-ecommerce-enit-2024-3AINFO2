@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.UUID;
 
 @Entity
@@ -32,6 +33,14 @@ public class Client {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "numero_cart_bancaire")
+    private BigInteger numeroCartBancaire;  // Use BigInteger for large number storage
+
+
+    @Column(name = "code_secret")
+    private String codeSecret;
+
 
     // Add any other necessary client-related fields here
 }
