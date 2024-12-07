@@ -22,6 +22,10 @@ public class EventProducerService {
     @Channel("product-events")
     Emitter<String> productEventEmitter;
 
+    @Inject
+    @Channel("product-disponibility")
+    Emitter<String> disponibiltyEventEmitter;
+
     @PostPersist
     public void sendProductEvent(Product product, String eventType) throws JsonProcessingException {
         ProductEvent productEvent = new ProductEvent(
@@ -59,7 +63,7 @@ public class EventProducerService {
         try{
             //String jsonEvent = new Gson().toJson(productEvent);
             String productJSON=objectMapper.writeValueAsString(productEvent);
-            productEventEmitter.send(productJSON);}
+            disponibiltyEventEmitter.send(productJSON);}
         catch (Exception e){
             e.printStackTrace();
         }
