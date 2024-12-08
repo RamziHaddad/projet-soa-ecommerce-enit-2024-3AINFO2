@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AvailabilityCheckDTO {
-    private UUID orderId;
+    private Long orderId;
     private List<Item> items;
 
 }

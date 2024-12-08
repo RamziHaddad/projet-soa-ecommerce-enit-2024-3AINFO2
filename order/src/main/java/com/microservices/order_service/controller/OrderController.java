@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/order")
@@ -30,13 +29,13 @@ public class OrderController {
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> DeleteOrder(@PathVariable("id") UUID id){
+    public ResponseEntity<String> DeleteOrder(@PathVariable("id") Long id){
         orderService.deleteOrder(id);
         return ResponseEntity.ok("Order deleted");
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> UpdateOrder(@PathVariable("id") UUID id, @RequestBody Order order){
+    public ResponseEntity<String> UpdateOrder(@PathVariable("id") Long id, @RequestBody Order order){
         orderService.updateOrder(id, order);
         return ResponseEntity.ok("Order updated successfully");
     }
@@ -58,7 +57,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrder(@PathVariable("id") UUID id){
+    public ResponseEntity<Order> getOrder(@PathVariable("id") Long id){
         Order order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record OrderRequest(
-        UUID id,         // Cart ID
+        Long id,         // Cart ID
         List<Item> items,            // List of items (nested record for items)
         String orderStatus                   // jj
 ) {
