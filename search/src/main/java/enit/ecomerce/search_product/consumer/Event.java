@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
  @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed")
+ 
 })
 
 public abstract class Event {
