@@ -10,6 +10,7 @@ import com.microservices.order_service.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 
 
 @Service
@@ -27,11 +28,11 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public void deleteOrder(Long id) {
+    public void deleteOrder(UUID id) {
         orderRepository.deleteById(id);
     }
 
-    public void updateOrder(Long id, Order orderToUpdate) {
+    public void updateOrder(UUID id, Order orderToUpdate) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -57,7 +58,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public Order getOrderById(Long id) {
+    public Order getOrderById(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }

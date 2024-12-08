@@ -24,10 +24,10 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(name = "idCart")
-    private Long idCart;
+    private UUID idCart;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch type
     @JoinColumn(name = "id") // Foreign key in the Item table
