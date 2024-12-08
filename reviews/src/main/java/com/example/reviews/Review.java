@@ -1,36 +1,24 @@
 package com.example.reviews;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
-@Entity
+
+@Entity  // This annotation marks the class as a JPA entity
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;  // Unique identifier for each review (auto-generated)
 
-    @NotNull
-    private Long productId; // Just storing product_id as Long instead of the Product entity
+    private Long productId;  // ID of the product being reviewed
+    private String username;  // Username of the reviewer
+    private String reviewText;  // Text content of the review
 
-    @NotNull
-    private String username;
+    // Getters and setters for the fields
 
-    @Size(max = 500)
-    private String reviewText;
-
-    // Constructors
-    public Review() {}
-
-    public Review(Long id, Long productId, String username, String reviewText) {
-        this.id = id;
-        this.productId = productId;
-        this.username = username;
-        this.reviewText = reviewText;
-    }
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3faad96b-9dc6-46ec-baef-4a3373caba7b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/Review.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/Review.java" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/Review.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/src/main/java/com/example/reviews/ReviewRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reviews/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/reviews/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +36,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "46ffdd74",
+    "git-widget-placeholder": "52d8da72",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/manel/OneDrive/Bureau/ProjetHadad/projet-soa-ecommerce-enit-2024-3AINFO2",
@@ -134,7 +136,7 @@
       <workItem from="1733584380405" duration="3923000" />
       <workItem from="1733588553312" duration="32000" />
       <workItem from="1733588596115" duration="123000" />
-      <workItem from="1733588723477" duration="4047000" />
+      <workItem from="1733588723477" duration="9259000" />
     </task>
     <servers />
   </component>
