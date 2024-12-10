@@ -15,15 +15,15 @@ import org.ecommerce.domain.events.ProductListed;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
+import org.ecommerce.domain.Outbox;
 
-//import io.quarkus.scheduler.Scheduled;
-//import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @ApplicationScoped
 public class ProductService {
 
@@ -36,10 +36,12 @@ public class ProductService {
     @Inject
     @Channel("products-out")
     Emitter<Event> productsEmitter;
-    private final Logger logger= LoggerFactory.getLogger(ProductService.class);
+    @Inject
+    OutboxService outboxService;
+    private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-    public List<Product> findByRange(int page , int maxResults) {
-        return productRepo.findByRange(page , maxResults);
+    public List<Product> findByRange(int page, int maxResults) {
+        return productRepo.findByRange(page, maxResults);
     }
 
     public List<Product> findAll() {
@@ -51,57 +53,47 @@ public class ProductService {
     }
 
     public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
-        product.setId(UUID.randomUUID());
 
-        //waiting for pricing 
-        //product.setBasePrice(pricingService.getProductPrice(product.getId()));
+        product.setId(UUID.randomUUID());
         BigDecimal temp = new BigDecimal("10506");
         product.setBasePrice(temp);
         product.setShownPrice(product.getBasePrice());
-        /// temporary for testing 
-        
+
+
         ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
         ProductListed productListed = new ProductListed(product);
+
+
+        Outbox outboxMessage = outboxService.createOutboxMessage(productListed.toString());
+
+        if (outboxMessage == null) {
+            logger.error("Failed to create outbox message for product: " + product.getProductName());
+            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+        }
+
+
         try {
             CompletionStage<Void> ack = productsEmitter.send(productListed);
             ack.thenAccept(result -> {
-                logger.info("Product listed and sent via Kafka "+ack );
+                logger.info("Product listed and sent via Kafka: " + productListed);
+                outboxService.markAsSent(outboxMessage.getId());
             }).exceptionally(error -> {
-                logger.error("Error when sending the productlisted event");
+                logger.error("Error when sending the product listed event: " + error.getMessage());
+                outboxService.markAsFailed(outboxMessage.getId());
                 return null;
             });
         } catch (Exception e) {
-            logger.error("Error when Serializing JSON ");
+            logger.error("Error when serializing JSON: " + e.getMessage());
+            outboxService.markAsFailed(outboxMessage.getId());
         }
-        System.out.println(productListed);
+
+
         return productRepo.insert(product);
     }
 
-    // @Scheduled(every = "12h", concurrentExecution = ConcurrentExecution.SKIP)
-    // public void checkPriceUpdates(){
-    //     int page = 0;
-    //     int maxResults = 10; // Adjust the range as needed
-    //     List<Product> products;
-    //     do {
-    //         products = findByRange(page, maxResults);
-    //         products.forEach(product -> {
-    //             BigDecimal newPrice = pricingService.getProductPrice(product.getId());
-    //             if (product.getShownPrice() != newPrice) {
-    //                 product.setShownPrice(newPrice);
-    //                 try {
-    //                     productRepo.update(product);
-    //                 } catch (EntityNotFoundException e) {
-    //                     e.printStackTrace();
-    //                 }
-    //             }
-    //         });
-    //         page++;
-    //     } while (!products.isEmpty());
-    // }
-
     public Product updateProduct(Product product) throws EntityNotFoundException {
-        return productRepo.update(product);      
+        return productRepo.update(product);
     }
 
     public void removeProduct(UUID id) {

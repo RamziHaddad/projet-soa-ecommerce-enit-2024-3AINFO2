@@ -1,19 +1,18 @@
 package org.ecommerce.domain.events;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import lombok.Data;
 import lombok.ToString;
 
 @JsonTypeInfo(
- use = JsonTypeInfo.Id.NAME,
- include = JsonTypeInfo.As.EXISTING_PROPERTY,
- property = "eventType",
- visible = true
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "eventType",
+        visible = true
 )
 @JsonSubTypes({
  @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed"),
@@ -29,12 +28,19 @@ public abstract class Event {
     protected String aggregateType;
     protected String aggregateId;
     protected LocalDateTime createdAt = LocalDateTime.now();
-    public Event(){};
+
+    public Event() {}
+
     public Event(String eventType, String aggregateType, String aggregateId) {
         this.eventType = eventType;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
     }
+
+    public UUID getEventId() {
+        return eventId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -51,6 +57,7 @@ public abstract class Event {
             return false;
         return true;
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -58,7 +65,4 @@ public abstract class Event {
         result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
         return result;
     }
-
-    
-    
 }
