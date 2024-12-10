@@ -1,43 +1,23 @@
 package org.shipping.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
 import java.util.UUID;
 
-public class AddressDTO {
+public class AddressUpdateDTO {
 
-    private UUID addressId; // Utilisé pour l'identifiant de l'adresse (lecture seule)
-
-    @NotBlank(message = "Street is mandatory")
+    private UUID addressId; // Optionnel si nécessaire
     @Size(max = 100, message = "Street cannot exceed 100 characters")
     private String street; // Rue de l'adresse
 
-    @NotBlank(message = "Postal Code is mandatory")
     @Pattern(regexp = "^[0-9]{4}$", message = "Postal code must be a 4-digit number.")
     private String postalCode; // Code postal
 
-    @NotBlank(message = "City is mandatory")
     @Size(max = 50, message = "City cannot exceed 50 characters")
     private String city; // Ville
 
-    @NotBlank(message = "Country is mandatory")
     @Size(max = 50, message = "Country cannot exceed 50 characters")
     private String country; // Pays
-
-    // Constructeur sans paramètres
-    public AddressDTO() {
-    }
-
-    // Constructeur avec paramètres
-    public AddressDTO(UUID addressId, String street, String postalCode, String city, String country) {
-        this.addressId = addressId;
-        this.street = street;
-        this.postalCode = postalCode;
-        this.city = city;
-        this.country = country;
-    }
 
     // Getters et setters
     public UUID getAddressId() {

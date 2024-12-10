@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.shipping.dto.DeliveryStatusMessage;
-import org.shipping.model.Shipment.DeliveryStatus;
+import org.shipping.model.DeliveryStatus;
 
 @ApplicationScoped
 public class DeliveryStatusPublisher {

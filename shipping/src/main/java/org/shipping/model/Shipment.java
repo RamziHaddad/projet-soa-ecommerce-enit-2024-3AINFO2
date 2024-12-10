@@ -16,30 +16,27 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "orderId", "addressId" }) })
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "orderId" }) })
 public class Shipment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID shipmentId;
+
     @Column(nullable = false, updatable = false)
     private UUID orderId; // Identifiant de la commande associée
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate = LocalDateTime.now(); // Date de création
-    private LocalDateTime deliveryDate; // Date de livraison prévue/effective
+
+    private LocalDateTime deliveryDate = LocalDateTime.now().plusDays(2); // Date de livraison prévue/effective
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "addressId", referencedColumnName = "addressId", nullable = false)
     private Address deliveryAddress; // Relation avec l’entité Address
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DeliveryStatus status = DeliveryStatus.PENDING; // Statut de la livraison
-
-    // Enumération pour le statut de livraison, placée en classe externe pour
-    // réutilisation
-    public enum DeliveryStatus {
-        PENDING, // En attente
-        IN_PROGRESS, // En cours
-        DELIVERED // Effectuée
-    }
 
     // Constructeur sans paramètres
     public Shipment() {
@@ -51,6 +48,7 @@ public class Shipment {
         this.deliveryAddress = deliveryAddress;
     }
 
+    // Getters et setters
     public UUID getShipmentId() {
         return shipmentId;
     }

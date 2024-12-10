@@ -2,7 +2,8 @@ package org.shipping.dto;
 
 import java.util.UUID;
 
-import org.shipping.model.Shipment.DeliveryStatus;
+import org.shipping.model.DeliveryStatus;
+
 
 public class DeliveryStatusMessage {
     private UUID orderId;
