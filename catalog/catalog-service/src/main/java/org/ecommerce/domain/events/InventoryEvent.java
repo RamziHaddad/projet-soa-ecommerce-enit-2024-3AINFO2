@@ -1,4 +1,4 @@
-package org.ecommerce.dto;
+package org.ecommerce.domain.events;
 
 
 public class InventoryEvent {
