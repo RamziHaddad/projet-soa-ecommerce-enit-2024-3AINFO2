@@ -63,7 +63,11 @@ public class PaymentServiceImpl implements PaymentService {
         creditCardRequest.setCardCode(paymentRequest.getCardCode());
         creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
         cardServices.registerCreditCard(creditCardRequest);
-        
+        if(paymentRequest.getCardCode()!=paymentRequest.getCardNumber()){
+            payment.setPaymentStatus(PaymentStatus.FAILED);
+            paymentRepository.updatePayment(payment) ; 
+            return paymentMapper.toResponseDTO(savedPayment);
+        }
 
         // 6. Create a PaymentOutBox entry for the Outbox pattern
         PaymentOutBox outBoxEvent = new PaymentOutBox();
@@ -114,5 +118,16 @@ public class PaymentServiceImpl implements PaymentService {
                 .stream()
                 .map(paymentMapper::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean completePayment(UUID paymentUuid) {
+        Payment payment=paymentRepository.findById(paymentUuid) ; 
+        if (payment != null && payment.getPaymentStatus() == PaymentStatus.PENDING){
+            payment.setPaymentStatus(PaymentStatus.COMPLETED);
+            paymentRepository.updatePayment(payment) ; 
+            return true ; 
+        }
+        return false ; 
     }
 }

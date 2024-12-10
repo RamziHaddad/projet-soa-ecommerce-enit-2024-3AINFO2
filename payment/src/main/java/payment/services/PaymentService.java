@@ -10,7 +10,7 @@ import payment.api.dto.PaymentResponseDTO;
 public interface PaymentService {
     
     PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest);
- 
+    boolean completePayment(UUID paymentUuid) ; 
     
     Optional<PaymentResponseDTO> getPaymentById(UUID paymentId);
  

@@ -14,6 +14,7 @@ import payment.domain.PaymentOutBox;
 import payment.domain.objectValues.PaymentStatus;
 import payment.repository.PaymentRepository;
 import payment.repository.outBoxRepository.PaymentOutBoxRepository;
+import payment.services.PaymentService;
 
 @ApplicationScoped
 public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
@@ -23,6 +24,8 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
 
     @Inject
     PaymentRepository paymentRepository;
+    @Inject
+    PaymentService paymentService ; 
 
     @Inject
     @RestClient
@@ -36,7 +39,7 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
         List<PaymentOutBox> unprocessedEvents = boxRepository.findUnprocessedEvents();
 
         for (PaymentOutBox event : unprocessedEvents) {
-            try {
+            
                 Payment payment = paymentRepository.findById(event.getPaymentId());
                 BankPaymentRequest bankPaymentRequest = new BankPaymentRequest(
                         event.getPaymentId(),
@@ -45,25 +48,27 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
                         event.getCardCode()
                 );
 
-                
+                try {   
                 Response response = bankClient.makeNewPayment(bankPaymentRequest) ; 
                 if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                     event.setProcessed(true);
                     event.setPaymentStatus(PaymentStatus.COMPLETED);
-                    payment.setPaymentStatus(PaymentStatus.COMPLETED);
                     boxRepository.update(event);
-                    paymentRepository.updatePayment(payment);
-                } else {
-                    event.setProcessed(false);
-                    event.setPaymentStatus(PaymentStatus.FAILED);
-                    boxRepository.update(event);
-                }
-
+                    paymentService.completePayment(payment.getPaymentId()) ; 
+                } 
             } catch (Exception e) {
                 event.setProcessed(true);
                 event.setPaymentStatus(PaymentStatus.FAILED);
-                boxRepository.update(event);
+                boxRepository.update(event); 
+                
             }
         }
     }
+
+    @Override
+    public void processFailedEvents() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'processFailedEvents'");
+    }
+
 }
