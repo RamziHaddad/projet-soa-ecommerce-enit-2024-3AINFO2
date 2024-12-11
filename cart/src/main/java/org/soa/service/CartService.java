@@ -4,9 +4,15 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.soa.Kafka.dto.CartDTO;
+import org.soa.Kafka.dto.CartMessageDTO;
+import org.soa.Kafka.dto.ItemDTO;
+import org.soa.Kafka.messaging.CartProducer;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -14,6 +20,9 @@ public class CartService {
 
     @Inject
     RedissonClient redissonClient;
+
+    @Inject
+    CartProducer cartProducer;
 
     private RMap<UUID, Cart> getCartsMap() {
         return redissonClient.getMap("carts");
@@ -28,6 +37,11 @@ public class CartService {
 
         Cart cart = new Cart(userId);
         carts.put(userId, cart);
+
+        // Convert Cart to CartDTO and send to Kafka
+        CartDTO cartDTO = convertToCartDTO(cart);
+        cartProducer.sendCartMessage(new CartMessageDTO(userId, "Cart created", cartDTO));
+
         return cart;
     }
 
@@ -39,22 +53,25 @@ public class CartService {
     public void addItem(UUID userId, Item item) {
         RMap<UUID, Cart> carts = getCartsMap();
         Cart cart = carts.get(userId);
-    
+
         if (cart == null) {
             throw new IllegalArgumentException("Cart not found for userId: " + userId);
         }
 
         cart.getItems().compute(item.getItemId(), (key, existingItem) -> {
             if (existingItem != null) {
-                // Si l'item existe déjà, on incrémente la quantité
                 existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
-                return existingItem;
+            } else {
+                return item;
             }
-            // Sinon on ajoute l'item
-            return item;
+            return existingItem;
         });
 
-        carts.put(userId, cart); // Mise à jour explicite
+        carts.put(userId, cart);
+
+        // Convert Cart to CartDTO and send to Kafka
+        CartDTO cartDTO = convertToCartDTO(cart);
+        cartProducer.sendCartMessage(new CartMessageDTO(userId, "Item added: " + item.getItemId(), cartDTO));
     }
 
     public void updateItem(UUID userId, Item cartItem) {
@@ -70,28 +87,35 @@ public class CartService {
         }
 
         cart.getItems().put(cartItem.getItemId(), cartItem);
-        carts.put(userId, cart); // Mise à jour explicite
+        carts.put(userId, cart);
+
+        // Convert Cart to CartDTO and send to Kafka
+        CartDTO cartDTO = convertToCartDTO(cart);
+        cartProducer.sendCartMessage(new CartMessageDTO(userId, "Item updated: " + cartItem.getItemId(), cartDTO));
     }
 
     public void removeItem(UUID userId, UUID productId) {
         RMap<UUID, Cart> carts = getCartsMap();
         Cart cart = carts.get(userId);
-    
+
         if (cart == null) {
             throw new IllegalArgumentException("Cart not found for userId: " + userId);
         }
-    
+
         cart.getItems().computeIfPresent(productId, (key, existingItem) -> {
             if (existingItem.getQuantity() > 1) {
-                // Si la quantité est supérieure à 1, on décrémente
                 existingItem.setQuantity(existingItem.getQuantity() - 1);
-                return existingItem;
+            } else {
+                return null;
             }
-            // Sinon on supprime l'item
-            return null;
+            return existingItem;
         });
 
-        carts.put(userId, cart); // Mise à jour explicite
+        carts.put(userId, cart);
+
+        // Convert Cart to CartDTO and send to Kafka
+        CartDTO cartDTO = convertToCartDTO(cart);
+        cartProducer.sendCartMessage(new CartMessageDTO(userId, "Item removed: " + productId, cartDTO));
     }
 
     public void clearCart(UUID userId) {
@@ -103,6 +127,27 @@ public class CartService {
         }
 
         cart.getItems().clear();
-        carts.put(userId, cart); // Mise à jour explicite
+        carts.put(userId, cart);
+
+        // Convert Cart to CartDTO and send to Kafka
+        CartDTO cartDTO = convertToCartDTO(cart);
+        cartProducer.sendCartMessage(new CartMessageDTO(userId, "Cart cleared", cartDTO));
+    }
+
+    // Helper method to convert Cart to CartDTO
+    private CartDTO convertToCartDTO(Cart cart) {
+        Map<UUID, ItemDTO> itemDTOs = new LinkedHashMap<>();
+        cart.getItems().forEach((id, item) -> {
+            ItemDTO itemDTO = new ItemDTO(
+                    item.getItemId(),
+                    item.getQuantity(),
+                    item.getPrice(),
+                    item.getName(),
+                    item.getTotalPrice()
+            );
+            itemDTOs.put(id, itemDTO);
+        });
+
+        return new CartDTO(cart.getUserId(), itemDTOs);
     }
 }

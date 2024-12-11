@@ -1,14 +1,11 @@
-package org.soa.model;
+package org.soa.Kafka.dto;
 
-import org.soa.Kafka.dto.ItemDTO;
-
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Cart {
+public class CartDTO {
     private UUID cartId;
-    private Map<UUID, ItemDTO> items = new LinkedHashMap<>();
+    private Map<UUID, ItemDTO> items;
 
     // Getters and setters
     public UUID getCartId() {
