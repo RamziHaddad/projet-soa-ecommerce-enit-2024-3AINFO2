@@ -19,6 +19,7 @@ public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Column(name = "idClient")
     private UUID idClient;
 

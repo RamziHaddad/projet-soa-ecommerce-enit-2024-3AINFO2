@@ -1,4 +1,5 @@
 -- Migration script to create the 'orders' table
+
 CREATE TABLE clients (
                          idClient UUID PRIMARY KEY,        -- Primary key with auto-increment
                          firstName VARCHAR(255),             -- First name of the client
