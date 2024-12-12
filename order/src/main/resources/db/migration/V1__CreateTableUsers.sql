@@ -26,3 +26,5 @@ CREATE TABLE orders (
                         CONSTRAINT fk_client FOREIGN KEY (idClient) REFERENCES clients (idClient) -- Foreign key to clients
 );
 
+
+

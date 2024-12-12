@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5437/db_order
     username: postgres
-    password: nebras2001
+    password: fadizoe1212
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

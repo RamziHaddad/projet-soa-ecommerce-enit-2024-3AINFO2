@@ -7,7 +7,7 @@ CREATE TABLE clients (
                            phone VARCHAR(50)                    -- Phone number
 );
 */
-
+DELETE FROM flyway_schema_history WHERE version = '2';
 
 
 
