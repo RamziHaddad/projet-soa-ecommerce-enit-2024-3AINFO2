@@ -133,6 +133,13 @@ public class CartResource {
         }
     }
 
+    @POST
+    @Path("/{userId}/validate")
+    public Response validateCart(@PathParam("userId") UUID userId) {
+        cartService.validateCart(userId);
+        return Response.status(Status.OK).entity("Enfin, publié!!!!").build();
+    }
+
     // Vider le panier d'un utilisateur
     //@DELETE
     //@Path("/{userId}/clear")

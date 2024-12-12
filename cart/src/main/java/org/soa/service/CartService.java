@@ -6,8 +6,10 @@ import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
+import org.soa.messaging.CartPublisher;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +27,6 @@ public class CartService {
     }
 
     // Créer un nouveau panier
-    @Transactional
     public Cart createCart(UUID userId) {
         try {
             logger.info("Creating cart for userId: " + userId);
@@ -66,7 +67,6 @@ public class CartService {
     }
 
     // Ajouter un item au panier
-    @Transactional
     public void addItem(UUID userId, Item item) {
         try {
             logger.info("Adding item to cart for userId: " + userId);
@@ -95,7 +95,6 @@ public class CartService {
     }
 
     // Mettre à jour un item dans le panier
-    @Transactional
     public void updateItem(UUID userId, Item cartItem) {
         try {
             logger.info("Updating item in cart for userId: " + userId);
@@ -122,7 +121,6 @@ public class CartService {
     }
 
     // Supprimer un item du panier
-    @Transactional
     public void removeItem(UUID userId, UUID itemId) {
         try {
             logger.info("Removing item from cart for userId: " + userId);
@@ -168,7 +166,6 @@ public class CartService {
     }
 
     // Supprimer le panier
-    @Transactional
     public void deleteCart(UUID userId) {
         try {
             logger.info("Deleting cart for userId: " + userId);
@@ -186,4 +183,36 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while deleting the cart.", e);
         }
     }
+
+    @Inject
+    CartPublisher cartPublisher;
+
+    public void validateCart(UUID cartId) {
+        // Récupérer le panier à partir de son ID
+        Cart cart = getCart(cartId);
+        if (cart == null) {
+            throw new IllegalArgumentException("Cart not found with ID: " + cartId);
+        }
+    
+        // Vérifier si le panier est vide
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Cannot validate an empty cart.");
+        }
+    
+        // Convertir les items du panier en objets ItemDTO
+        List<ItemDTO> itemDTOs = cart.getItems().entrySet().stream()
+            .map(entry -> new ItemDTO(entry.getKey(), entry.getValue().getName(), 
+                                      entry.getValue().getQuantity(), entry.getValue().getPrice()))
+            .toList();
+    
+        // Publier le panier dans le broker
+        cartPublisher.publishCart(cartId, itemDTOs);
+    
+        // Optionnel : journaliser l'action
+        logger.info("Cart with ID: " + cartId + " successfully published to the broker.");
+    }
+    
+
+
+    
 }
