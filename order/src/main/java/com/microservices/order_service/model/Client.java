@@ -40,7 +40,7 @@ public class Client {
 
 
     @Column(name = "code_secret")
-    private String codeSecret;
+    private BigInteger codeSecret;
 
 
     // Add any other necessary client-related fields here

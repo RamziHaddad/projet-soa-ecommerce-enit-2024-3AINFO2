@@ -1,6 +1,7 @@
 package com.microservices.order_service.model;
 
 
+import com.microservices.order_service.domain.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class Order {
 
 
     @Column(name = "orderStatus")
-    private String orderStatus;  // Order status
+    private OrderStatus orderStatus;  // Order status
 
     @Column(name = "price")
     private BigDecimal price;  // Price field

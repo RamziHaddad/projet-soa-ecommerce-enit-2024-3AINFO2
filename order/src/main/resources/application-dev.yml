@@ -2,9 +2,9 @@ spring:
   application:
     name: SpringAPI
   datasource:
-    url: jdbc:postgresql://localhost:5432/order_service
+    url: jdbc:postgresql://localhost:5437/db_order
     username: postgres
-    password: SQL_2023test
+    password: nebras2001
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

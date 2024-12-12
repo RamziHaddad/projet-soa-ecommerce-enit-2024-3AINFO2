@@ -18,6 +18,8 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.microservices.order_service.domain.OrderStatus.CREATED;
+
 @Service
 public class CartConsumer {
 
@@ -37,7 +39,7 @@ public class CartConsumer {
         Type listType = new TypeToken<List<Item>>(){}.getType();
         List<Item> items = gson.fromJson(itemsArray, listType);
         int quantity = cartEvent.get("quantity").getAsInt();
-        order.setOrderStatus("Order Requested");
+        order.setOrderStatus(CREATED);
         order.setStockVerification(false);
         order.setDeliveryVerification(false);
         order.setPriceVerification(false);

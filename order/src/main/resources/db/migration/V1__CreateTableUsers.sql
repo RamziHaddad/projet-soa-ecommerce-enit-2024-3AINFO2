@@ -9,10 +9,16 @@ CREATE TABLE clients (
                          numero_cart_bancaire NUMERIC(19, 0),                  -- Credit card number (up to 19 digits)
                          code_secret CHAR(4)
 );
+CREATE TYPE OrderStatus AS ENUM (
+    'CREATED',
+    'AVAILABLE',
+    'PAID',
+    'DELIVERED'
+);
 CREATE TABLE orders (
                         id UUID PRIMARY KEY,                        -- Primary key with auto-increment
                         id_cart UUID,                               -- Reference to a cart
-                        order_status VARCHAR(255),                   -- Order status
+                        order_status OrderStatus,                   -- Order status
                         price NUMERIC(10, 2),                        -- Price field (BigDecimal equivalent)
                         idClient UUID,                            -- Reference to a client
                         quantity INT,                                -- Quantity field

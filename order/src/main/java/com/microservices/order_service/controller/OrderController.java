@@ -1,5 +1,6 @@
 package com.microservices.order_service.controller;
 
+import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.*;
 import com.microservices.order_service.kafka.OrderCreationProducer;
 import com.microservices.order_service.model.Order;
@@ -55,7 +56,7 @@ public class OrderController {
         if ("ok".equals(response.get("status"))) {
             Order order = orderService.getOrderById(availabilityCheckDTO.getOrderId());
             order.setStockVerification(true);
-            order.setOrderStatus("Order Created");
+            order.setOrderStatus(OrderStatus.CREATED);
             orderService.updateOrder(availabilityCheckDTO.getOrderId(), order);
 
             OrderEventDTO orderEventDTO = new OrderEventDTO();
