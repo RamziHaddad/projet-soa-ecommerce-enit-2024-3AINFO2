@@ -1,17 +1,16 @@
 package org.soa.api;
 
-import java.util.UUID;
-
-import org.soa.Kafka.dto.CartDTO;
-import org.soa.Kafka.messaging.CartProducer;
-import org.soa.model.Cart;
-import org.soa.model.Item;
-import org.soa.service.CartService;
-
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import org.jboss.logging.Logger;
+import org.soa.model.Cart;
+import org.soa.model.Item;
+import org.soa.service.CartService;
+
+import java.util.UUID;
 
 @Path("/carts")
 @Produces(MediaType.APPLICATION_JSON)
@@ -21,88 +20,136 @@ public class CartResource {
     @Inject
     CartService cartService;
 
+    private static final Logger logger = Logger.getLogger(CartResource.class);
+
     // Créer un panier pour un utilisateur donné
     @POST
     @Path("/create/{userId}")
     public Response createCart(@PathParam("userId") UUID userId) {
-        Cart cart = cartService.createCart(userId);
-        CartMessageDTO kafkaMessage = new CartMessageDTO(userId, "Cart created", cart.toDTO());
-        return Response.status(Response.Status.CREATED)
-                .entity(kafkaMessage)
-                .build();
+        try {
+            logger.info("Creating cart for User ID: " + userId);
+
+            Cart cart = cartService.createCart(userId);
+            logger.info("Cart created successfully with ID: " + cart.getCartId());
+
+            return Response.status(Status.CREATED).entity(cart).build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while creating cart: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
     }
 
-    // Récupérer un panier pour un utilisateur donné
+    // Récupérer le panier d'un utilisateur
     @GET
     @Path("/get/{userId}")
     public Response getCart(@PathParam("userId") UUID userId) {
-        Cart cart = cartService.getCart(userId);
-        if (cart == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Cart not found").build();
+        try {
+            logger.info("Fetching cart for User ID: " + userId);
+
+            Cart cart = cartService.getCart(userId);
+            if (cart == null) {
+                logger.warn("No cart found for User ID: " + userId);
+                return Response.status(Status.NOT_FOUND).entity("Cart not found").build();
+            }
+
+            return Response.ok(cart).build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while fetching cart: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        return Response.ok(cart.toDTO()).build();
     }
 
-    // Récupérer tous les items d'un panier
+    // Récupérer les items du panier d'un utilisateur
     @GET
     @Path("/{userId}/items")
     public Response getItems(@PathParam("userId") UUID userId) {
-        Cart cart = cartService.getCart(userId);
-        if (cart == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Cart not found").build();
+        try {
+            logger.info("Fetching items for cart of User ID: " + userId);
+
+            Cart cart = cartService.getCart(userId);
+            if (cart == null) {
+                logger.warn("No cart found for User ID: " + userId);
+                return Response.status(Status.NOT_FOUND).entity("Cart not found").build();
+            }
+
+            return Response.ok(cart.getItems()).build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while fetching items: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        return Response.ok(cart.getItems()).build();
     }
 
-    // Ajouter un item à un panier
+    // Ajouter un item au panier d'un utilisateur
     @POST
     @Path("/{userId}/add-item")
     public Response addItem(@PathParam("userId") UUID userId, Item cartItem) {
-        cartService.addItem(userId, cartItem);
-        return Response.status(Response.Status.CREATED).entity("Item added to cart").build();
+        try {
+            logger.info("Adding item to cart for User ID: " + userId);
+
+            cartService.addItem(userId, cartItem);
+            logger.info("Item added successfully to cart of User ID: " + userId);
+
+            return Response.status(Status.CREATED).entity("Item added to cart").build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while adding item: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
     }
 
-    // Mettre à jour un item dans un panier
+    // Mettre à jour un item dans le panier d'un utilisateur
     @PUT
     @Path("/{userId}/update-item")
     public Response updateItem(@PathParam("userId") UUID userId, Item updatedItem) {
-        cartService.updateItem(userId, updatedItem);
-        return Response.ok("Item updated in cart").build();
+        try {
+            logger.info("Updating item in cart for User ID: " + userId);
+
+            cartService.updateItem(userId, updatedItem);
+            logger.info("Item updated successfully in cart of User ID: " + userId);
+
+            return Response.ok("Item updated in cart").build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while updating item: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
     }
 
-    // Supprimer un item d'un panier
+    // Supprimer un item du panier d'un utilisateur
     @DELETE
     @Path("/{userId}/remove-item/{productId}")
     public Response removeItem(@PathParam("userId") UUID userId, @PathParam("productId") UUID productId) {
         try {
+            logger.info("Removing item with Product ID: " + productId + " from cart of User ID: " + userId);
+
             cartService.removeItem(userId, productId);
-            return Response.status(Response.Status.NO_CONTENT).build();
+            logger.info("Item removed successfully from cart of User ID: " + userId);
+
+            return Response.status(Status.NO_CONTENT).build();
         } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            logger.warn("Invalid input: " + e.getMessage());
+            return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while removing item: " + e.getMessage(), e);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
-    // Vider un panier
-    @DELETE
-    @Path("/{userId}/clear")
-    public Response clearCart(@PathParam("userId") UUID userId) {
-        try {
-            cartService.clearCart(userId);
-            return Response.status(Response.Status.NO_CONTENT).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        }
-    }
-    @Inject
-    CartProducer cartProducer;
-
-    @POST
-    @Path("/publish")
-    public Response publishCart(Cart cart) {
-        CartDTO cartDTO = new CartDTO();
-        cartDTO.setCartId(cart.getCartId());
-        cartDTO.setItems(cart.getItems());
-        cartProducer.sendCartMessage(cartDTO);
-        return Response.ok("Cart published!").build();
-    }
+    // Vider le panier d'un utilisateur
+    //@DELETE
+    //@Path("/{userId}/clear")
+    //public Response clearCart(@PathParam("userId") UUID userId) {
+    //    try {
+    //        logger.info("Clearing cart for User ID: " + userId);
+//
+    //        cartService.clearCart(userId);
+    //        logger.info("Cart cleared successfully for User ID: " + userId);
+//
+    //        return Response.status(Status.NO_CONTENT).build();
+    //    } catch (IllegalArgumentException e) {
+    //        logger.warn("Invalid input: " + e.getMessage());
+    //        return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
+    //    } catch (Exception e) {
+    //        logger.error("Unexpected error occurred while clearing cart: " + e.getMessage(), e);
+    //        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+    //    }
+    //}
 }

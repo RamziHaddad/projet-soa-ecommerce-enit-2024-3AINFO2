@@ -1,6 +1,5 @@
 package org.soa.model;
 
-import org.soa.Kafka.dto.ItemDTO;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,7 +7,13 @@ import java.util.UUID;
 
 public class Cart {
     private UUID cartId;
-    private Map<UUID, ItemDTO> items = new LinkedHashMap<>();
+    private Map<UUID, Item> items = new LinkedHashMap<>();
+
+    public Cart(UUID id) {
+        this.cartId = id;
+        // Initialiser d'autres attributs si nécessaire
+    }
+    
 
     // Getters and setters
     public UUID getCartId() {
@@ -19,11 +24,11 @@ public class Cart {
         this.cartId = cartId;
     }
 
-    public Map<UUID, ItemDTO> getItems() {
+    public Map<UUID, Item> getItems() {
         return items;
     }
 
-    public void setItems(Map<UUID, ItemDTO> items) {
+    public void setItems(Map<UUID, Item> items) {
         this.items = items;
     }
 }
