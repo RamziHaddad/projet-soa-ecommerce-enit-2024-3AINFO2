@@ -16,13 +16,15 @@ import org.ecommerce.domain.events.ProductUpdated;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
-import org.ecommerce.domain.Outbox;
+import org.ecommerce.domain.OutboxEvent;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ApplicationScoped
 public class ProductService {
@@ -67,9 +69,9 @@ public class ProductService {
         ProductListed productListed = new ProductListed(product);
 
 
-        Outbox outboxMessage = outboxService.createOutboxMessage(productListed.getEventId().toString());
-
-        if (outboxMessage == null) {
+        try {
+            outboxService.createOutboxMessage(productListed);
+        }catch (Exception e) {
             logger.error("Failed to create outbox message for product: " + product.getProductName());
             throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
         }
@@ -79,15 +81,15 @@ public class ProductService {
             CompletionStage<Void> ack = productsListedEmitter.send(productListed);
             ack.thenAccept(result -> {
                 logger.info("Product listed and sent via Kafka: " + productListed);
-                outboxService.markAsSent(outboxMessage.getId());
+                outboxService.markAsSent(productListed.getEventId());
             }).exceptionally(error -> {
                 logger.error("Error when sending the product listed event: " + error.getMessage());
-                outboxService.markAsFailed(outboxMessage.getId());
+                outboxService.markAsFailed(productListed.getEventId());
                 return null;
             });
         } catch (Exception e) {
             logger.error("Error when serializing JSON: " + e.getMessage());
-            outboxService.markAsFailed(outboxMessage.getId());
+            outboxService.markAsFailed(productListed.getEventId());
         }
 
 
@@ -117,21 +119,31 @@ public class ProductService {
         existingProduct.setDisponibility(product.isDisponibility());
         
         ProductUpdated productUpdated = new ProductUpdated(existingProduct);
-        Outbox outboxMessage = outboxService.createOutboxMessage(productUpdated.getEventId().toString());
+        try {
+            outboxService.createOutboxMessage(productUpdated);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            logger.error("Failed to create outbox message for product: " + product.getProductName());
+            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+        } catch (EntityAlreadyExistsException e) {
+            e.printStackTrace();
+            logger.error("Failed to create outbox message for product: " + product.getProductName());
+            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+        }
 
         try {
             CompletionStage<Void> ack = productsUpdatedEmitter.send(productUpdated);
             ack.thenAccept(result -> {
                 logger.info("Product listed and sent via Kafka: " + productUpdated);
-                outboxService.markAsSent(outboxMessage.getId());
+                outboxService.markAsSent(productUpdated.getEventId());
             }).exceptionally(error -> {
                 logger.error("Error when sending the product listed event: " + error.getMessage());
-                outboxService.markAsFailed(outboxMessage.getId());
+                outboxService.markAsFailed(productUpdated.getEventId());
                 return null;
             });
         } catch (Exception e) {
             logger.error("Error when serializing JSON: " + e.getMessage());
-            outboxService.markAsFailed(outboxMessage.getId());
+            outboxService.markAsFailed(productUpdated.getEventId());
         }
 
         return productRepo.update(existingProduct);

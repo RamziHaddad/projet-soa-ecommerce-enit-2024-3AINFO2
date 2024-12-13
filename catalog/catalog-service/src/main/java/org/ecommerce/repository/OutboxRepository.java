@@ -10,8 +10,13 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 
-import org.ecommerce.domain.Outbox;
+import org.ecommerce.domain.OutboxEvent;
+import org.ecommerce.domain.events.Event;
 import org.ecommerce.exceptions.EntityNotFoundException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 
 @ApplicationScoped
@@ -19,51 +24,66 @@ public class OutboxRepository {
 
     @Inject
     EntityManager em;
+    @Inject
+    ObjectMapper jsonMapper;
 
-    public List<Outbox> findAll() {
-        return em.createQuery("from Outbox", Outbox.class)
-                .getResultList();
-    }
-
-    public List<Outbox> findPendingMessages() {
-        TypedQuery<Outbox> query = em.createQuery(
-                "SELECT o FROM Outbox o WHERE o.status = 'PENDING'", Outbox.class);
+    public List<OutboxEvent> findPendingMessages() {
+        TypedQuery<OutboxEvent> query = em.createQuery(
+                "SELECT o FROM OutboxEvent o WHERE o.status = 'PENDING'", OutboxEvent.class);
         return query.getResultList();
     }
 
-    public Outbox findById(UUID id) throws EntityNotFoundException {
-        Outbox outbox = em.find(Outbox.class, id);
-        if (outbox != null) {
-            return outbox;
+    public OutboxEvent findById(UUID id) throws EntityNotFoundException {
+        OutboxEvent outboxEvent = em.find(OutboxEvent.class, id);
+        if (outboxEvent != null) {
+            return outboxEvent;
         }
-        throw new EntityNotFoundException("Cannot find outbox entry with ID: " + id);
+        throw new EntityNotFoundException("Cannot find outboxEvent entry with ID: " + id);
     }
 
     @Transactional
-    public Outbox insert(Outbox outbox) throws EntityAlreadyExistsException {
+    public OutboxEvent insert(Event event) throws EntityAlreadyExistsException, JsonProcessingException {
         try {
-            outbox.setId(UUID.randomUUID());
-            em.persist(outbox);
-            return outbox;
+            OutboxEvent oe=new OutboxEvent(event.getEventId(),
+                                            event.getEventType(),
+                                            "PENDING",
+                                            event.getCreatedAt(),
+                                            event.getAggregateType(),
+                                            event.getAggregateId(),
+                                            jsonMapper.writeValueAsString(event));
+            em.persist(oe);
+            return oe;
         } catch (EntityExistsException e) {
-            throw new EntityAlreadyExistsException("Outbox entry already exists");
+            throw new EntityAlreadyExistsException("OutboxEvent entry already exists");
+        } catch (JsonProcessingException e){
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @Transactional
-    public Outbox update(Outbox outbox) throws EntityNotFoundException {
+    public OutboxEvent update(OutboxEvent outboxEvent) throws EntityNotFoundException {
         try {
-            return em.merge(outbox);
+            return em.merge(outboxEvent);
         } catch (IllegalArgumentException e) {
-            throw new EntityNotFoundException("Cannot find outbox entry with ID: " + outbox.getId());
+            throw new EntityNotFoundException("Cannot find outboxEvent entry with ID: " + outboxEvent.getId());
         }
     }
 
     @Transactional
     public void delete(UUID id) {
-        Outbox outbox = em.find(Outbox.class, id);
-        if (outbox != null) {
-            em.remove(outbox);
+        OutboxEvent outboxEvent = em.find(OutboxEvent.class, id);
+        if (outboxEvent != null) {
+            em.remove(outboxEvent);
         }
+    }
+
+    public void markAsSent(UUID eventId) throws EntityNotFoundException {
+        em.createQuery("update OutboxEvent oe set oe.status = 'SENT' where oe.eventId=:oeid").setParameter("oeid", eventId).executeUpdate();
+        throw new UnsupportedOperationException("Unimplemented method 'markAsSent'");
+    }
+
+    public void markAsFailed(UUID eventId) throws EntityNotFoundException {
+        em.createQuery("update OutboxEvent oe set oe.status = 'FAILED' where oe.eventId=:oeid").setParameter("oeid", eventId).executeUpdate();
+        throw new UnsupportedOperationException("Unimplemented method 'markAsFailed'");
     }
 }

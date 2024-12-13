@@ -1,7 +1,7 @@
 package org.ecommerce.service;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.ecommerce.domain.Outbox;
+import org.ecommerce.domain.OutboxEvent;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 import io.quarkus.scheduler.Scheduled;
@@ -24,9 +24,9 @@ public class OutboxProcessor {
 
     @Scheduled(every = "60s")
     public void processOutbox() {
-        List<Outbox> messages = outboxService.getPendingMessages();
+        List<OutboxEvent> messages = outboxService.getPendingMessages();
 
-        for (Outbox message : messages) {
+        for (OutboxEvent message : messages) {
             try {
                 productsEmitter.send(message.getMessage()).thenRun(() -> {
                     outboxService.markAsSent(message.getId());

@@ -1,8 +1,12 @@
 package org.ecommerce.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import org.ecommerce.domain.Outbox;
+import org.ecommerce.domain.OutboxEvent;
+import org.ecommerce.domain.events.Event;
 import org.ecommerce.repository.OutboxRepository;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import jakarta.inject.Inject;
@@ -19,26 +23,20 @@ public class OutboxService {
     OutboxRepository outboxRepository;
 
     @Transactional
-    public Outbox createOutboxMessage(String message) {
-        Outbox outbox = new Outbox();
-        outbox.setMessage(message);
-        outbox.setStatus("PENDING");
-        outbox.setCreatedAt(Instant.now().toString());
+    public void createOutboxMessage(Event event) throws JsonProcessingException, EntityAlreadyExistsException {
+        outboxRepository.insert(event);
         try {
-            return outboxRepository.insert(outbox);
+            outboxRepository.insert(event);
         } catch (EntityAlreadyExistsException e) {
             System.err.println(e.getMessage());
-            return null;
         }
     }
 
     @Transactional
     public void markAsSent(UUID id) {
         try {
-            Outbox outbox = outboxRepository.findById(id);
-            outbox.setStatus("SENT");
-            outbox.setSentAt(Instant.now().toString());
-            outboxRepository.update(outbox);
+            //outbox.setSentAt(Instant.now().toString());
+            outboxRepository.markAsSent(id);
         } catch (EntityNotFoundException e) {
             System.err.println(e.getMessage());
         }
@@ -47,16 +45,14 @@ public class OutboxService {
     @Transactional
     public void markAsFailed(UUID id) {
         try {
-            Outbox outbox = outboxRepository.findById(id);
-            outbox.setStatus("FAILED");
-            outboxRepository.update(outbox);
+            outboxRepository.markAsFailed(id);
         } catch (EntityNotFoundException e) {
             System.err.println(e.getMessage());
         }
     }
 
     @Transactional
-    public List<Outbox> getPendingMessages() {
+    public List<OutboxEvent> getPendingMessages() {
         return outboxRepository.findPendingMessages();
     }
 }
