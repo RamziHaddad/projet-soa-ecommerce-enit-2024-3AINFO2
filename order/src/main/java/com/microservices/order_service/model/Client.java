@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigInteger;
 import java.util.UUID;
@@ -18,8 +19,7 @@ import java.util.UUID;
 public class Client {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
+    @GeneratedValue
     @Column(name = "idClient")
     private UUID idClient;
 
@@ -40,7 +40,7 @@ public class Client {
 
 
     @Column(name = "code_secret")
-    private String codeSecret;
+    private BigInteger codeSecret;
 
 
     // Add any other necessary client-related fields here

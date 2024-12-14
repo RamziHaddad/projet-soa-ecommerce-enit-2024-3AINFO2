@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,5 +15,5 @@ public class EmailRequest {
     private String to;
     private String subject;
     private String body;
-    private int templateId;
+    private UUID templateId;
 }

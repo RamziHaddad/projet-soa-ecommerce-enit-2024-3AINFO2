@@ -1,6 +1,8 @@
 package com.microservices.order_service.controller;
 
+import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.*;
+import com.microservices.order_service.kafka.CartConsumer;
 import com.microservices.order_service.kafka.OrderCreationProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
@@ -27,6 +29,8 @@ public class OrderController {
     private final OrderCreationProducer orderCreationProducer;
 
     private final PricingService pricingService;
+
+    private final CartConsumer cartConsumer;
 
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
@@ -55,7 +59,7 @@ public class OrderController {
         if ("OK".equals(response.get("status"))) {
             Order order = orderService.getOrderById(availabilityCheckDTO.getOrderId());
             order.setStockVerification(true);
-            order.setOrderStatus("Order Created");
+            order.setOrderStatus(OrderStatus.CREATED);
             orderService.updateOrder(availabilityCheckDTO.getOrderId(), order);
 
             OrderEventDTO orderEventDTO = new OrderEventDTO();
@@ -90,9 +94,16 @@ public class OrderController {
         return ResponseEntity.ok(response);
 
     }
+
     @PostMapping("/checkPrice")
     public ResponseEntity<cartResponse> CheckPrice(@RequestBody List<CartItem> cartItems){
         cartResponse response = pricingService.checkPrice(cartItems);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/recieveCart")
+    public ResponseEntity<List<CartItem>> RecieveCart(@RequestBody List<CartItem> cartItems){
+        return null;
+
     }
 }

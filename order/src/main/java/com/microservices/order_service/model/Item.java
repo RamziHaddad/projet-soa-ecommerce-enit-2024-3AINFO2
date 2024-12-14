@@ -17,11 +17,16 @@ import java.util.UUID;
 public class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "quantity")
     private int quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private Order order; // Add the reference to Order
+
 
     // Override equals() method to compare items based on their attributes
     @Override

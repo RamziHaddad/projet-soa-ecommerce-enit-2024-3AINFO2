@@ -1,6 +1,7 @@
 package com.microservices.order_service.model;
 
 
+import com.microservices.order_service.domain.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,19 +24,19 @@ import java.util.UUID;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "idCart")
     private UUID idCart;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Specify cascade and fetch type
-    @JoinColumn(name = "id") // Foreign key in the Item table
-    private List<Item> items; // Use List instead of Array
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Item> items; // Link the items to the order using the 'order' field in the Item entity
+
 
 
     @Column(name = "orderStatus")
-    private String orderStatus;  // Order status
+    private OrderStatus orderStatus;  // Order status
 
     @Column(name = "price")
     private BigDecimal price;  // Price field

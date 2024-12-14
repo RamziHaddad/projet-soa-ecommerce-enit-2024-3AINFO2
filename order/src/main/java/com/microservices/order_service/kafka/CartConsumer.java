@@ -7,37 +7,73 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.microservices.order_service.dto.CartDTO;
+import com.microservices.order_service.dto.ItemDTO;
 import com.microservices.order_service.model.Item;
 import com.microservices.order_service.model.Order;
+import com.microservices.order_service.repository.ItemRepository;
 import com.microservices.order_service.repository.OrderRepository;
 import com.microservices.order_service.service.OrderService;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.hibernate.service.spi.InjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static com.microservices.order_service.domain.OrderStatus.CREATED;
 
 @Service
 public class CartConsumer {
 
+    private static final Logger logger = LoggerFactory.getLogger(CartConsumer.class);
+
+    @Autowired
     OrderRepository orderRepository;
 
-    @KafkaListener(topics = "order-cart-topic", groupId = "cartReceiver")
-    public void listen(String event){
+    @Autowired
+    ItemRepository itemRepository;
+
+    @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "kafkaListenerContainerFactory")
+    public void listen(CartDTO cartDTO) {
+
+
+
+        logger.info("Received event:");
+
 
         LocalDateTime receivedAt = LocalDateTime.now();
 
         Order order = new Order();
+        order.setReceivedAt(receivedAt);
 
-        JsonObject cartEvent = JsonParser.parseString(event).getAsJsonObject();
-        String cartId = cartEvent.get("cartId").getAsString();
-        JsonArray itemsArray = cartEvent.get("items").getAsJsonArray();
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<Item>>(){}.getType();
-        List<Item> items = gson.fromJson(itemsArray, listType);
-        int quantity = cartEvent.get("quantity").getAsInt();
-        order.setOrderStatus("Order Requested");
+        List<ItemDTO> itemsDTO = cartDTO.getItems();
+
+        List<Item> items = new ArrayList<>();
+
+        for (ItemDTO itemDTO : itemsDTO) {
+            Item item = new Item();
+            item.setId(itemDTO.getId());
+            item.setQuantity(itemDTO.getQuantity());
+            item.setOrder(order);
+            items.add(item);
+        }
+
+        order.setItems(items);
+
+
+
+        UUID cartId = cartDTO.getCartId();
+        order.setIdCart(cartId);
+        order.setOrderStatus(CREATED);
         order.setStockVerification(false);
         order.setDeliveryVerification(false);
         order.setPriceVerification(false);
