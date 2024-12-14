@@ -9,43 +9,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 public class InboxProductCreationService {
-    private static final int BATCH_SIZE = 100;
-
     @Autowired
     private ProducteEntityRepository productEntityRepository;
-
     @Autowired
     private ProductRepository productRepository;
+
+    private static final int BATCH_SIZE = 50; // Define your batch size
 
     @Scheduled(fixedRate = 300000)
     @Transactional
     public void treatInbox() {
         List<ProductEntity> unindexedProducts;
 
-        do {
-            // Retrieve unindexed products in batches
-            unindexedProducts = productEntityRepository.findUnindexedProducts(BATCH_SIZE);
-
-            if (!unindexedProducts.isEmpty()) {
+        while (!(unindexedProducts = productEntityRepository.findUnindexedProducts(BATCH_SIZE)).isEmpty()) {
+            for (ProductEntity product : unindexedProducts) {
                 try {
-                    batchIndexProducts(unindexedProducts);
+                    productRepository.save(new Product(product));
+                    product.setIndex(true);
+                    productEntityRepository.save(product);
                 } catch (Exception e) {
-                    System.err.println("Error processing batch: " + e.getMessage());
-                    throw e; // Rethrow to trigger rollback
+                    System.err.println("Error processing product: " + product.getId() + " - " + e.getMessage());
+                    throw e; // Rethrow the exception to trigger transaction rollback
                 }
             }
-        } while (!unindexedProducts.isEmpty());
-    }
-
-    private void batchIndexProducts(List<ProductEntity> unindexedProducts) {
-        for (ProductEntity product : unindexedProducts) {
-            productRepository.save(new Product(product));
-            product.setIndex(true);
-            productEntityRepository.save(product);
         }
     }
 }

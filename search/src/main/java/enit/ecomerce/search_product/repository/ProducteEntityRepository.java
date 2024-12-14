@@ -1,11 +1,17 @@
 package enit.ecomerce.search_product.repository;
 
 import enit.ecomerce.search_product.product.ProductEntity;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-public interface ProducteEntityRepository extends CrudRepository<ProductEntity, String> {
+@Repository
+public interface ProducteEntityRepository extends JpaRepository<ProductEntity, String> {
 
-    @Query("SELECT p FROM ProductEntity p WHERE p.isIndex = false")
-    List<ProductEntity> findUnindexedProducts();
+    @Query(value = "SELECT * FROM product_entity WHERE is_indexed = false LIMIT :batchSize", nativeQuery = true)
+    List<ProductEntity> findUnindexedProducts(@Param("batchSize") int batchSize);
 }
