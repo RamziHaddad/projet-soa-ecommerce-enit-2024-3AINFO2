@@ -8,35 +8,30 @@ import enit.ecomerce.search_product.repository.ProducteEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
 public class InboxProductCreationService {
     @Autowired
-    private ProducteEntityRepository productEntityRepository; 
-    @Autowired 
-    private ProductRepository productRepository; 
-    @Scheduled(fixedRate = 300000)  
+    private ProducteEntityRepository productEntityRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
+    @Scheduled(fixedRate = 300000)
+    @Transactional
     public void treatInbox() {
-       
         List<ProductEntity> unindexedProducts = productEntityRepository.findUnindexedProducts();
- 
+
         for (ProductEntity product : unindexedProducts) {
             try {
-                //we should see how to make these operation a transaction , 
-                //i dont want to save a product annd not set it in the inbox
                 productRepository.save(new Product(product));
-
-              
                 product.setIndex(true);
                 productEntityRepository.save(product);
-
             } catch (Exception e) {
                 System.err.println("Error processing product: " + product.getId() + " - " + e.getMessage());
+                throw e; // Rethrow the exception to trigger transaction rollback
             }
         }
     }
-} 
-           
-
+}
