@@ -6,6 +6,7 @@ import org.ecommerce.domain.events.Event;
 import org.ecommerce.repository.OutboxRepository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
@@ -24,11 +25,18 @@ public class OutboxService {
 
     @Transactional
     public void createOutboxMessage(Event event) throws JsonProcessingException, EntityAlreadyExistsException {
-        outboxRepository.insert(event);
         try {
+            System.out.println("Creating outbox message in service "+event.getEventId().toString());
             outboxRepository.insert(event);
         } catch (EntityAlreadyExistsException e) {
-            System.err.println(e.getMessage());
+            //logger.error("OutboxEvent already exists: " + e.getMessage());
+            throw new RuntimeException("Failed to insert outbox event: Duplicate entry");
+        } catch (JsonProcessingException e) {
+            //logger.error("Failed to serialize event to JSON: " + e.getMessage());
+            throw e; 
+        } catch (Exception e) {
+            //logger.error("Unexpected error during outbox message creation: " + e.getMessage());
+            throw new RuntimeException("Unexpected error during outbox message creation", e);
         }
     }
 
@@ -54,5 +62,14 @@ public class OutboxService {
     @Transactional
     public List<OutboxEvent> getPendingMessages() {
         return outboxRepository.findPendingMessages();
+    }
+
+    public Event convertToEvent(OutboxEvent outboxEvent) throws Exception {
+        try {
+            return new ObjectMapper().readValue(outboxEvent.getMessage(), Event.class);
+        } catch (JsonProcessingException e) {
+            //logger.error("Failed to convert OutboxEvent to Event: " + e.getMessage());
+            throw e;
+        }
     }
 }

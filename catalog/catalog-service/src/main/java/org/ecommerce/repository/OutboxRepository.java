@@ -1,6 +1,7 @@
 package org.ecommerce.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,6 +13,8 @@ import jakarta.transaction.Transactional;
 
 import org.ecommerce.domain.OutboxEvent;
 import org.ecommerce.domain.events.Event;
+import org.ecommerce.domain.events.ProductListed;
+import org.ecommerce.domain.events.ProductUpdated;
 import org.ecommerce.exceptions.EntityNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,19 +47,40 @@ public class OutboxRepository {
     @Transactional
     public OutboxEvent insert(Event event) throws EntityAlreadyExistsException, JsonProcessingException {
         try {
+            System.out.println("New OutboxEvent will created  in repo for "+ event.getEventId().toString());
+            String payload;
+            if (event instanceof ProductListed productListed) {
+            payload = jsonMapper.writeValueAsString(Map.of(
+                "productName", productListed.getProductName(),
+                "categoryName", productListed.getCategoryName(),
+                "description", productListed.getDescription(),
+                "price", productListed.getPrice()
+            ));
+            } else if (event instanceof ProductUpdated productUpdated) {
+            payload = jsonMapper.writeValueAsString(Map.of(
+                "productName", productUpdated.getProductName(),
+                "categoryName", productUpdated.getCategoryName(),
+                "description", productUpdated.getDescription(),
+                "shownPrice", productUpdated.getShownPrice(),
+                "disponibility", productUpdated.isDisponibility()
+            ));
+        } else {
+            payload = jsonMapper.writeValueAsString(event);
+        }
             OutboxEvent oe=new OutboxEvent(event.getEventId(),
                                             event.getEventType(),
                                             "PENDING",
                                             event.getCreatedAt(),
                                             event.getAggregateType(),
                                             event.getAggregateId(),
-                                            jsonMapper.writeValueAsString(event));
-            em.persist(oe);
+                                            payload);
+            System.out.println("new oe created "+oe.getId());
+                                            em.persist(oe);
             return oe;
         } catch (EntityExistsException e) {
             throw new EntityAlreadyExistsException("OutboxEvent entry already exists");
         } catch (JsonProcessingException e){
-            throw new RuntimeException(e.getMessage());
+            throw e;
         }
     }
 
@@ -78,12 +102,14 @@ public class OutboxRepository {
     }
 
     public void markAsSent(UUID eventId) throws EntityNotFoundException {
-        em.createQuery("update OutboxEvent oe set oe.status = 'SENT' where oe.eventId=:oeid").setParameter("oeid", eventId).executeUpdate();
-        throw new UnsupportedOperationException("Unimplemented method 'markAsSent'");
+        em.createQuery("update OutboxEvent oe set oe.status = 'SENT' where oe.id=:oeid").setParameter("oeid", eventId).executeUpdate();
+        
     }
 
     public void markAsFailed(UUID eventId) throws EntityNotFoundException {
-        em.createQuery("update OutboxEvent oe set oe.status = 'FAILED' where oe.eventId=:oeid").setParameter("oeid", eventId).executeUpdate();
-        throw new UnsupportedOperationException("Unimplemented method 'markAsFailed'");
+        em.createQuery("update OutboxEvent oe set oe.status = 'FAILED' where oe.id=:oeid").setParameter("oeid", eventId).executeUpdate();
+        
     }
+
+    
 }
