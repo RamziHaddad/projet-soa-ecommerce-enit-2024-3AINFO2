@@ -31,4 +31,10 @@ public class Cart {
     public void setItems(Map<UUID, Item> items) {
         this.items = items;
     }
+    
+    public double calculateTotalPrice() {
+        return items.values().stream()
+                    .mapToDouble(Item::getTotalPrice)
+                    .sum();
+    }
 }

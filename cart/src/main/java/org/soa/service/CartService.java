@@ -10,6 +10,8 @@ import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 import org.soa.messaging.CartPublisher;
+import org.soa.messaging.PricingEventConsumer;
+import java.util.Map;
 
 import java.util.List;
 import java.util.UUID;
@@ -65,11 +67,13 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while fetching the cart.", e);
         }
     }
-
-    // Ajouter un item au panier
+    @Inject
+    PricingEventConsumer PricingEventConsumer;
     public void addItem(UUID userId, Item item) {
         try {
             logger.info("Adding item to cart for userId: " + userId);
+
+            // Récupérer la carte des paniers
             RMap<UUID, Cart> carts = getCartsMap();
             Cart cart = carts.get(userId);
 
@@ -78,6 +82,21 @@ public class CartService {
                 throw new IllegalArgumentException("Cart not found for userId: " + userId);
             }
 
+            // Récupérer tous les prix depuis PricingEventConsumer
+            Map<UUID, Double> allPrices = PricingEventConsumer.getAllPrices();
+
+            // Récupérer le prix de l'article à partir de la map des prix
+            Double price = allPrices.get(item.getItemId());
+
+            if (price == null) {
+                logger.error("Price not found for itemId: " + item.getItemId());
+                throw new IllegalArgumentException("Price not found for itemId: " + item.getItemId());
+            }
+
+            // Mettre à jour l'article avec le prix récupéré
+            item.setPrice(price);
+
+            // Ajouter l'article au panier, en mettant à jour la quantité si l'article existe déjà
             cart.getItems().compute(item.getItemId(), (key, existingItem) -> {
                 if (existingItem != null) {
                     existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
@@ -86,6 +105,7 @@ public class CartService {
                 return item;
             });
 
+            // Mettre à jour le panier dans la carte
             carts.put(userId, cart);
             logger.info("Item added successfully to cart for userId: " + userId);
         } catch (Exception e) {
@@ -93,6 +113,7 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while adding the item to the cart.", e);
         }
     }
+
 
     // Mettre à jour un item dans le panier
     public void updateItem(UUID userId, Item cartItem) {
