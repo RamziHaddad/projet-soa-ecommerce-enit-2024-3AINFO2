@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import org.ecommerce.domain.Product;
 
 
 @Data
 @NoArgsConstructor
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class ProductListed extends Event {
     private  String productName;

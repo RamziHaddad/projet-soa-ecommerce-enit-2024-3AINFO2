@@ -10,7 +10,7 @@ public class ProductAvailabilityEvent extends Event {
     private final String availability;
     
     public ProductAvailabilityEvent(String productId, String availability) {
-        super("productsAvailability", "Product", productId);
+        super("ProductAvailability", "Product", productId);
         this.productId = productId;
         this.availability = availability;
     }
