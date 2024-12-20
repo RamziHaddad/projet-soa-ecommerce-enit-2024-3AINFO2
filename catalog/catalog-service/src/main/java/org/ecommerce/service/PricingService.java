@@ -12,9 +12,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @Path("/pricing")
 @RegisterRestClient(configKey="pricing-api")
 public interface PricingService {
-
     @GET
     @Path("/{id}")
     public double getProductPrice(@PathParam("id") UUID id);
-
 }

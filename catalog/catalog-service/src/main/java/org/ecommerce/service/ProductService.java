@@ -17,7 +17,6 @@ import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
 import org.ecommerce.domain.Outbox;
 
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -41,37 +40,40 @@ public class ProductService {
     private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     public List<Product> findByRange(int page, int maxResults) {
-        return productRepo.findByRange(page, maxResults);
+        List<Product> products = productRepo.findByRange(page, maxResults);
+        updateShownPrices(products);
+        return products;
     }
 
     public List<Product> findAll() {
-        return productRepo.findAll();
+        List<Product> products = productRepo.findAll();
+        updateShownPrices(products);
+        return products;
     }
 
     public Product getProductDetails(UUID id) throws EntityNotFoundException {
-        return productRepo.findById(id);
+        Product product = productRepo.findById(id);
+        updateShownPrice(product);
+        return product;
     }
 
     public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
-
         product.setId(UUID.randomUUID());
-        BigDecimal temp = new BigDecimal("10506");
-        product.setBasePrice(temp);
-        product.setShownPrice(product.getBasePrice());
 
+        double fetchedBasePrice = pricingService.getProductPrice(product.getId());
+        product.setBasePrice(new BigDecimal(fetchedBasePrice));
+        product.setShownPrice(product.getBasePrice());
 
         ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
         ProductListed productListed = new ProductListed(product);
 
-
         Outbox outboxMessage = outboxService.createOutboxMessage(productListed.toString());
 
         if (outboxMessage == null) {
             logger.error("Failed to create outbox message for product: " + product.getProductName());
-            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+            throw new RuntimeException("Failed to create outbox message");
         }
-
 
         try {
             CompletionStage<Void> ack = productsEmitter.send(productListed);
@@ -88,7 +90,6 @@ public class ProductService {
             outboxService.markAsFailed(outboxMessage.getId());
         }
 
-
         return productRepo.insert(product);
     }
 
@@ -98,5 +99,16 @@ public class ProductService {
 
     public void removeProduct(UUID id) {
         productRepo.delete(id);
+    }
+
+    private void updateShownPrices(List<Product> products) {
+        for (Product product : products) {
+            updateShownPrice(product);
+        }
+    }
+
+    private void updateShownPrice(Product product) {
+        double latestPrice = pricingService.getProductPrice(product.getId());
+        product.setShownPrice(new BigDecimal(latestPrice));
     }
 }

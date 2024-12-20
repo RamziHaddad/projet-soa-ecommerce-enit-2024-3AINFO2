@@ -7,7 +7,7 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.ecommerce.domain.Product;
 import org.ecommerce.domain.ProductCategory;
 import org.ecommerce.domain.events.ProductAvailabilityEvent;
-import org.ecommerce.dto.InventoryEvent;
+import org.ecommerce.domain.events.InventoryEvent;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
