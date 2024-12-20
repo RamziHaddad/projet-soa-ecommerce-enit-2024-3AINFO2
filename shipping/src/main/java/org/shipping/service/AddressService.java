@@ -6,6 +6,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 
 import org.jboss.logging.Logger;
+import org.shipping.factory.AddressFactory;
+import org.shipping.messaging.AddressEventPublisher;
 import org.shipping.model.Address;
 import org.shipping.repository.AddressRepository;
 
@@ -50,46 +52,7 @@ public class AddressService {
         }
     }
 
-    // Ajouter une adresse pour un utilisateur
-    @Transactional
-    public Address addAddress(String street, String postalCode, String city, String country) {
-        try {
-            // Validation des champs
-            if (street == null || postalCode == null || city == null || country == null) {
-                throw new IllegalArgumentException(
-                        "All address fields (street, postal code, city, country) must be provided.");
-            }
-
-            // UUID utilisateur simulé pour le moment
-            UUID userId = UUID.fromString("faa1b47d-27e3-4106-b42b-2d1e7d1f6e93");
-
-            // Vérifier si l'adresse existe déjà pour l'utilisateur
-            boolean addressExists = addressRepository
-                    .find("userId = ?1 AND street = ?2 AND postalCode = ?3 AND city = ?4 AND country = ?5",
-                            userId, street, postalCode, city, country)
-                    .firstResult() != null;
-
-            if (addressExists) {
-                throw new IllegalStateException("The address already exists for the user.");
-            }
-
-            // Créer et persister l'adresse
-            Address address = new Address(userId, street, postalCode, city, country);
-            addressRepository.persist(address);
-            logger.info("Address added successfully for userId: " + userId);
-            return address;
-
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid input: " + e.getMessage(), e);
-            throw new IllegalArgumentException("Invalid input: " + e.getMessage());
-        } catch (IllegalStateException e) {
-            logger.warn("Address already exists: " + e.getMessage());
-            throw new IllegalStateException(e.getMessage());
-        } catch (Exception e) {
-            logger.error("Unexpected error occurred while adding the address.", e);
-            throw new RuntimeException("An unexpected error occurred while adding the address.");
-        }
-    }
+    
 
     // Trouver les adresses d'un utilisateur
     public List<Address> getAddressesByUserId() {
@@ -118,6 +81,8 @@ public class AddressService {
             throw new RuntimeException("An unexpected error occurred while fetching user addresses.");
         }
     }
+   
+
 
     // Mettre à jour une adresse
     @Transactional
@@ -158,22 +123,29 @@ public class AddressService {
         }
     }
 
-    // Supprimer une adresse
-    @Transactional
-    public void deleteAddress(UUID addressId) {
-        try {
-            Address address = getAddressById(addressId);
-            if (addressRepository.isPersistent(address)) {
-                addressRepository.delete(address);
-                logger.info("Address with ID " + addressId + " deleted successfully.");
-                return;
-            }
-        } catch (NoResultException e) {
-            logger.error("Address with ID " + addressId + " is not persistent, cannot delete.");
-            throw new NoResultException("Address not found during deleting: " + e.getMessage());
-        } catch (Exception e) {
-            logger.error("Unexpected error occurred while deleting the address.", e);
-            throw new RuntimeException("An unexpected error occurred while deleting the address.");
-        }
+   
+    
+    @Inject
+AddressEventPublisher eventPublisher;
+
+@Transactional
+public Address addAddress(String street, String postalCode, String city, String country) {
+    UUID userId = UUID.fromString("faa1b47d-27e3-4106-b42b-2d1e7d1f6e93");
+    Address address = AddressFactory.createAddress(userId, street, postalCode, city, country);
+    addressRepository.persist(address);
+    eventPublisher.publishAddressAddedEvent(address); // Publier l'événement
+    return address;
+}
+
+@Transactional
+public boolean deleteAddress(UUID addressId) {
+    Address address = getAddressById(addressId);
+    if (addressRepository.isPersistent(address)) {
+        addressRepository.delete(address);
+        eventPublisher.publishAddressDeletedEvent(addressId); // Publier l'événement
+        return true;
     }
+    return false;
+}
+
 }
