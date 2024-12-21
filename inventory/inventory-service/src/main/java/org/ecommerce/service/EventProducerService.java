@@ -23,7 +23,7 @@ public class EventProducerService {
     Emitter<String> productEventEmitter;
 
     @Inject
-    @Channel("product-disponibility")
+    @Channel("product-availability")
     Emitter<String> disponibiltyEventEmitter;
 
     @PostPersist
