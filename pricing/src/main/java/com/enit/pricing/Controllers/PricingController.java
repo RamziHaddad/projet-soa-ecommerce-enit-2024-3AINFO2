@@ -55,7 +55,5 @@ public class PricingController {
         BigDecimal basePrice = productService.getBasePrice(productId);
         return ResponseEntity.ok(basePrice);
     }
-
     
-
 }

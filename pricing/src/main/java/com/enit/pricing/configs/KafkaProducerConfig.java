@@ -10,7 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer; 
 
-import com.enit.pricing.events.dto.PriceEvent;
+import com.enit.pricing.events.dto.PriceUpdateEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +30,12 @@ public class KafkaProducerConfig {
 
 
     @Bean
-    public ProducerFactory<String, PriceEvent> producerFactory() {
+    public ProducerFactory<String, PriceUpdateEvent> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, PriceEvent> KafkaTemplate() {
+    public KafkaTemplate<String, PriceUpdateEvent> KafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

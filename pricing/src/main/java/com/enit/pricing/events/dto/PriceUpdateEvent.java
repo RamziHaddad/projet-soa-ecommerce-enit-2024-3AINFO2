@@ -3,14 +3,14 @@ package com.enit.pricing.events.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class PriceEvent {
+public class PriceUpdateEvent {
     private UUID productId;
     private BigDecimal price;
 
     
-    public PriceEvent() {
+    public PriceUpdateEvent() {
     }
-    public PriceEvent(UUID productId, BigDecimal price) {
+    public PriceUpdateEvent(UUID productId, BigDecimal price) {
         this.productId = productId;
         this.price = price;
     }

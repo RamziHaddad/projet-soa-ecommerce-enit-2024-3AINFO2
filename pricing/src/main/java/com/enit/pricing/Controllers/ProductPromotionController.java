@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.enit.pricing.domain.Product;
 import com.enit.pricing.domain.ProductPromotion;
 import com.enit.pricing.dto.ReducThreshold;
-import com.enit.pricing.events.dto.PriceEvent;
+import com.enit.pricing.events.dto.PriceUpdateEvent;
 import com.enit.pricing.events.producer.PriceUpdateProducer;
 import com.enit.pricing.service.PricingService;
 import com.enit.pricing.service.ProductPromotionService;
@@ -59,7 +59,7 @@ public class ProductPromotionController {
             List<Product> products= productPromotionService.getProductsList(promotionId);
             for(Product p: products){     
                 productService.updateProductCurrentPrice(p.getProductId(), p.getBasePrice());
-                PriceEvent event= new PriceEvent(p.getProductId(),p.getBasePrice());
+                PriceUpdateEvent event= new PriceUpdateEvent(p.getProductId(),p.getBasePrice());
                 priceProducer.sendPrice(event);
             } 
             productPromotionService.deletePromotion(promotionId);
@@ -155,7 +155,7 @@ public class ProductPromotionController {
             for(Product p: products){     
                 UUID prodId= p.getProductId();
                 BigDecimal prodPrice= pricingService.calculateProductPrice(prodId);
-                PriceEvent event= new PriceEvent(prodId,prodPrice);
+                PriceUpdateEvent event= new PriceUpdateEvent(prodId,prodPrice);
                 priceProducer.sendPrice(event);
             }
 

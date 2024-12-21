@@ -15,27 +15,20 @@ public class InventoryConsumer {
     private final ProductService productService;
     private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.class);
 
-    @Value("${spring.kafka.topics.add-product}")
+    @Value("${spring.kafka.topic.inventory-topic}")
     private String addProductTopic;
-
-    @Value("${spring.kafka.topics.update-product}")
-    private String updateProductTopic;
-
-    @Value("${spring.kafka.topics.delete-product}")
-    private String deleteProductTopic;
 
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
-
 
 
     public InventoryConsumer(ProductService productService) {
         this.productService = productService;
     }
 
-    @KafkaListener(topics = "${spring.kafka.topics.add-product}", groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "${spring.kafka.topic.inventory-topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void productAdded(InventoryEvent product) {
-        logger.info("Received product ", product.getProductId());
+        logger.info("Received product {}", product.getProductId());
         try{
             productService.addProduct(product.getProductId());
         }catch(Exception e){
@@ -44,15 +37,4 @@ public class InventoryConsumer {
         
     }
 
-
-    @KafkaListener(topics = "${spring.kafka.topics.delete-product}", groupId = "${spring.kafka.consumer.group-id}")
-    public void productDeleted(InventoryEvent product) {
-         logger.info("Received product", product.getProductId());
-        try{
-            productService.deleteProduct(product.getProductId());
-        }catch(Exception e){
-            logger.error("Error deleting product", e);
-        }
-        
-    } 
 } 
