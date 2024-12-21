@@ -1,28 +1,32 @@
 package com.enit.pricing.domain;
 
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 
 
 
 @Entity 
-@DiscriminatorValue("product_promotion")
+@DiscriminatorValue("product_promotions")
 public class ProductPromotion extends Promotion{
-   
-	@ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+	
+    @JsonIgnore
+	@OneToMany(mappedBy = "promotion", cascade = CascadeType.PERSIST)
+	private List<Product> products;
 	
     
-	public Product getProduct() {
-		return product;
+	public List<Product> getProducts() {
+		return products;
 	}
-	public void setProduct(Product product) {
-		this.product = product;
+	public void setProducts(List<Product> products) {
+		this.products = products;
 	}
 	
 }

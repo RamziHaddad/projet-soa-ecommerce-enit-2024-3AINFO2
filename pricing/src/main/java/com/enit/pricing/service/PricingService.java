@@ -11,38 +11,19 @@ import com.enit.pricing.dto.CartItem;
 @Service
 public class PricingService {
     @Autowired
-    private final ProductPromotionService productPromotionService;
-    private final TieredDsicountService tieredDsicountService;
-    private final ProductService productService;
+    private  ProductPromotionService productPromotionService;
+    private  TieredDsicountService tieredDsicountService;
+    //private  ProductService productService; 
 
-    
-    public PricingService(ProductPromotionService productPromotionService,
-                          TieredDsicountService tieredDsicountService,
-                          ProductService productService){
-                            this.productPromotionService= productPromotionService;
-                            this.tieredDsicountService=tieredDsicountService;
-                            this.productService=productService;
-                          }
 
-     /**
-     * This function calculates the price of a product after applying promotions to it.
-     * To calculate the final price with two promotions applied at the same time, 
-     * we first apply the first promotion to the base price, then apply the second promotion 
-     * to the resulting price. ->  both promotions are factored in sequentially.
-     */
-
+  //calculates  the price of the product after applying the corresponding promotion
     public BigDecimal calculateProductPrice(UUID prodId) {
-        BigDecimal basePrice = productService.getProductBasePrice(prodId);
-        BigDecimal priceAfterProdPromotion = productPromotionService.calculateProductPrice(prodId, basePrice);
+        BigDecimal priceAfterProdPromotion = productPromotionService.calculateProductPrice(prodId);
         return priceAfterProdPromotion;
     }
 
-    public BigDecimal calculateCartTotalFinal(List<CartItem> cartItems){
-        BigDecimal total= calculateCartTotal(cartItems);
-        return tieredDsicountService.calculatePriceAfterDiscount(total);
-      }
 
-      
+      //calculates the total of the cart after applying pormotion on each product and before the tiered promotion.
       public BigDecimal calculateCartTotal(List<CartItem> cartItems){
         BigDecimal total= BigDecimal.ZERO;
         for( CartItem c: cartItems){
@@ -51,4 +32,11 @@ public class PricingService {
         }
         return total;
       }
+
+
+    //calculates the final total after applying the tiered promotion
+     public BigDecimal calculateCartTotalFinal(List<CartItem> cartItems){
+        BigDecimal total= calculateCartTotal(cartItems);
+        return tieredDsicountService.calculatePriceAfterTieredPromotion(total);
+      } 
 }

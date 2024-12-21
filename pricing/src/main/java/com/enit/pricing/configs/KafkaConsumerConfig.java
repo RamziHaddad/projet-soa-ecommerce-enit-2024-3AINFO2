@@ -1,4 +1,4 @@
-package com.enit.pricing.InventoryKafkaEvent.consumer;
+ package com.enit.pricing.configs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,13 +15,14 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import com.enit.pricing.InventoryKafkaEvent.dto.InventoryEvent;
+import com.enit.pricing.events.dto.InventoryEvent;
 
 
 
 @EnableKafka
 @Configuration
-public class KafkaConfig {
+public class KafkaConsumerConfig {
+
 
 @Bean
 public ConsumerFactory<String, InventoryEvent> consumerFactory() {
@@ -37,7 +38,7 @@ public ConsumerFactory<String, InventoryEvent> consumerFactory() {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> listenerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, InventoryEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;

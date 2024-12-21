@@ -13,8 +13,8 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("tiered_discount")
 public class TieredPromotion extends Promotion{
     
-	  @Column(name="threshold_amount")
-      private BigDecimal thresholdAmount;
+	@Column(name="threshold_amount")
+    private BigDecimal thresholdAmount;
 
    public BigDecimal getThresholdAmount() {
        return thresholdAmount;

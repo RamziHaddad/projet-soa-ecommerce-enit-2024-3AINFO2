@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "spring.kafka.topics.add-product",
+    "type": "java.lang.String",
+    "description": "Topic name for adding a product"
+  },
+  {
+    "name": "spring.kafka.topics.delete-product",
+    "type": "java.lang.String",
+    "description": "Topic for deleting a product"
+  },
+  {
+    "name": "spring.kafka.topics.update-product",
+    "type": "java.lang.String",
+    "description": "Topic for updating a product"
+  }
+]}

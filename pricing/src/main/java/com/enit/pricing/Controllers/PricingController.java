@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/pricing")
 public class PricingController {
 
-    private final ProductService productService;
+     private final ProductService productService;
     private final PricingService pricingService;
 
     public PricingController(ProductService productService, PricingService pricingService) {
@@ -40,21 +40,22 @@ public class PricingController {
 
     // Calculate the total
     //will be used by order and cart to calculate the total price of all the products
-    @PostMapping("/cart-total")
+     @PostMapping("/purchase-total")
     public ResponseEntity <CartResponse> calculateCartTotal(@RequestBody List<CartItem> cartItems) {
         BigDecimal totalBefore= pricingService.calculateCartTotal(cartItems);
         BigDecimal total=pricingService.calculateCartTotalFinal(cartItems);
         CartResponse cartResponse = new CartResponse(totalBefore, total);
         return ResponseEntity.ok(cartResponse);
-    }
+    } 
 
 
     // Returns the base price of a product
     @GetMapping("/base-price/{productId}")
-    public ResponseEntity<BigDecimal> returnBasePrice(@RequestParam UUID productId) {
-        BigDecimal basePrice = productService.getProductBasePrice(productId);
+    public ResponseEntity<BigDecimal> returnBasePrice(@PathVariable("productId") UUID productId) {
+        BigDecimal basePrice = productService.getBasePrice(productId);
         return ResponseEntity.ok(basePrice);
     }
+
     
 
 }

@@ -1,14 +1,15 @@
 package com.enit.pricing.domain;
 import java.math.BigDecimal;
-import java.util.Set;
 import java.util.UUID;
-import jakarta.persistence.CascadeType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 
 @Entity
 @Table(name = "products")
@@ -16,24 +17,32 @@ import jakarta.persistence.Table;
 public class Product {
 	
     @Id
-    @Column(updatable = false, nullable = false)
+    @Column(name = "product_id", updatable = true, nullable = false)
     private UUID productId;
 
-    @Column(name = "base_price", nullable = false)
+    @Column(name = "base_price", precision = 38, scale = 4, nullable = true)
     private BigDecimal basePrice;
 
-    @Column(name = "category")
-    private String category;
-    
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, targetEntity = ProductPromotion.class)
-    private Set<Promotion> promotions;
+    @Column(name="current_price",precision = 38, scale = 4, nullable = true)
+    private BigDecimal currentPrice;
 
 
+    @ManyToOne
+    @JoinColumn(name="promotion_id", nullable =true)
+    ProductPromotion promotion;
 
-	public Product(UUID productId, BigDecimal basePrice, String category) {
+
+	public Product(UUID productId) {
+        this.productId = productId;
+    }
+
+    public Product() {
+    }
+
+    public Product(UUID productId, BigDecimal basePrice, String category, BigDecimal currentPrice) {
         this.productId = productId;
         this.basePrice = basePrice;
-        this.category = category;
+        this.currentPrice=currentPrice;
     }
 
     public UUID getProductId() {
@@ -47,28 +56,26 @@ public class Product {
     public BigDecimal getBasePrice() {
         return basePrice;
     }
-
-    public Set<Promotion> getPromotions() {
-		return promotions;
+    public ProductPromotion getPromotion() {
+		return promotion;
 	}
 
-	public void setPromotions(Set<Promotion> promotions) {
-		this.promotions = promotions;
+	public void setPromotion(ProductPromotion promotion) {
+		this.promotion = promotion;
 	}
 
 	public void setBasePrice(BigDecimal basePrice) {
         this.basePrice = basePrice;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
     
+        public BigDecimal getCurrentPrice() {
+        return currentPrice;
+    }
 
+    public void setCurrentPrice(BigDecimal currentPrice) {
+        this.currentPrice = currentPrice;
+    }
    
 
 
