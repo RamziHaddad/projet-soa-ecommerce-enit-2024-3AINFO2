@@ -3,7 +3,7 @@ package com.microservices.order_service.controller;
 import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.*;
 import com.microservices.order_service.kafka.CartConsumer;
-import com.microservices.order_service.kafka.OrderCreationProducer;
+import com.microservices.order_service.kafka.OrderEventProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
 import com.microservices.order_service.service.OrderService;
@@ -26,7 +26,7 @@ public class OrderController {
 
     private final InventoryService inventoryService;
 
-    private final OrderCreationProducer orderCreationProducer;
+    private final OrderEventProducer orderEventProducer;
 
     private final PricingService pricingService;
 
@@ -66,7 +66,7 @@ public class OrderController {
             orderEventDTO.setOrderId(order.getId());
             orderEventDTO.setItems(order.getItems());
             orderEventDTO.setOrderStatus("Order Created");
-            orderCreationProducer.sendMessage(orderEventDTO);
+            orderEventProducer.sendOrderEvent(orderEventDTO);
 
             return ResponseEntity.ok(Map.of("message", "Order placed successfully"));
         } else {
@@ -84,7 +84,7 @@ public class OrderController {
 
     @PostMapping("/publish")
     public ResponseEntity<String> publishOrder(@RequestBody OrderEventDTO orderEventDTO){
-        orderCreationProducer.sendMessage(orderEventDTO);
+        orderEventProducer.sendOrderEvent(orderEventDTO);
         return ResponseEntity.ok("Order published");
     }
 

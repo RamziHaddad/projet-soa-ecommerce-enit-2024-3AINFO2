@@ -7,7 +7,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 
 import java.util.Map;
 
-public class CartEventDeserializer implements Deserializer<CartDTO> {
+public class CartDTODeserializer implements Deserializer<CartDTO> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

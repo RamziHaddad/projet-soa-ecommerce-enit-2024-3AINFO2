@@ -12,20 +12,8 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.microservices.order_service.dto.CartDTO;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 @Configuration
-public class KafkaConfig {
+public class CartConsumerConfig {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, CartDTO> kafkaListenerContainerFactory() {
