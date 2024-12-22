@@ -24,14 +24,14 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd inventory/
+          cd inventory/inventory-service/
           mvn clean package -DskipTests
 
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
           name: service-inventory.jar
-          path: inventory/target/*.jar
+          path: inventory/inventory-service/target/*.jar
 
   deploy:
     runs-on: ubuntu-latest
