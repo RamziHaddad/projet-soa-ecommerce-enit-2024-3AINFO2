@@ -70,7 +70,7 @@ jobs:
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/Cart/cart-project.jar"
+          "ls -l ~/cart-project.jar"
 
       - name: Show system resources usage after file transfer
         run: |
