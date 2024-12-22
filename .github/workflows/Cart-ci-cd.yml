@@ -45,7 +45,7 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v3
         with:
-          name: service-Cart.jar
+          name: cart-project.jar
           path: ./ 
 
       - name: Verify if the correct JAR file exists
@@ -63,14 +63,14 @@ jobs:
       
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-Cart-1.0.0-SNAPSHOT.jar \
-          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-Cart.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp cart-project-1.0.0-SNAPSHOT.jar \
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/cart-project.jar
 
 
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/Cart/service-inventory.jar"
+          "ls -l ~/Cart/cart-project.jar"
 
       - name: Show system resources usage after file transfer
         run: |
@@ -88,14 +88,14 @@ jobs:
 
             echo "Starting Spring Boot service..."
             cd ~/inventory-service
-            nohup java -jar service-Cart.jar --server.port=8081 > service-Cart.log 2>&1 &
+            nohup java -jar cart-project.jar --server.port=8081 > cart-project.log 2>&1 &
             echo "Spring Boot service deployed successfully!"
 
             sleep 30
 
             echo "Performing health check..."
-            curl -X 'GET' 'http://localhost:8083/actuator/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
+            curl -X 'GET' 'http://localhost:8081/actuator/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed and healthy!"
             
-            tail -n 50 ~/inventory-service/service-inventory.log
+            tail -n 50 ~/Cart/cart-project.log
