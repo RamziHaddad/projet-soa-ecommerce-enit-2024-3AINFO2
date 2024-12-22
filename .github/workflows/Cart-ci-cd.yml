@@ -87,7 +87,7 @@ jobs:
             sleep 10
 
             echo "Starting Spring Boot service..."
-            cd ~/inventory-service
+            cd ~/Cart
             nohup java -jar cart-project.jar --server.port=8081 > cart-project.log 2>&1 &
             echo "Spring Boot service deployed successfully!"
 
