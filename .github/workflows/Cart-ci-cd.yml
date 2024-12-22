@@ -30,8 +30,8 @@ jobs:
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: service-Cart.jar
-          path: Cart/target/*.jar
+          name: cart-project.jar
+          path: cart/target/cart-project-1.0.0-SNAPSHOT.jar
 
   deploy:
     runs-on: ubuntu-latest
