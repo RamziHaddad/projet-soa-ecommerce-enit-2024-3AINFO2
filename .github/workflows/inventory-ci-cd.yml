@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify if the correct JAR file exists
         run: |
-          ls target/service-inventory-*.jar || (echo "JAR file not found!" && exit 1)
+          ls service-inventory.jar || (echo "JAR file not found!" && exit 1)
 
       - name: Add Server to Known Hosts
         run: |
@@ -65,7 +65,7 @@ jobs:
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/service-inventory/service-inventory.jar"
+          "ls -l ~/inventory-service/service-inventory.jar"
 
       - name: Show system resources usage after file transfer
         run: |
@@ -82,7 +82,7 @@ jobs:
             sleep 10
 
             echo "Starting Spring Boot service..."
-            cd ~/service-inventory
+            cd ~/inventory-service
             nohup java -jar service-inventory.jar --server.port=8083 > service-inventory.log 2>&1 &
             echo "Spring Boot service deployed successfully!"
 
@@ -93,4 +93,4 @@ jobs:
 
             echo "Service deployed and healthy!"
             
-            tail -n 50 ~/service-inventory/service-inventory.log
+            tail -n 50 ~/inventory-service/service-inventory.log
