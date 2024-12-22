@@ -59,7 +59,7 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp inventory/inventory-service/target/inventory-service-1.0.0-SNAPSHOT.jar \
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./inventory-service-1.0.0-SNAPSHOT.jar \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/inventory-service/service-inventory.jar
 
       - name: Verify if the JAR file exists on the VPS
