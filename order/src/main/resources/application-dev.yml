@@ -19,16 +19,16 @@ spring:
     enabled: false
     baseline-on-migrate: true
     locations: classpath:db/migration
+  http:
+    host: 0.0.0.0
+    cors:
+      enabled: true
+      origins: "*"
+      
 logging:
   level:
     org:
-      flywaydb : DEBUG
+      flywaydb: DEBUG
 
 server:
   port: 8084
-  
-http:
-  host: 0.0.0.0
-  cors:
-    enabled: true
-    origins: "*"
