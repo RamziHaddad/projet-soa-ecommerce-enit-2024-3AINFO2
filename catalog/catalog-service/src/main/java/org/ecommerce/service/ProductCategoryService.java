@@ -39,6 +39,7 @@ public class ProductCategoryService {
         categoryRepo.delete(category);
     }
 
+@Transactional
     public ProductCategory getCategoryByName(String categoryName) throws EntityNotFoundException {
         return categoryRepo.findByName(categoryName);
     }

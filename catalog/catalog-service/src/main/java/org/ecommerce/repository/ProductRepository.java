@@ -15,6 +15,7 @@ import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 
 @ApplicationScoped
+@Transactional
 public class ProductRepository {
 
     @Inject

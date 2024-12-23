@@ -10,6 +10,7 @@ import org.ecommerce.exceptions.EntityNotFoundException;
 import java.util.UUID;
 
 @ApplicationScoped
+@Transactional
 public class ProductCategoryRepository {
 
     @Inject
