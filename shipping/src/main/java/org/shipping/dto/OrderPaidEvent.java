@@ -19,15 +19,7 @@ public class OrderPaidEvent {
         return orderId;
     }
 
-    public void setOrderId(UUID orderId) {
-        this.orderId = orderId;
-    }
-
     public UUID getAddressId() {
         return addressId;
-    }
-
-    public void setAddressId(UUID addressId) {
-        this.addressId = addressId;
     }
 }
