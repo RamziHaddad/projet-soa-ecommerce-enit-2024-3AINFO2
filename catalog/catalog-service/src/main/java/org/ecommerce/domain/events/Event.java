@@ -17,7 +17,6 @@ import lombok.ToString;
 @JsonSubTypes({
  @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed"),
  @JsonSubTypes.Type(value = ProductUpdated.class, name = "ProductUpdated"),
- @JsonSubTypes.Type(value = ProductAvailabilityEvent.class, name = "ProductAvailability"),
 })
 
 @Data

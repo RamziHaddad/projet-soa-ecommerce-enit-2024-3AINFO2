@@ -79,7 +79,7 @@ public class KafkaProductConsumer {
             Product product = productRepo.findById(UUID.fromString(event.getProductId()));
             if (product != null) {
                 product.setDescription(event.getDescription());
-                product.setDisponibility(event.isDisponibility());
+                //product.setDisponibility(event.isDisponibility());
                 ProductCategory category = getOrCreateCategory(event.getCategory());
                 product.setCategory(category);
                 productRepo.update(product);
@@ -121,7 +121,7 @@ public class KafkaProductConsumer {
     public void updateAvailabilityOfProduct(String payload) {
         try {
             ProductAvailabilityEvent event = objectMapper.readValue(payload, ProductAvailabilityEvent.class);
-            UUID productId = UUID.fromString(event.getAggregateId());
+            UUID productId = UUID.fromString(event.getProductId());
             Product product = productService.getProductDetails(productId);
 
             if (product != null) {

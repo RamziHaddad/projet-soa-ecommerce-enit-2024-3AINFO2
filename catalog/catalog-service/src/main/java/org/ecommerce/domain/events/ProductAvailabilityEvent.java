@@ -2,27 +2,17 @@ package org.ecommerce.domain.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ProductAvailabilityEvent extends Event {
-    @JsonProperty("productId")
+public class ProductAvailabilityEvent {
     private String productId;
-
-    @JsonProperty("eventType")
-    private final String availability;
+    private String availability;
     
+    public ProductAvailabilityEvent() {
+    }
     public ProductAvailabilityEvent(String productId, String availability) {
-        super("ProductAvailability", "Product", productId);
         this.productId = productId;
         this.availability = availability;
     }
     
-    @Override
-    public String toString() {
-        return "ProductAvailabilityEvent{" +
-               ", eventType=" + getEventType() +
-               ", aggregateType=" + getAggregateType() +
-               ", aggregateId=" + getAggregateId() +
-               '}';
-    }
 
     public String getAvailability() {
         return availability;
