@@ -27,48 +27,64 @@ public class ProductService {
 
     @Inject
     ProductRepository productRepo;
+
     @Inject
     ProductCategoryService categoryService;
+
     @RestClient
     PricingService pricingService;
     
     @Inject
     OutboxService outboxService;
+
     private final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     @Transactional
     public List<Product> findByRange(int page, int maxResults) {
-        return productRepo.findByRange(page, maxResults);
+        List<Product> products = productRepo.findByRange(page, maxResults);
+        products.forEach(product -> {
+            BigDecimal price = pricingService.getProductPrice(product.getId());
+            product.setShownPrice(price);
+        });
+        return products;
     }
 
     @Transactional
     public List<Product> findAll() {
-        return productRepo.findAll();
+        List<Product> products = productRepo.findAll();
+        products.forEach(product -> {
+            BigDecimal price = pricingService.getProductPrice(product.getId());
+            product.setShownPrice(price);
+        });
+        return products;
     }
 
     @Transactional
     public Product getProductDetails(UUID id) throws EntityNotFoundException {
-        return productRepo.findById(id);
+        Product product = productRepo.findById(id);
+        BigDecimal price = pricingService.getProductPrice(product.getId());
+        product.setShownPrice(price);
+        return product;
     }
     @Transactional
     public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
-
         product.setId(UUID.randomUUID());
-        BigDecimal temp = new BigDecimal("10506");
-        product.setBasePrice(temp);
-        product.setShownPrice(product.getBasePrice());
 
+
+        BigDecimal price = pricingService.getProductPrice(product.getId());
+        product.setBasePrice(price);
+        product.setShownPrice(price);
 
         ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
-        ProductListed productListed = new ProductListed(product);
 
+        ProductListed productListed = new ProductListed(product);
 
         try {
             outboxService.createOutboxMessage(productListed);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to create outbox message for product: " + product.getProductName());
-            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+            throw new RuntimeException("Failed to create outbox message");
         }
 
         return productRepo.insert(product);
@@ -77,37 +93,35 @@ public class ProductService {
     @Transactional
     public Product updateProduct(Product product) throws EntityNotFoundException {
         Product existingProduct = productRepo.findById(product.getId());
-    
+
         if (product.getCategory() != null) {
-                ProductCategory newCategory = categoryService.getCategoryByName(product.getCategory().getCategoryName());
-                if (newCategory != null) {
-                    existingProduct.setCategory(newCategory);
-                } else {
-                    throw new EntityNotFoundException("Category not found: " + product.getCategory().getCategoryName());
-                }
+            ProductCategory newCategory = categoryService.getCategoryByName(product.getCategory().getCategoryName());
+            if (newCategory != null) {
+                existingProduct.setCategory(newCategory);
+            } else {
+                throw new EntityNotFoundException("Category not found: " + product.getCategory().getCategoryName());
+            }
         }
         if (product.getProductName() != null) {
-                existingProduct.setProductName(product.getProductName());
+            existingProduct.setProductName(product.getProductName());
         }
         if (product.getDescription() != null) {
-                existingProduct.setDescription(product.getDescription());
+            existingProduct.setDescription(product.getDescription());
         }
         if (product.getShownPrice() != null) {
-                existingProduct.setShownPrice(product.getShownPrice());
+            existingProduct.setShownPrice(product.getShownPrice());
         }
         existingProduct.setDisponibility(product.isDisponibility());
-        
+
         ProductUpdated productUpdated = new ProductUpdated(existingProduct);
         try {
             outboxService.createOutboxMessage(productUpdated);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             logger.error("Failed to create outbox message for product: " + product.getProductName());
-            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+            throw new RuntimeException("Failed to create outbox message");
         } catch (EntityAlreadyExistsException e) {
-            e.printStackTrace();
             logger.error("Failed to create outbox message for product: " + product.getProductName());
-            throw new RuntimeException("Failed to create outbox message"); // Handle accordingly
+            throw new RuntimeException("Failed to create outbox message");
         }
 
         return productRepo.update(existingProduct);

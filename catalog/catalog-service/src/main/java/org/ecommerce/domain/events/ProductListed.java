@@ -22,7 +22,7 @@ public class ProductListed extends Event {
     public ProductListed(Product product) {
         super("ProductListed", "Product", product.getId().toString());
         this.productName = product.getProductName();
-        this.categoryName = product.getCategory().getCategoryName(); 
+        this.categoryName = product.getCategory().getCategoryName();
         this.description = product.getDescription();
         this.price = product.getShownPrice();
     }

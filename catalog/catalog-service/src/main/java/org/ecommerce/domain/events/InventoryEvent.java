@@ -1,37 +1,25 @@
 package org.ecommerce.domain.events;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-public class InventoryEvent {
-
-    private String eventType;
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class InventoryEvent extends Event {
     private String productId;
     private String name;
     private String description;
     private String category;
     private boolean disponibility;
 
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public String getProductId() {
-        return productId;
-    }
-    
-    public String getDescription() {
-        return description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public boolean isDisponibility() {
-        return disponibility;
-    }
-
-    public String getName() {
-        return name;
+    public InventoryEvent(String aggregateType, String aggregateId, String productId, String name, String description, String category, boolean disponibility) {
+        super("InventoryEvent", aggregateType, aggregateId);
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.disponibility = disponibility;
     }
 }
