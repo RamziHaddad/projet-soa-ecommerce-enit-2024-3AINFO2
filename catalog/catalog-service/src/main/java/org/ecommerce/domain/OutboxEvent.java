@@ -1,11 +1,13 @@
 package org.ecommerce.domain;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@ToString
 public class OutboxEvent {
 
     @Id
