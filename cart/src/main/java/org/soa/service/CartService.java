@@ -2,7 +2,6 @@ package org.soa.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
