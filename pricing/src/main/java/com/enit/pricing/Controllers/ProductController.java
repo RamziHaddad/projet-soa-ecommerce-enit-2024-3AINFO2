@@ -7,25 +7,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enit.pricing.domain.Product;
 import com.enit.pricing.dto.PromotionDTO;
 import com.enit.pricing.events.dto.InventoryEvent;
-import com.enit.pricing.events.dto.PriceEvent;
+import com.enit.pricing.events.dto.PriceUpdateEvent;
 import com.enit.pricing.events.producer.PriceUpdateProducer;
 import com.enit.pricing.service.PricingService;
 import com.enit.pricing.service.ProductService;
 
 import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 
 
@@ -99,11 +98,11 @@ public class ProductController {
 
     //add a promotion to a product
     @PutMapping("addPromotiontoProduct/{prodId}")
-    public ResponseEntity<PriceEvent> addPromotion(@PathVariable UUID prodId, @RequestBody PromotionDTO promotion) {
+    public ResponseEntity<PriceUpdateEvent> addPromotion(@PathVariable UUID prodId, @RequestBody PromotionDTO promotion) {
         try{
             productService.addPromotiontoProduct(prodId,promotion.getPromotionId());
             BigDecimal prodPrice= pricingService.calculateProductPrice(prodId);
-            PriceEvent event= new PriceEvent(prodId,prodPrice);
+            PriceUpdateEvent event= new PriceUpdateEvent(prodId,prodPrice);
             priceProducer.sendPrice(event);
             return ResponseEntity.ok()
                                 .header("message","Promotion added and event sent")
@@ -117,7 +116,7 @@ public class ProductController {
     }
     //for setting base price ( after a product sent by the inventory is added the base price will be set from here)
     @PutMapping("basePrice/{prodId}")
-    public ResponseEntity<String> setBasePrice(@PathVariable UUID prodId, @RequestBody PriceEvent price) {
+    public ResponseEntity<String> setBasePrice(@PathVariable UUID prodId, @RequestBody PriceUpdateEvent price) {
         try{
             productService.updateBasePrice(prodId, price.getPrice());
             return ResponseEntity.ok().body("Price updated successfully");
@@ -131,7 +130,7 @@ public class ProductController {
     public ResponseEntity<String> deletePromoFromProduct(@PathVariable("prodId") UUID prodId){
         try{
             productService.updateProductCurrentPrice(prodId,productService.getBasePrice(prodId));
-            PriceEvent event= new PriceEvent(prodId,productService.getBasePrice(prodId));
+            PriceUpdateEvent event= new PriceUpdateEvent(prodId,productService.getBasePrice(prodId));
             priceProducer.sendPrice(event);
             productService.removePromotionFromProduct(prodId);
             return ResponseEntity.ok("Product with ID "+prodId+ " deleted");

@@ -1,13 +1,11 @@
 package com.enit.pricing.events.producer;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-
 import org.springframework.stereotype.Service;
 
-import com.enit.pricing.events.dto.PriceEvent;
+import com.enit.pricing.events.dto.PriceUpdateEvent;
 
 
 @Service
@@ -17,8 +15,8 @@ public class  PriceUpdateProducer {
     private String productPrice;
 
         @Autowired
-        private KafkaTemplate<String, PriceEvent> kafkaTemplate;
-    	public void sendPrice(PriceEvent price) {
+        private KafkaTemplate<String, PriceUpdateEvent> kafkaTemplate;
+    	public void sendPrice(PriceUpdateEvent price) {
 			kafkaTemplate.send(productPrice, price)
             .whenComplete((result, ex) -> {
                 if (ex != null) {
