@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class InventoryEvent {
 
+    private UUID eventId;
     private UUID productId;
 
     public InventoryEvent() {
@@ -13,6 +14,8 @@ public class InventoryEvent {
         this.productId = productId;
 
     }
+
+    
     public UUID getProductId() {
         return productId;
     }

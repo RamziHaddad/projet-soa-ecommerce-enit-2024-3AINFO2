@@ -3,8 +3,8 @@ package com.enit.pricing.dto;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class UpdateDateDto {
-
+public class  UpdateDateDto{
+  
     private UUID promotionId;
     private LocalDate date;
 

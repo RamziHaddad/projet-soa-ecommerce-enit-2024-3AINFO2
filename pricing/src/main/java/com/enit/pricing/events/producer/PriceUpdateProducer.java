@@ -13,7 +13,7 @@ import com.enit.pricing.events.dto.PriceEvent;
 @Service
 public class  PriceUpdateProducer {
 
-    @Value("${spring.kafka.topic.name}")
+    @Value("${spring.kafka.topic.price-update-topic}")
     private String productPrice;
 
         @Autowired
