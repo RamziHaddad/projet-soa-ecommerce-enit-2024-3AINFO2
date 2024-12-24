@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
+import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 import org.soa.service.CartService;
@@ -79,25 +80,17 @@ public class CartResource {
         }
     }
 
-    // Ajouter un item au panier d'un utilisateur
     @POST
-    @Path("/{userId}/add-item")
-    public Response addItem(@PathParam("userId") UUID userId, Item cartItem) {
-        try {
-            logger.info("Adding item to cart for User ID: " + userId);
+    @Path("/{userId}/add-item/{productId}")
+    public Response addItemFromCatalog(
+        @PathParam("userId") UUID userId,
+        @PathParam("productId") UUID productId,
+        @QueryParam("quantity") @DefaultValue("1") int quantity) {
 
-            cartService.addItem(userId, cartItem);
-            logger.info("Item added successfully to cart of User ID: " + userId);
-
-            return Response.status(Status.CREATED).entity("Item added to cart").build();
-        } catch (IllegalArgumentException e) {
-            logger.warn("Invalid input: " + e.getMessage());
-            return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            logger.error("Unexpected error occurred while adding item: " + e.getMessage(), e);
-            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        Item newItem = cartService.addItemFromCatalog(userId,productId, quantity);
+        return Response.status(Status.CREATED).entity(newItem).build();
     }
+
 
     // Mettre à jour un item dans le panier d'un utilisateur
     @PUT
@@ -161,5 +154,11 @@ public class CartResource {
            logger.error("Unexpected error occurred while clearing cart: " + e.getMessage(), e);
            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
        }
+    }
+
+    @GET
+    @Path("/item/{itemId}")
+    public ItemDTO getItemDetails(@PathParam("itemId") UUID itemId) {
+        return cartService.getItemDetails(itemId);
     }
 }
