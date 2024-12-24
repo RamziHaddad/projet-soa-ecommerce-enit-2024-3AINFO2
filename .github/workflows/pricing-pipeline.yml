@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - pricing
+      - Pricing
   pull_request:
     branches:
-      - pricing
+      - Pricing
 
 jobs:
   build:
