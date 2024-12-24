@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  db_rating:
+    image: pgvector/pgvector:pg15
+    container_name: db_rating
+    environment:
+      POSTGRES_DB: db_rating
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: azerty
+    ports:
+      - "5440:5432"
+    restart: unless-stopped
