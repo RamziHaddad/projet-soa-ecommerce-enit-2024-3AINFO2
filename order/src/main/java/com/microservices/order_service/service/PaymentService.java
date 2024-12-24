@@ -29,7 +29,7 @@ public class PaymentService {
     public PaymentResponseDTO processPayment(List<CartItem> cartItems, @NotNull PaymentRequestDTO paymentRequestDTO) {
 
         cartResponse pricingResponse = pricingService.checkPrice(cartItems);
-        BigDecimal totalAmount = pricingResponse.getTotalAfterDiscount();
+        BigDecimal totalAmount = pricingResponse.getTotalBeforeDiscount();
 
 
         paymentRequestDTO.setAmount(totalAmount);
