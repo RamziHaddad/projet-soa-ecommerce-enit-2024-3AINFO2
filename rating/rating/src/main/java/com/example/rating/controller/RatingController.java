@@ -39,4 +39,5 @@ public class RatingController {
     public List<Rating> getRatingsForUser(@PathVariable Long idUser) {
         return ratingService.getRatingsForUser(idUser);
     }
+
 }
