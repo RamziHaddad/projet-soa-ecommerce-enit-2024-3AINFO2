@@ -1,6 +1,11 @@
 version: '3'
 
 services:
+  redis:
+    image: redis:7.0
+    container_name: redis-container
+    ports:
+      - "6379:6379"
   db_bank:
     image: pgvector/pgvector:pg15
     environment:

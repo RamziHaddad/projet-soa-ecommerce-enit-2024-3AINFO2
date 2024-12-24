@@ -2,19 +2,17 @@ package org.soa.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.jboss.logging.Logger;
-import org.redisson.api.RMap;
+import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 import org.soa.messaging.CartPublisher;
-import org.soa.messaging.PricingEventConsumer;
-import java.util.Map;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
 public class CartService {
@@ -24,23 +22,29 @@ public class CartService {
 
     private static final Logger logger = Logger.getLogger(CartService.class);
 
-    private RMap<UUID, Cart> getCartsMap() {
-        return redissonClient.getMap("carts");
+    private RMapCache<UUID, Cart> getCartsMap() {
+        return redissonClient.getMapCache("carts");
     }
 
     // Créer un nouveau panier
     public Cart createCart(UUID userId) {
         try {
             logger.info("Creating cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+
+            // Utiliser RMapCacheCache pour permettre la gestion du TTL
+            RMapCache<UUID, Cart> carts = redissonClient.getMapCache("carts");
 
             if (carts.containsKey(userId)) {
                 logger.error("Cart already exists for userId: " + userId);
                 throw new IllegalStateException("Cart already exists for userId: " + userId);
             }
 
+            // Créer un nouveau panier
             Cart cart = new Cart(userId);
-            carts.put(userId, cart);
+
+            // Ajouter le panier avec une durée de vie de 24 heures
+            carts.put(userId, cart, 24, TimeUnit.HOURS);
+
             logger.info("Cart created successfully for userId: " + userId);
             return cart;
         } catch (Exception e) {
@@ -53,7 +57,7 @@ public class CartService {
     public Cart getCart(UUID userId) {
         try {
             logger.info("Fetching cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
 
             Cart cart = carts.get(userId);
             if (cart == null) {
@@ -67,14 +71,15 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while fetching the cart.", e);
         }
     }
-    @Inject
-    PricingEventConsumer PricingEventConsumer;
+
+    // @Inject
+    // PricingEventConsumer PricingEventConsumer;
     public void addItem(UUID userId, Item item) {
         try {
             logger.info("Adding item to cart for userId: " + userId);
 
             // Récupérer la carte des paniers
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
             Cart cart = carts.get(userId);
 
             if (cart == null) {
@@ -82,21 +87,23 @@ public class CartService {
                 throw new IllegalArgumentException("Cart not found for userId: " + userId);
             }
 
-            // Récupérer tous les prix depuis PricingEventConsumer
-            Map<UUID, Double> allPrices = PricingEventConsumer.getAllPrices();
+            // // Récupérer tous les prix depuis PricingEventConsumer
+            // Map<UUID, Double> allPrices = PricingEventConsumer.getAllPrices();
 
-            // Récupérer le prix de l'article à partir de la map des prix
-            Double price = allPrices.get(item.getItemId());
+            // // Récupérer le prix de l'article à partir de la map des prix
+            // Double price = allPrices.get(item.getItemId());
 
-            if (price == null) {
-                logger.error("Price not found for itemId: " + item.getItemId());
-                throw new IllegalArgumentException("Price not found for itemId: " + item.getItemId());
-            }
+            // if (price == null) {
+            // logger.error("Price not found for itemId: " + item.getItemId());
+            // throw new IllegalArgumentException("Price not found for itemId: " +
+            // item.getItemId());
+            // }
 
-            // Mettre à jour l'article avec le prix récupéré
-            item.setPrice(price);
+            // // Mettre à jour l'article avec le prix récupéré
+            // item.setPrice(price);
 
-            // Ajouter l'article au panier, en mettant à jour la quantité si l'article existe déjà
+            // Ajouter l'article au panier, en mettant à jour la quantité si l'article
+            // existe déjà
             cart.getItems().compute(item.getItemId(), (key, existingItem) -> {
                 if (existingItem != null) {
                     existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
@@ -114,12 +121,11 @@ public class CartService {
         }
     }
 
-
     // Mettre à jour un item dans le panier
     public void updateItem(UUID userId, Item cartItem) {
         try {
             logger.info("Updating item in cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
             Cart cart = carts.get(userId);
 
             if (cart == null) {
@@ -145,7 +151,7 @@ public class CartService {
     public void removeItem(UUID userId, UUID itemId) {
         try {
             logger.info("Removing item from cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
             Cart cart = carts.get(userId);
 
             if (cart == null) {
@@ -171,7 +177,7 @@ public class CartService {
     public List<Item> getCartItems(UUID userId) {
         try {
             logger.info("Fetching items from cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
             Cart cart = carts.get(userId);
 
             if (cart == null) {
@@ -190,7 +196,7 @@ public class CartService {
     public void deleteCart(UUID userId) {
         try {
             logger.info("Deleting cart for userId: " + userId);
-            RMap<UUID, Cart> carts = getCartsMap();
+            RMapCache<UUID, Cart> carts = getCartsMap();
 
             if (!carts.containsKey(userId)) {
                 logger.error("Cart not found for userId: " + userId);
@@ -202,6 +208,32 @@ public class CartService {
         } catch (Exception e) {
             logger.error("Unexpected error occurred while deleting cart: " + e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred while deleting the cart.", e);
+        }
+    }
+
+    // Vider le panier
+    public void clearCart(UUID userId) {
+        try {
+            logger.info("Clearing cart for userId: " + userId);
+            RMapCache<UUID, Cart> carts = getCartsMap();
+
+            // Vérifier si le panier existe
+            if (!carts.containsKey(userId)) {
+                logger.error("Cart not found for userId: " + userId);
+                throw new IllegalArgumentException("Cart not found for userId: " + userId);
+            }
+
+            // Récupérer le panier
+            Cart cart = carts.get(userId);
+
+            // Vider le contenu du panier
+            cart.getItems().clear();
+            carts.put(userId, cart); // Mettre à jour la carte après nettoyage
+
+            logger.info("Cart cleared successfully for userId: " + userId);
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while clearing cart: " + e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred while clearing the cart.", e);
         }
     }
 

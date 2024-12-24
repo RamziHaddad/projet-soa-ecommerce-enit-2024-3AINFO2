@@ -90,6 +90,9 @@ public class CartResource {
             logger.info("Item added successfully to cart of User ID: " + userId);
 
             return Response.status(Status.CREATED).entity("Item added to cart").build();
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid input: " + e.getMessage());
+            return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.error("Unexpected error occurred while adding item: " + e.getMessage(), e);
             return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -137,26 +140,26 @@ public class CartResource {
     @Path("/{userId}/validate")
     public Response validateCart(@PathParam("userId") UUID userId) {
         cartService.validateCart(userId);
-        return Response.status(Status.OK).entity("Enfin, publié!!!!").build();
+        return Response.status(Status.OK).entity("Cart Validated Successfully").build();
     }
 
     // Vider le panier d'un utilisateur
-    //@DELETE
-    //@Path("/{userId}/clear")
-    //public Response clearCart(@PathParam("userId") UUID userId) {
-    //    try {
-    //        logger.info("Clearing cart for User ID: " + userId);
-//
-    //        cartService.clearCart(userId);
-    //        logger.info("Cart cleared successfully for User ID: " + userId);
-//
-    //        return Response.status(Status.NO_CONTENT).build();
-    //    } catch (IllegalArgumentException e) {
-    //        logger.warn("Invalid input: " + e.getMessage());
-    //        return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
-    //    } catch (Exception e) {
-    //        logger.error("Unexpected error occurred while clearing cart: " + e.getMessage(), e);
-    //        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-    //    }
-    //}
+    @DELETE
+    @Path("/{userId}/clear")
+    public Response clearCart(@PathParam("userId") UUID userId) {
+       try {
+           logger.info("Clearing cart for User ID: " + userId);
+
+           cartService.clearCart(userId);
+           logger.info("Cart cleared successfully for User ID: " + userId);
+
+           return Response.status(Status.NO_CONTENT).build();
+       } catch (IllegalArgumentException e) {
+           logger.warn("Invalid input: " + e.getMessage());
+           return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
+       } catch (Exception e) {
+           logger.error("Unexpected error occurred while clearing cart: " + e.getMessage(), e);
+           return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+       }
+    }
 }
