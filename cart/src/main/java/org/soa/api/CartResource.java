@@ -6,6 +6,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
+import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 import org.soa.service.CartService;
@@ -79,22 +80,21 @@ public class CartResource {
         }
     }
 
-    // Ajouter un item au panier d'un utilisateur
     @POST
-    @Path("/{userId}/add-item")
-    public Response addItem(@PathParam("userId") UUID userId, Item cartItem) {
-        try {
-            logger.info("Adding item to cart for User ID: " + userId);
+    @Path("/{cartId}/add-item-from-catalog/{productId}")
+    public Response addItemFromCatalog(
+        @PathParam("cartId") UUID cartId,
+        @PathParam("productId") UUID productId,
+        @QueryParam("quantity") @DefaultValue("1") int quantity) {
 
-            cartService.addItem(userId, cartItem);
-            logger.info("Item added successfully to cart of User ID: " + userId);
+        Item newItem = cartService.addItemFromCatalog(productId, quantity);
+        // Ajoutez cet item au panier existant (vous pouvez améliorer la gestion des paniers ici)
+        Cart cart = new Cart(cartId);
+        cart.getItems().put(newItem.getItemId(), newItem);
 
-            return Response.status(Status.CREATED).entity("Item added to cart").build();
-        } catch (Exception e) {
-            logger.error("Unexpected error occurred while adding item: " + e.getMessage(), e);
-            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        return Response.ok(cart).build();
     }
+
 
     // Mettre à jour un item dans le panier d'un utilisateur
     @PUT
@@ -159,4 +159,10 @@ public class CartResource {
     //        return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     //    }
     //}
+
+    @GET
+    @Path("/item/{itemId}")
+    public ItemDTO getItemDetails(@PathParam("itemId") UUID itemId) {
+        return cartService.getItemDetails(itemId);
+    }
 }

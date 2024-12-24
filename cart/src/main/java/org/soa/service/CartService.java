@@ -2,22 +2,28 @@ package org.soa.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.soa.api.CatalogueClient;
 import org.soa.dto.ItemDTO;
 import org.soa.model.Cart;
 import org.soa.model.Item;
 import org.soa.messaging.CartPublisher;
-import org.soa.messaging.PricingEventConsumer;
-import java.util.Map;
 
 import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
 public class CartService {
+    
 
+    public ItemDTO getItemDetails(UUID itemId) {
+        return catalogueClient.fetchItemDetails(itemId);
+    }
+    
     @Inject
     RedissonClient redissonClient;
 
@@ -66,52 +72,23 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while fetching the cart.", e);
         }
     }
+   
     @Inject
-    PricingEventConsumer PricingEventConsumer;
-    public void addItem(UUID userId, Item item) {
-        try {
-            logger.info("Adding item to cart for userId: " + userId);
+    @RestClient
+    CatalogueClient catalogueClient;
 
-            // Récupérer la carte des paniers
-            RMap<UUID, Cart> carts = getCartsMap();
-            Cart cart = carts.get(userId);
+    public Item addItemFromCatalog(UUID productId, int quantity) {
+        // Récupérer les informations du produit via l'API Catalogue
+        ItemDTO product = catalogueClient.fetchItemDetails(productId);
 
-            if (cart == null) {
-                logger.error("Cart not found for userId: " + userId);
-                throw new IllegalArgumentException("Cart not found for userId: " + userId);
-            }
-
-            // Récupérer tous les prix depuis PricingEventConsumer
-            Map<UUID, Double> allPrices = PricingEventConsumer.getAllPrices();
-
-            // Récupérer le prix de l'article à partir de la map des prix
-            Double price = allPrices.get(item.getItemId());
-
-            if (price == null) {
-                logger.error("Price not found for itemId: " + item.getItemId());
-                throw new IllegalArgumentException("Price not found for itemId: " + item.getItemId());
-            }
-
-            // Mettre à jour l'article avec le prix récupéré
-            item.setPrice(price);
-
-            // Ajouter l'article au panier, en mettant à jour la quantité si l'article existe déjà
-            cart.getItems().compute(item.getItemId(), (key, existingItem) -> {
-                if (existingItem != null) {
-                    existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
-                    return existingItem;
-                }
-                return item;
-            });
-
-            // Mettre à jour le panier dans la carte
-            carts.put(userId, cart);
-            logger.info("Item added successfully to cart for userId: " + userId);
-        } catch (Exception e) {
-            logger.error("Unexpected error occurred while adding item: " + e.getMessage(), e);
-            throw new RuntimeException("An unexpected error occurred while adding the item to the cart.", e);
+        if (product == null) {
+            throw new IllegalArgumentException("Produit non trouvé pour l'ID : " + productId);
         }
+
+        // Créer un nouvel Item basé sur les informations du produit
+        return new Item(productId, quantity, product.getPrice(), product.getName());
     }
+
 
 
     // Mettre à jour un item dans le panier
@@ -231,6 +208,7 @@ public class CartService {
         // Optionnel : journaliser l'action
         logger.info("Cart with ID: " + cartId + " successfully published to the broker.");
     }
+  
     
 
 
