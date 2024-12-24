@@ -30,7 +30,7 @@ jobs:
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: service-order.jar
+          name: order.jar
           path: order/target/*.jar
 
   deploy:
@@ -45,7 +45,7 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v3
         with:
-          name: service-order.jar
+          name: order.jar
           path: ./ 
 
       - name: Verify if the correct JAR file exists
@@ -64,7 +64,7 @@ jobs:
       
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-order.jar \
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp order.jar \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/order/order.jar
 
       - name: Verify if the JAR file exists on the VPS
