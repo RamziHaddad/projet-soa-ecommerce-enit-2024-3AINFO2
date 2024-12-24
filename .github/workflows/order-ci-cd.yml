@@ -25,7 +25,7 @@ jobs:
       - name: Build with Maven
         run: |
           cd order/
-          mvn clean package -DskipTests
+          mvn clean package -DskipTests -Djava.version=17
 
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
@@ -45,7 +45,7 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v3
         with:
-          name: order.jar
+          name: service-order.jar
           path: ./ 
 
       - name: Verify if the correct JAR file exists
@@ -56,6 +56,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
+
       - name: Create destination directory on VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
@@ -63,9 +64,8 @@ jobs:
       
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp order-1.0.0-SNAPSHOT.jar \
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-order.jar \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/order/order.jar
-
 
       - name: Verify if the JAR file exists on the VPS
         run: |
