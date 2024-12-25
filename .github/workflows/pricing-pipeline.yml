@@ -59,13 +59,13 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./target/service-pricing-*.jar \
-          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/pricing/service-pricing.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./target/pricing-service.jar \
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/pricing/pricing-service.jar
 
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/pricing/service-pricing.jar"
+          "ls -l ~/pricing/pricing-service.jar"
 
       - name: Show system resources usage after file transfer
         run: |
@@ -83,16 +83,16 @@ jobs:
 
             echo "Starting Spring Boot service..."
             cd ~/pricing
-            nohup java -jar service-pricing.jar --server.port=8086 > service-pricing.log 2>&1 &
+            nohup java -jar pricing-service.jar --server.port=8086 > pricing-service.log 2>&1 &
             echo "Spring Boot service deployed successfully!"
 
             sleep 30
 
             echo "Performing health check..."
-            curl -X 'GET' 'http://localhost:8089/actuator/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
+            curl -X 'GET' 'http://localhost:8086/actuator/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed and healthy!"
             
-            tail -n 50 ~/pricing/service-pricing.log
+            tail -n 50 ~/pricing/pricing-service.log
 
  
