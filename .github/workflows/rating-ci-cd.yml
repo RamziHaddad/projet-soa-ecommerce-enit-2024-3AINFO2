@@ -65,12 +65,12 @@ jobs:
       - name: Transfer JAR to VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp rating-0.0.1-SNAPSHOT.jar \
-          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-rating.jar
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/rating/service-rating.jar
 
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/service-rating.jar"
+          "ls -l ~/rating/service-rating.jar"
 
       - name: Show system resources usage after file transfer
         run: |
