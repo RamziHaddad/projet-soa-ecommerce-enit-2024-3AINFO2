@@ -75,15 +75,10 @@ jobs:
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ${{ steps.find_jar.outputs.JAR_NAME }} \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/order/order.jar
 
-      - name: Verify JAR File on VPS
+      - name: Kill Process on Port 8084 (if any)
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/order/order.jar"
-
-      - name: Show System Resources on VPS
-        run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
+          "fuser -k 8084/tcp || echo 'No process on port 8084'"
 
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
