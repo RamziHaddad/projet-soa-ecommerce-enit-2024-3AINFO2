@@ -91,7 +91,7 @@ jobs:
             sleep 10
 
             echo "Starting Spring Boot service..."
-            cd ~/service-search
+            cd ~/search
             nohup java -jar service-search.jar --server.port=8089 > service-search.log 2>&1 &
             echo "Spring Boot service deployed successfully!"
 
