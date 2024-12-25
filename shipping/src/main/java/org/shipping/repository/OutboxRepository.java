@@ -3,9 +3,8 @@ package org.shipping.repository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import org.shipping.model.Shipment;
+import org.shipping.model.OutboxEvent;
 
 @ApplicationScoped
-public class ShipmentRepository implements PanacheRepository<Shipment> {
-    // Now this repository has the persist method
+public class OutboxRepository implements PanacheRepository<OutboxEvent> {
 }

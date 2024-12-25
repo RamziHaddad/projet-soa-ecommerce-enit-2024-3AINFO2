@@ -51,7 +51,7 @@ public class ShippingResource {
             return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.error("Unexpected error occurred during shipment creation: " + e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error creating shipment").build();
         }
     }
 
@@ -86,6 +86,12 @@ public class ShippingResource {
     public Response updateShipment(@PathParam("orderId") UUID orderId, @Valid ShipmentUpdateDTO shipmentDTO) {
         try {
             logger.info("Updating shipment for Order ID: " + orderId);
+
+            Shipment shipment = shippingService.getShipmentByOrderId(orderId);
+            if (shipment.getStatus() == DeliveryStatus.DELIVERED) {
+                logger.error("Cannot update a delivered shipment");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Cannot update a delivered shipment").build();
+            }
 
             Shipment updatedShipment = shippingService.updateShipment(
                     orderId,
@@ -141,7 +147,7 @@ public class ShippingResource {
 
             if (shipments.isEmpty()) {
                 logger.warn("No shipments found for user with status: " + status);
-                return Response.status(Response.Status.NOT_FOUND).entity("No shipments found").build();
+                return Response.status(Response.Status.NOT_FOUND).entity("No shipments found for the given status").build();
             }
 
             return Response.ok(shipments).build();
@@ -162,16 +168,26 @@ public class ShippingResource {
         try {
             logger.info("Deleting shipment with ID: " + shipmentId);
 
+            // Vérification de la livraison
+            Shipment shipment = shippingService.getShipmentById(shipmentId);
+            if (shipment == null) {
+                logger.error("No shipment found with ID: " + shipmentId);
+                return Response.status(Response.Status.NOT_FOUND).entity("Shipment not found").build();
+            }
+
+            // Vérification du statut
+            if (shipment.getStatus() == DeliveryStatus.DELIVERED) {
+                logger.error("Cannot delete a delivered shipment");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Cannot delete a delivered shipment").build();
+            }
+
             shippingService.deleteShipment(shipmentId);
             logger.info("Shipment deleted successfully with ID: " + shipmentId);
 
             return Response.noContent().build();
-        } catch (NoResultException e) {
-            logger.error("NoResultException: " + e.getMessage());
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (Exception e) {
             logger.error("Unexpected error occurred while deleting shipment: " + e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error deleting shipment").build();
         }
     }
 }

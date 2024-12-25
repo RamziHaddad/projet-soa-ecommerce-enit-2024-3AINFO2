@@ -18,34 +18,50 @@ import java.util.UUID;
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "orderId" }) })
 public class Shipment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID shipmentId;
 
     @Column(nullable = false, updatable = false)
-    private UUID orderId; // Identifiant de la commande associée
+    private UUID orderId;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdDate = LocalDateTime.now(); // Date de création
+    private LocalDateTime createdDate;
 
-    private LocalDateTime deliveryDate = LocalDateTime.now().plusDays(2); // Date de livraison prévue/effective
+    private LocalDateTime deliveryDate;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "addressId", referencedColumnName = "addressId", nullable = false)
-    private Address deliveryAddress; // Relation avec l’entité Address
+    @ManyToOne
+    @JoinColumn(name = "addressId", referencedColumnName = "id")
+    private Address address;
 
+
+    private Address deliveryAddress;
+
+    // Ajouter addressId en tant que UUID pour utiliser explicitement la colonne
+    @Column(name = "addressId", insertable = false, updatable = false)
+    private UUID addressId;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DeliveryStatus status = DeliveryStatus.PENDING; // Statut de la livraison
+    private DeliveryStatus status;
 
     // Constructeur sans paramètres
     public Shipment() {
+        this.createdDate = LocalDateTime.now();
+        this.deliveryDate = LocalDateTime.now().plusDays(2);
+        this.status = DeliveryStatus.PENDING;
     }
 
+    
+
     // Constructeur avec paramètres
-    public Shipment(UUID orderId, Address deliveryAddress) {
+    public Shipment(UUID orderId, Address deliveryAddress, LocalDateTime createdDate, LocalDateTime deliveryDate) {
         this.orderId = orderId;
         this.deliveryAddress = deliveryAddress;
+        this.addressId = deliveryAddress.getAddressId();  // Assurez-vous de récupérer l'ID de l'adresse
+        this.createdDate = createdDate != null ? createdDate : LocalDateTime.now();
+        this.deliveryDate = deliveryDate != null ? deliveryDate : LocalDateTime.now().plusDays(2);
+        this.status = DeliveryStatus.PENDING;
     }
 
     // Getters et setters
@@ -75,6 +91,11 @@ public class Shipment {
 
     public void setDeliveryAddress(Address deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
+        this.addressId = deliveryAddress.getAddressId();  // Mettez à jour l'ID de l'adresse
+    }
+
+    public UUID getAddressId() {
+        return addressId;
     }
 
     public DeliveryStatus getStatus() {
