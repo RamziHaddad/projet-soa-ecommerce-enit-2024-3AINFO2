@@ -24,7 +24,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd search/
+          cd pricing/
           mvn clean package -DskipTests
 
       - name: Archive JAR Artifact
