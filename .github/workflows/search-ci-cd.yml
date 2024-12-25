@@ -64,7 +64,7 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp search-product-0.0.1-SNAPSHOT.jar \
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./target/search-product-0.0.1-SNAPSHOT.jar \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/search/service-search.jar
 
       - name: Verify if the JAR file exists on the VPS
