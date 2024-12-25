@@ -76,7 +76,11 @@ jobs:
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
           "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
-
+          
+      - name: Kill Process on Port 8089 (if any)
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "fuser -k 8089/tcp || echo 'No process on port 8089'"
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
         with:
