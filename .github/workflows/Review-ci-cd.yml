@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - reviews
+      - Review
   pull_request:
     branches:
-      - reviews
+      - Review
 
 jobs:
   build:
