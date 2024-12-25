@@ -34,6 +34,7 @@ public class OrderController {
 
     private final CartConsumer cartConsumer;
 
+
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
 
@@ -47,6 +48,14 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.ok("Order deleted");
     }
+    @RestController
+    public class HealthController {
+    @GetMapping("/api")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Service is healthy!");
+      }
+      }
+
 
     @PutMapping("/update/{id}")
     public ResponseEntity<String> UpdateOrder(@PathVariable("id") UUID id, @RequestBody Order order){
