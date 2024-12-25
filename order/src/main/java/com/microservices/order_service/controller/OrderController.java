@@ -7,8 +7,10 @@ import com.microservices.order_service.kafka.OrderEventProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
 import com.microservices.order_service.service.OrderService;
+import com.microservices.order_service.service.PaymentService;
 import com.microservices.order_service.service.PricingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -105,5 +107,13 @@ public class OrderController {
     public ResponseEntity<List<CartItem>> RecieveCart(@RequestBody List<CartItem> cartItems){
         return null;
 
+    }
+    @Autowired
+    private PaymentService paymentService;
+
+    @PostMapping("/pay")
+    public PaymentResponseDTO payForOrder(@RequestBody List<CartItem> cartItems, @RequestBody PaymentRequestDTO paymentRequestDTO) {
+        // Call processPayment to handle both pricing and payment
+        return paymentService.processPayment(cartItems, paymentRequestDTO);
     }
 }

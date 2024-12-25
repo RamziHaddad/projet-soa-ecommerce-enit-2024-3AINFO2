@@ -1,11 +1,19 @@
 package com.microservices.order_service.service;
+import com.microservices.order_service.dto.CartItem;
 import com.microservices.order_service.dto.PaymentRequestDTO;
 import com.microservices.order_service.dto.PaymentResponseDTO;
+import com.microservices.order_service.dto.cartResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @Service
@@ -16,15 +24,33 @@ public class PaymentService {
     public PaymentService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8085/payments").build();
     }
+    @Autowired
+    private PricingService pricingService;
+    public PaymentResponseDTO processPayment(List<CartItem> cartItems, @NotNull PaymentRequestDTO paymentRequestDTO) {
 
-    public PaymentResponseDTO checkPrice(PaymentRequestDTO paymentRequestDTO) {
+        cartResponse pricingResponse = pricingService.checkPrice(cartItems);
+        BigDecimal totalAmount = pricingResponse.getTotalBeforeDiscount();
 
 
+        paymentRequestDTO.setAmount(totalAmount);
+        return sendForPayment(paymentRequestDTO);
+    }
+
+
+    public PaymentResponseDTO sendForPayment(PaymentRequestDTO paymentRequestDTO) {
         return webClient.post()
                 .uri("http://localhost:8085/payments")
                 .bodyValue(paymentRequestDTO)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), clientResponse -> {
+                    return clientResponse.createException()
+                            .flatMap(error -> Mono.error(new RuntimeException("Client Error: " + error.getMessage())));
+                })
+                .onStatus(status -> status.is5xxServerError(), clientResponse -> {
+                    return clientResponse.createException()
+                            .flatMap(error -> Mono.error(new RuntimeException("Server Error: " + error.getMessage())));
+                })
                 .bodyToMono(new ParameterizedTypeReference<PaymentResponseDTO>() {})
-                .block(); // Communication synchrone
+                .block(); // Communication is synchronous here
     }
 }

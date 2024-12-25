@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5437/db_order
     username: postgres
-    password: fadizoe1212
+    password: nebras2001
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -24,7 +24,7 @@ spring:
     cors:
       enabled: true
       origins: "*"
-      
+
 logging:
   level:
     org:
