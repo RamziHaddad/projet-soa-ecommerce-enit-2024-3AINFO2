@@ -55,6 +55,7 @@ public class ShippingService {
             // Créer et persister la livraison
             Shipment newShipment = new Shipment(orderId, address);
             shipmentRepository.persist(newShipment);
+            statusPublisher.publishStatus(orderId, DeliveryStatus.PENDING); // Publier le statut de la livraison
             logger.info("Shipment created successfully: " + newShipment.getShipmentId());
             return newShipment;
 

@@ -4,10 +4,15 @@ import java.util.UUID;
 
 public class OrderPaidEvent {
     private UUID orderId;
+    private UUID cartId;
     private UUID addressId;
 
     // Constructeurs, getters et setters
     public OrderPaidEvent() {
+    }
+
+    public UUID getCartId() {
+        return cartId;
     }
 
     public OrderPaidEvent(UUID orderId, UUID addressId) {
@@ -19,15 +24,7 @@ public class OrderPaidEvent {
         return orderId;
     }
 
-    public void setOrderId(UUID orderId) {
-        this.orderId = orderId;
-    }
-
     public UUID getAddressId() {
         return addressId;
-    }
-
-    public void setAddressId(UUID addressId) {
-        this.addressId = addressId;
     }
 }
