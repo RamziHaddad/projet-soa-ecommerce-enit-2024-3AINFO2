@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify if the correct JAR file exists
         run: |
-          ls pricing/target/service-pricing-*.jar || (echo "JAR file not found!" && exit 1)
+          ls *.jar || (echo "JAR file not found!" && exit 1)
 
       - name: Add Server to Known Hosts
         run: |
