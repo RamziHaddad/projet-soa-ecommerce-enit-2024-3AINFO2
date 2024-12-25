@@ -45,9 +45,7 @@ public class CartConsumer {
     @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "kafkaListenerContainerFactory")
     public void listen(CartDTO cartDTO) {
 
-
-
-        logger.info("Received event:");
+        logger.info("Received event with ID :"+cartDTO.getCartId());
 
 
         LocalDateTime receivedAt = LocalDateTime.now();
@@ -61,7 +59,7 @@ public class CartConsumer {
 
         for (ItemDTO itemDTO : itemsDTO) {
             Item item = new Item();
-            item.setId(itemDTO.getId());
+            item.setItemId(itemDTO.getId());
             item.setQuantity(itemDTO.getQuantity());
             item.setOrder(order);
             items.add(item);

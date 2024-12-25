@@ -12,6 +12,8 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
+
 @Configuration
 public class CartConsumerConfig {
 

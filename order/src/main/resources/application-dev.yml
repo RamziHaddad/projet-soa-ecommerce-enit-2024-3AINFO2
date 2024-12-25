@@ -2,13 +2,13 @@ spring:
   application:
     name: SpringAPI
   datasource:
-    url: jdbc:postgresql://localhost:5437/db_order
+    url: jdbc:postgresql://localhost:5432/db_order
     username: postgres
-    password: nebras2001
+    password: fadizoe1212
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:

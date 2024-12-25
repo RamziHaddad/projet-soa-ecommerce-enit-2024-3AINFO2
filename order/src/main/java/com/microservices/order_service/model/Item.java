@@ -17,8 +17,9 @@ import java.util.UUID;
 public class Item {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "item_id", updatable = false, nullable = false)
+    private UUID itemId;
 
     @Column(name = "quantity")
     private int quantity;
@@ -36,6 +37,6 @@ public class Item {
         Item item = (Item) o;
         return quantity == item.quantity
                  &&
-                id.equals(item.id);
+                itemId.equals(item.itemId);
     }
 }
