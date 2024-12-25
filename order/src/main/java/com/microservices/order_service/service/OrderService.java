@@ -1,5 +1,6 @@
 package com.microservices.order_service.service;
 
+import com.microservices.order_service.dto.OrderDeliveryDTO;
 import com.microservices.order_service.dto.OrderRequest;
 import com.microservices.order_service.dto.ItemRequest;
 import com.microservices.order_service.model.Client;
@@ -18,7 +19,8 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final ClientRepository clientRepository; // For fetching associated Client
+    private final ClientRepository clientRepository;
+    private final DeliveryService deliveryService;
 
     public void placeOrder(Order order) {
         // Map OrderRequest to Order object
@@ -26,6 +28,18 @@ public class OrderService {
         // Set Client from idClient in OrderRequest
         // Save order to the database
         orderRepository.save(order);
+    }
+
+    public void processOrder(UUID clientId, UUID orderId, String clientAddress) {
+        // Simulate payment success
+        System.out.println("Payment successful for Order: " + orderId);
+
+        // Create OrderDeliveryDTO
+        OrderDeliveryDTO deliveryDTO = new OrderDeliveryDTO(clientId, orderId, clientAddress);
+
+        // Trigger Delivery
+        deliveryService.startDelivery(deliveryDTO);
+        System.out.println("Delivery triggered for Order: " + orderId);
     }
 
     public void deleteOrder(UUID id) {

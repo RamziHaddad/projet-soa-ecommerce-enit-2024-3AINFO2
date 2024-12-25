@@ -1,12 +1,17 @@
 version: '4'
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16
     container_name: db_order
     environment:
       POSTGRES_USER: postgres
+<<<<<<< HEAD
       POSTGRES_PASSWORD: nebras2001
       POSTGRES_DB: db_order
+=======
+      POSTGRES_PASSWORD: SQL_2023test
+      POSTGRES_DB: order_service
+>>>>>>> e868fa2 (Delivery Service , DTO and API)
       PGDATA: /var/lib/postgresql/data
     ports:
       - "5437:5432"
