@@ -4,6 +4,7 @@ import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.*;
 import com.microservices.order_service.kafka.CartConsumer;
 import com.microservices.order_service.kafka.OrderEventProducer;
+import com.microservices.order_service.kafka.OrderStatusUpdateProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.InventoryService;
 import com.microservices.order_service.service.OrderService;
@@ -29,6 +30,8 @@ public class OrderController {
     private final InventoryService inventoryService;
 
     private final OrderEventProducer orderEventProducer;
+
+    private final OrderStatusUpdateProducer orderStatusUpdateProducer;
 
     private final PricingService pricingService;
 
@@ -96,7 +99,14 @@ public class OrderController {
     @PostMapping("/publish")
     public ResponseEntity<String> publishOrder(@RequestBody OrderEventDTO orderEventDTO){
         orderEventProducer.sendOrderEvent(orderEventDTO);
-        return ResponseEntity.ok("Order published");
+        return ResponseEntity.ok("Order published whose id is "+orderEventDTO.getOrderId());
+    }
+
+    @PostMapping("/notify")
+    public ResponseEntity<String> notifyOrder(@RequestBody OrderStatusUpdateDTO orderStatusUpdateDTO){
+        orderStatusUpdateProducer.sendOrderEvent(orderStatusUpdateDTO);
+        return ResponseEntity.ok("Order whose id is "+orderStatusUpdateDTO.getOrderId()+"has been updated");
+
     }
 
     @PostMapping("/checkOrder")
