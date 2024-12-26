@@ -5,7 +5,7 @@ spring:
 
     url: jdbc:postgresql://localhost:5432/db_order
     username: postgres
-    password: SQL_2023test
+    password: azerty
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
