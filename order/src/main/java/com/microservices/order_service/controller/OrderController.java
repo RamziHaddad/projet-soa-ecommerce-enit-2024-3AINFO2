@@ -130,9 +130,9 @@ public class OrderController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("/pay")
-    public PaymentResponseDTO payForOrder(@RequestBody List<CartItem> cartItems, @RequestBody PaymentRequestDTO paymentRequestDTO) {
+    /*@PostMapping("/pay")
+    public PaymentResponseDTO payForOrder(@RequestBody CartItem cartItem, @RequestBody PaymentRequestDTO paymentRequestDTO) {
         // Call processPayment to handle both pricing and payment
-        return paymentService.processPayment(cartItems, paymentRequestDTO);
-    }
+        return paymentService.processPayment(cartItem, paymentRequestDTO);
+    } */
 }

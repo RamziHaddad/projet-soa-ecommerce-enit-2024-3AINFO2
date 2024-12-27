@@ -17,14 +17,14 @@ import java.util.Map;
 public class PricingService {
     private WebClient webClient;
     public PricingService(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8086/cart-total").build();
+        this.webClient = webClientBuilder.baseUrl("http://localhost:8086/pricing/cart-total").build();
     }
 
     public cartResponse checkPrice(List<CartItem> cartItems) {
 
 
         return webClient.post()
-                .uri("http://localhost:8086/cart-total")
+                .uri("http://localhost:8086/pricing/cart-total")
                 .bodyValue(cartItems)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<cartResponse>() {})

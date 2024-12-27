@@ -1,7 +1,7 @@
 version: '4'
 services:
   postgres:
-    image: postgres:16
+    image: postgres:15
     container_name: db_order
     environment:
       POSTGRES_USER: postgres

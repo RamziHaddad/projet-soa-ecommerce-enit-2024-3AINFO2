@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Getter
@@ -14,5 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartItem {
-    private List<ItemRequest> items;
+    private UUID ProductId;
+    private int quantity;
 }
