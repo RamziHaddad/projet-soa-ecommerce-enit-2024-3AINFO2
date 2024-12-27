@@ -56,6 +56,12 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Stop Old Process
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "ps aux | grep 'service-mailing.jar' | grep -v grep | awk '{print \$2}' | xargs -r kill -9 || echo 'No old process running'"
+
       - name: Create destination directory on VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
@@ -63,9 +69,8 @@ jobs:
       
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp mailing-1.0.0-SNAPSHOT.jar \
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-mailing.jar \
           ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/mailing-service/service-mailing.jar
-
 
       - name: Verify if the JAR file exists on the VPS
         run: |
