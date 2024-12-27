@@ -53,6 +53,21 @@ public class ProductResource {
         }
     }
 
+
+    @GET
+    @Path("/{id}/available")
+    @Operation(summary = "Check product availability", description = "Checks if a product exists by ID.")
+    public Response isProductAvailable(
+        @Parameter(name = "id", required = true, description = "ID of the product to check availability")
+        @PathParam("id") UUID id) {
+        try {
+            productService.getProductDetails(id);
+            return Response.ok(true).build();
+        } catch (EntityNotFoundException e) {
+            return Response.ok(false).build();
+        }
+    }
+
     @POST
     @Operation(summary = "Create a new product with category", description = "Creates a new product with a specified category.")
     public Response addProductWithCategory(Product product, @QueryParam("categoryName") String categoryName) {
