@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: service-mailing.jar
-          path: mailing/mailing/target/*.jar
+          path: mailing/mailing/target/mailing-1.0.0-SNAPSHOT.jar
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,9 +48,9 @@ jobs:
           name: service-mailing.jar
           path: ./ 
 
-      - name: Verify if the correct JAR file exists
+      - name: Verify Downloaded Files
         run: |
-          ls *.jar || (echo "JAR file not found!" && exit 1)
+          ls -l
 
       - name: Add Server to Known Hosts
         run: |
@@ -66,7 +66,7 @@ jobs:
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
           "mkdir -p ~/mailing-service"
-      
+
       - name: Transfer JAR to VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-mailing.jar \
