@@ -12,8 +12,9 @@ import com.enit.pricing.dto.CartItem;
 public class PricingService {
     @Autowired
     private  ProductPromotionService productPromotionService;
+
+    @Autowired
     private  TieredDsicountService tieredDsicountService;
-    //private  ProductService productService; 
 
 
   //calculates  the price of the product after applying the corresponding promotion
@@ -33,7 +34,7 @@ public class PricingService {
         return total;
       }
 
-
+ 
     //calculates the final total after applying the tiered promotion
      public BigDecimal calculateCartTotalFinal(List<CartItem> cartItems){
         BigDecimal total= calculateCartTotal(cartItems);

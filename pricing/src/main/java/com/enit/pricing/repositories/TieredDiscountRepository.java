@@ -12,6 +12,7 @@ import com.enit.pricing.domain.TieredPromotion;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceException;
 import jakarta.transaction.Transactional;
 
@@ -58,13 +59,11 @@ public class TieredDiscountRepository {
        @Transactional
        public void updateThreshold(UUID promotionId, BigDecimal threshold) {
               String query= "UPDATE TieredPromotion t SET t.thresholdAmount = :threshold WHERE t.promotionId = :promotionId";
-              System.out.println("Im just right after the query");
               int updatedCount =entityManager.createQuery(query)
                                    .setParameter("threshold",threshold)
                                    .setParameter("promotionId", promotionId)
                                    .executeUpdate();
 
-              System.out.println("after execution");
               if (updatedCount  == 0) {
               throw new RuntimeException("TieredDiscount with ID " + promotionId + " not found.");
               }
@@ -113,14 +112,16 @@ public class TieredDiscountRepository {
        }
 
 
-@Transactional
-  public TieredPromotion getCurrentThreshold(){
-       String query = "select p from Product p where p.startDate <= current_date and p.endDate >= current_date";    
-       TieredPromotion promotion= entityManager.createQuery(query, TieredPromotion.class)
-                      .getSingleResult();
-     return promotion;
-  }
-   
+       @Transactional
+       public TieredPromotion getCurrentThreshold() {
+       String query = "select p from TieredPromotion p where p.startDate <= current_date and p.endDate >= current_date";
+       try {
+              return entityManager.createQuery(query, TieredPromotion.class).getSingleResult();
+       } catch (NoResultException e) {
+              return null;
+       }
+       }
+
   
 
 

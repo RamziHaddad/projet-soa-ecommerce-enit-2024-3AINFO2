@@ -44,6 +44,7 @@ public class ProductPromotionController {
     @Autowired
     PriceUpdateProducer priceProducer;
 
+    //add a promotion
     @PostMapping("/addPromotion")
     public ResponseEntity<ProductPromotion> addPromotion(@RequestBody ProductPromotion promotion) {
             productPromotionService.addProductPromotion(promotion);
@@ -51,7 +52,7 @@ public class ProductPromotionController {
        
     }
 
- 
+    //delete promotion
     @DeleteMapping("/deletePromotion/{promotionId}")
     public ResponseEntity<String> deletePromotion(@PathVariable UUID promotionId){
         try{
@@ -67,7 +68,7 @@ public class ProductPromotionController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Promotion with ID "+promotionId+ " not found");
             }    
     }
-
+    //update start date
     @PutMapping("/startDate")
     public  ResponseEntity<String> updateStartDate(@RequestBody UpdateDateDto date){
         try{
@@ -78,6 +79,7 @@ public class ProductPromotionController {
         }
     }
 
+    //update end date
     @PutMapping("/endDate")
     public  ResponseEntity<String> updateEndDate(@RequestBody UpdateDateDto date){
         try{
@@ -88,7 +90,7 @@ public class ProductPromotionController {
         }
     }
 
-    
+    //get the active promotion for a certain product
     @GetMapping("/prodPromotion/{productId}")
     public ResponseEntity<ProductPromotion> getProductPromotion(@PathVariable UUID productId) {
         try{
@@ -103,7 +105,7 @@ public class ProductPromotionController {
         }
     }
 
-
+    //get a promotion by ID
     @GetMapping("/getPromotion/{promotionId}")
     public ResponseEntity<ProductPromotion> getPromotionById(@PathVariable UUID promotionId) {
         try{
@@ -119,6 +121,7 @@ public class ProductPromotionController {
     }
 
 
+    //get active promotions
     @GetMapping("/activePromotions")
     public  ResponseEntity<List<ProductPromotion>> getActivePromotions() {
         try{
@@ -132,7 +135,8 @@ public class ProductPromotionController {
 
     }
 
-        @GetMapping("/expiredPromotions")
+    //get expired promotions
+    @GetMapping("/expiredPromotions")
     public  ResponseEntity<List<ProductPromotion>> getExpiredPromotions() {
         try{
             List<ProductPromotion> productPromotions=productPromotionService.getExpiredPromotions();
@@ -145,6 +149,7 @@ public class ProductPromotionController {
 
     }
 
+    //update reduction percentage
     @PutMapping("/updateReductionPer")
     public ResponseEntity<String> updateReductPerc(@RequestBody ReducThreshold value) {
         try {

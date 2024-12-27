@@ -1,1 +1,146 @@
-description
+**Overview:**
+The Pricing Microservice is responsible for managing and calculating product and cart prices, incorporating various promotions.
+The service supports two primary promotion types: individual product promotions and tiered promotions applied to cart totals.
+
+Features:
+
+**Product Management:
+
+-Each product has a base price and a current price.
+The current price displayed in the catalog is determined by applying applicable promotions to the base price.
+If no promotions apply, the current price defaults to the base price.
+
+**Promotion Types:
+
+--Product Promotion:
+Applies directly to a single product.
+Offers a percentage-based discount on the product's base price.
+
+--Tiered Promotion:
+Applies to the total cost of the cart.
+If the cart total exceeds a predefined threshold, a discount percentage is applied.
+Only one tiered promotion can be active at a time.
+
+**Total Calculation:
+
+Given a list of products:
+The initial sum is calculated by adding the current price of each product (which already incorporates any applicable product promotions).
+If the calculated sum exceeds the threshold of the active tiered promotion:
+The total is reduced by the tiered promotion's discount percentage.
+Otherwise, the original sum (without the tiered discount) is returned as the final cart total.
+
+
+## Inter-Microservice Communication:
+
+*Asynchronous Communication (via Kafka):*
+When a product is added to the inventory, its ID is sent via a Kafka message.
+The Pricing microservice consumes this message, saves the product in its own database and waits for the administrator to set a price.
+When a promotion is applied, Pricing sends an event containing the new price via Kafka, so that Catalog and Cart can update their respective data.
+
+*Synchronous Communication:*
+The Cart and Order microservices communicate directly with Pricing to obtain the total of purchased products, ensuring accurate calculations.
+
+**Managing Promotions with Expiration Dates:**
+
+-Each promotion has a start and end date. 
+-The Pricing microservice checks for expired promotions daily using a scheduler that runs automatically at midnight.
+-If a promotion expires, the scheduler updates the prices of the affected products and triggers an event to inform the other microservices of this change.
+
+
+
+### How the system works:
+
+**Adding a product:** When a new product is added, a message with the product id is sent to the Pricing service by the inventory to set a price :
+
+{
+  "productId":"d0f34f1a-1234-45b6-9b2e-112131416161"
+}
+
+* **Setting prices:** The Pricing service waits for the admin to set the base price via the API: 
+
+http://localhost:8086/product/basePrice/{prodId}"
+
+and the body: 
+
+{
+  "productId":"d0f34f1a-1234-45b6-9b2e-112131416161",
+  "price": 12.0
+}
+
+***Adding promotions:**
+-We can add a product promotion via the API:
+(we first add the promotion seperately and then add it to the product via another api)
+
+http://localhost:8086/productPromotion/addPromotion
+
+and the body:
+
+{
+  "promotionId": "f9b7a1c7-8c5f-46fe-b925-8b2b1f58d718",
+  "startDate": "2024-12-01",
+  "endDate": "2024-12-31",
+  "reductionPercentage": 10,
+  "description": "Spring break promotions"
+}
+
+We can add a tiered promotion via the API:
+
+http://localhost:8086/tieredPromotion/addPromotion
+
+and the body:
+{
+  "promotionId": "f9b7a1c7-8c5f-46fe-b925-8b2b1f58d719",
+  "startDate": "2024-12-01",
+  "endDate": "2024-12-31",
+  "reductionPercentage": 10,
+  "description": "New year",
+  "thresholdAmount": 100
+}
+
+
+**Applying promotions:** 
+-To add an existing promotion to a product :
+
+http://localhost:8086/product/addPromotiontoProduct/{prodId}
+
+with the body:
+
+{
+  "promotionId":"f9b7a1c7-8c5f-46fe-b925-8b2b1f58d718"
+}
+
+-When a promotion is created, the Pricing service updates the prices and sends a message via  kafka to other services to update their data:
+{
+  "productId":"d0f34f1a-1234-45b6-9b2e-112131416161",
+  "price": 12.0
+}
+
+
+**Calculating totals:** 
+-When a customer wants to know the total cost of items in their cart, the Cart service sends to: 
+
+http://localhost:8086/pricing//purchase-total
+a list of 
+{
+  "productId":"d0f34f1a-1234-45b6-9b2e-112131416161",
+  "quantity": 12.0
+}
+and the pricing returns: 
+
+    {
+    "totalBeforeDiscount":150.00,
+    "totalAfterDiscount": 100.0
+    }
+
+**Managing expiration dates:** 
+-The Pricing service checks every day at midnight for promotions that have expired and updates prices accordingly with a scheduler.
+To test the scheduler, we can change the end date of a product promotion, to do so we use the API: 
+
+http://localhost:8086/productPromotion/
+with the body 
+
+{
+  "promotionId": "f9b7a1c7-8c5f-46fe-b925-8b2b1f58d719",
+  "date": "2024-12-19"
+}
+

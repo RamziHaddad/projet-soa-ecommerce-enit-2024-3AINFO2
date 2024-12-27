@@ -37,7 +37,7 @@ public class TieredDsicountService {
                 BigDecimal finalPrice = totalPrice.subtract(reductionAmount);
                 return finalPrice.setScale(3, RoundingMode.HALF_UP);
             } 
-        }
+        } 
         return totalPrice;
     }
 

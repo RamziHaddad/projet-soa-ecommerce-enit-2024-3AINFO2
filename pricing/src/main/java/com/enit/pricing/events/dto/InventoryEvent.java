@@ -3,8 +3,6 @@ package com.enit.pricing.events.dto;
 import java.util.UUID;
 
 public class InventoryEvent {
-
-    private UUID eventId;
     private UUID productId;
 
     public InventoryEvent() {
