@@ -100,6 +100,19 @@
 
     <build>
         <plugins>
+
+        <plugin>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>3.3.0</version>
+    <configuration>
+        <archive>
+            <manifest>
+                <mainClass>io.quarkus.bootstrap.runner.QuarkusEntryPoint</mainClass>
+            </manifest>
+        </archive>
+    </configuration>
+</plugin>
+
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
