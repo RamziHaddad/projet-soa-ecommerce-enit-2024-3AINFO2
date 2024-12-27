@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: mailing-1.0.0-SNAPSHOT.jar
-          path: ./ 
+          path: ./mailing
 
       - name: Verify Downloaded Files
         run: |
