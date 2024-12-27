@@ -76,7 +76,12 @@ jobs:
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
           "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
-
+          
+      - name: Kill Process on Port 8081 (if any)
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "fuser -k 8081/tcp || echo 'No process on port 8081'"
+          
       - name: Deploy JAR to VPS
         uses: appleboy/ssh-action@v0.1.2
         with:
@@ -86,10 +91,10 @@ jobs:
           script: |
             sleep 10
 
-            echo "Starting Spring Boot service..."
+            echo "Starting java service..."
             cd ~/Cart
             nohup java -jar cart-project.jar --server.port=8081 > cart-project.log 2>&1 &
-            echo "Spring Boot service deployed successfully!"
+            echo "java service deployed successfully!"
 
             sleep 30
 
