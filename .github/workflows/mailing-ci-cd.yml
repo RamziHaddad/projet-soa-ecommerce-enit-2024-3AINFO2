@@ -24,14 +24,14 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd mailing/mailing/
+          cd mailing/
           mvn clean package -DskipTests
 
       - name: Archive JAR Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: service-mailing.jar
-          path: mailing/mailing/target/mailing-1.0.0-SNAPSHOT.jar
+          name: mailing-1.0.0-SNAPSHOT.jar
+          path: mailing/target/mailing-1.0.0-SNAPSHOT.jar
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v3
         with:
-          name: service-mailing.jar
+          name: mailing-1.0.0-SNAPSHOT.jar
           path: ./ 
 
       - name: Verify Downloaded Files
@@ -60,7 +60,7 @@ jobs:
       - name: Stop Old Process
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ps aux | grep 'service-mailing.jar' | grep -v grep | awk '{print \$2}' | xargs -r kill -9 || echo 'No old process running'"
+          "ps aux | grep 'mailing-1.0.0-SNAPSHOT.jar' | grep -v grep | awk '{print \$2}' | xargs -r kill -9 || echo 'No old process running'"
 
       - name: Create destination directory on VPS
         run: |
@@ -69,13 +69,13 @@ jobs:
 
       - name: Transfer JAR to VPS
         run: |
-          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp service-mailing.jar \
-          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/mailing-service/service-mailing.jar
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp mailing-1.0.0-SNAPSHOT.jar \
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/mailing-service/mailing-1.0.0-SNAPSHOT.jar
 
       - name: Verify if the JAR file exists on the VPS
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
-          "ls -l ~/mailing-service/service-mailing.jar"
+          "ls -l ~/mailing-service/mailing-1.0.0-SNAPSHOT.jar"
 
       - name: Show system resources usage after file transfer
         run: |
@@ -91,16 +91,16 @@ jobs:
           script: |
             sleep 10
 
-            echo "Starting Spring Boot service..."
+            echo "Starting Quarkus application..."
             cd ~/mailing-service
-            nohup java -jar service-mailing.jar --server.port=8081 > service-mailing.log 2>&1 &
-            echo "Spring Boot service deployed successfully!"
+            nohup java -jar mailing-1.0.0-SNAPSHOT.jar --quarkus.http.port=8081 > mailing-service.log 2>&1 &
+            echo "Quarkus application deployed successfully!"
 
             sleep 30
 
             echo "Performing health check..."
-            curl -X 'GET' 'http://localhost:8081' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
+            curl -X 'GET' 'http://localhost:8081/q/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed and healthy!"
             
-            tail -n 50 ~/mailing-service/service-mailing.log
+            tail -n 50 ~/mailing-service/mailing-service.log
