@@ -1,3 +1,9 @@
-.vscode
+.vscode/
 settings.json
-.quarkus
+
+.quarkus/
+
+order/mysql/mysql.sock
+
+order/src/main/resources/application.properties
+order/docker-compose.yml
