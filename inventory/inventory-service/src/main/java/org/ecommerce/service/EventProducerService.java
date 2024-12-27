@@ -8,6 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.PostPersist;
 import org.ecommerce.events.MinimalEvent;
+import org.ecommerce.events.PricingEvent;
 import org.ecommerce.events.ProductEvent;
 import org.ecommerce.model.Product;
 
@@ -25,6 +26,12 @@ public class EventProducerService {
     @Inject
     @Channel("product-availability")
     Emitter<String> disponibiltyEventEmitter;
+
+
+    //This event will send only the id to the topic (for the pricing microservice)
+    @Inject
+    @Channel("product-created-id")
+    Emitter<String> pricingEventEmitter;
 
     @PostPersist
     public void sendProductEvent(Product product, String eventType) throws JsonProcessingException {
@@ -64,6 +71,18 @@ public class EventProducerService {
             //String jsonEvent = new Gson().toJson(productEvent);
             String productJSON=objectMapper.writeValueAsString(productEvent);
             disponibiltyEventEmitter.send(productJSON);}
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    @PostPersist
+    public void producePricingEvent(PricingEvent pricingEvent) throws JsonProcessingException {
+        try{
+            //String jsonEvent = new Gson().toJson(productEvent);
+            String productJSON=objectMapper.writeValueAsString(pricingEvent);
+            pricingEventEmitter.send(productJSON);}
         catch (Exception e){
             e.printStackTrace();
         }

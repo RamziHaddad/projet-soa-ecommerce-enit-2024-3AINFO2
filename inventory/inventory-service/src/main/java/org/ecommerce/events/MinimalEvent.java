@@ -4,7 +4,7 @@ import java.util.UUID;
 
 //The MinimalEvent will be sent for the events that require knowing only the id product
 public class MinimalEvent {
-    private UUID eventID;
+    //private UUID eventID;
     private UUID productId;
     private String eventType;
 
@@ -15,13 +15,13 @@ public class MinimalEvent {
         this.eventType=eventType;
     }
 
-    public UUID getEventID() {
-        return eventID;
-    }
-
-    public void setEventID(UUID eventID) {
-        this.eventID = eventID;
-    }
+//    public UUID getEventID() {
+//        return eventID;
+//    }
+//
+//    public void setEventID(UUID eventID) {
+//        this.eventID = eventID;
+//    }
 
     public UUID getProductId() {
         return productId;

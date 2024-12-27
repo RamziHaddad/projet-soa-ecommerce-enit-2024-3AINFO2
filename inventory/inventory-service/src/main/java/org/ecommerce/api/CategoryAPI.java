@@ -41,7 +41,7 @@ public class CategoryAPI {
                 .build();
     }
 
-    @DELETE
+    /*@DELETE
     @Path("/delete/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response removeCategoryById(@PathParam("id") UUID id) {
@@ -64,6 +64,6 @@ public class CategoryAPI {
             return Response.ok(categoryRepository.updateCategory(updatedCategory)).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
-    }
+    }*/
 
 }

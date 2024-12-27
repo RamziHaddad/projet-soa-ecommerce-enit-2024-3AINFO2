@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.ecommerce.events.PricingEvent;
 import org.ecommerce.model.AvailabilityCheckDTO;
 import org.ecommerce.model.Item;
 import org.ecommerce.model.OrderDTO;
@@ -30,6 +31,9 @@ public class ProductService {
         repo.addProduct(product);
         //Send an event "CREATE" to the topic "product-events"
         eventProducerService.sendProductEvent(product, "CREATE");
+        //send an event (containing only the id of the product to the pricing microservice )
+        PricingEvent pricingEvent=new PricingEvent(product.getId());
+        eventProducerService.producePricingEvent(pricingEvent);
         return product;
     }
 

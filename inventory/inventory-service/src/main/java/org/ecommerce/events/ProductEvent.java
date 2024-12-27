@@ -4,7 +4,7 @@ import java.util.UUID;
 
 
 //The ProductEvent will be sent for the events that require knowing the hole product
-public class ProductEvent extends  MinimalEvent {
+public class ProductEvent extends MinimalEvent {
 
     private int totalQuantity;
     private int reservedQuantity;
@@ -19,6 +19,14 @@ public class ProductEvent extends  MinimalEvent {
         this.name=name;
         this.category=category;
 
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public int getTotalQuantity() {

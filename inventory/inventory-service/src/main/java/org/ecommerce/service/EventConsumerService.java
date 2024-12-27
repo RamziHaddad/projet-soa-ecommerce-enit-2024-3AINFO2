@@ -40,7 +40,7 @@ public class EventConsumerService {
     }
 
 
-    @Incoming("order-status")//waiting for the true order topic
+    @Incoming("order-status-update")//waiting for the true order topic
     @Transactional
     public void consumeOrderStatusEvent(String orderEventJSON)throws JsonProcessingException {
         try{
