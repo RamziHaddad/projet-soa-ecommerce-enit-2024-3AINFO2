@@ -4,7 +4,7 @@ import com.enit.pricing.service.ProductPromotionService;
 import com.enit.pricing.domain.ProductPromotion;
 import com.enit.pricing.domain.Product;
 import com.enit.pricing.service.ProductService;
-import com.enit.pricing.events.dto.PriceEvent;
+import com.enit.pricing.events.dto.PriceUpdateEvent;
 import com.enit.pricing.events.producer.PriceUpdateProducer;
 
 
@@ -45,7 +45,7 @@ public class SchedulingExpiredPromo {
         for (Product p : products) {
             productService.removePromotionFromProduct(p.getProductId());
             productService.updateProductCurrentPrice(p.getProductId(), p.getBasePrice());
-            PriceEvent event= new PriceEvent(p.getProductId(),p.getBasePrice());
+            PriceUpdateEvent event= new PriceUpdateEvent(p.getProductId(),p.getBasePrice());
             priceProducer.sendPrice(event);
         }
     }

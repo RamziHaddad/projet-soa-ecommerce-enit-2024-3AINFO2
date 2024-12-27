@@ -8,27 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.enit.pricing.domain.Product;
 import com.enit.pricing.domain.ProductPromotion;
 import com.enit.pricing.dto.ReducThreshold;
+import com.enit.pricing.dto.UpdateDateDto;
 import com.enit.pricing.events.dto.PriceUpdateEvent;
 import com.enit.pricing.events.producer.PriceUpdateProducer;
 import com.enit.pricing.service.PricingService;
 import com.enit.pricing.service.ProductPromotionService;
 import com.enit.pricing.service.ProductService;
-import com.enit.pricing.dto.UpdateDateDto;
 
 import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 @SpringBootApplication
