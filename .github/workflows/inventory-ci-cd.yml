@@ -77,7 +77,7 @@ jobs:
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
           "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
           
-      - name: Kill Process on Port 8084 (if any)
+      - name: Kill Process on Port 8083 (if any)
         run: |
           sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
           "fuser -k 8083/tcp || echo 'No process on port 8083'"
