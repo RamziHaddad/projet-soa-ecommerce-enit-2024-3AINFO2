@@ -2,23 +2,23 @@ package com.microservices.order_service.controller;
 
 import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.*;
+import com.microservices.order_service.events.OrderPaidEvent;
 import com.microservices.order_service.kafka.CartConsumer;
 import com.microservices.order_service.kafka.OrderEventProducer;
 import com.microservices.order_service.kafka.OrderStatusUpdateProducer;
 import com.microservices.order_service.model.Order;
-import com.microservices.order_service.service.InventoryService;
-import com.microservices.order_service.service.OrderService;
-import com.microservices.order_service.service.PaymentService;
-import com.microservices.order_service.service.PricingService;
+import com.microservices.order_service.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/order")
@@ -37,6 +37,9 @@ public class OrderController {
 
     private final CartConsumer cartConsumer;
 
+    private final DeliveryService deliveryService;
+
+    private final KafkaTemplate<String, OrderPaidEvent> kafkaTemplate;
 
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
@@ -130,9 +133,56 @@ public class OrderController {
     @Autowired
     private PaymentService paymentService;
 
-    /*@PostMapping("/pay")
-    public PaymentResponseDTO payForOrder(@RequestBody CartItem cartItem, @RequestBody PaymentRequestDTO paymentRequestDTO) {
+    @PostMapping("/pay")
+    public PaymentResponseDTO payForOrder(@RequestBody List<CartItem> cartItems, @RequestBody PaymentRequestDTO paymentRequestDTO) {
         // Call processPayment to handle both pricing and payment
-        return paymentService.processPayment(cartItem, paymentRequestDTO);
-    } */
+        return paymentService.processPayment(cartItems, paymentRequestDTO);
+    }
+
+
+
+
+/*    @PostMapping("/process-payment/{clientId}")
+    public ResponseEntity<?> processPaymentAndInitiateDelivery(
+            @PathVariable UUID clientId,
+            @RequestBody PaymentConfirmationRequest paymentRequest) {
+        try {
+            // Process payment
+            Order order = orderService.processPayment(paymentRequest);
+
+            // Synchronous call to delivery service to get available addresses
+            List<Address> availableAddresses = deliveryServiceClient.getClientAddresses(clientId);
+
+            if (availableAddresses.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body("No delivery addresses found for client");
+            }
+
+            // Assuming we take the first available address or let the client choose
+            Address selectedAddress = availableAddresses.get(0);
+
+            // Create and publish OrderPaidEvent to Kafka
+            OrderPaidEvent orderPaidEvent = new OrderPaidEvent(
+                    order.getOrderId(),
+                    selectedAddress.getAddressId()
+            );
+
+            kafkaTemplate.send("order-paid-topic", orderPaidEvent)
+                    .whenComplete((result, ex) -> {
+                        if (ex != null) {
+                            logger.error("Failed to publish OrderPaidEvent", ex);
+                        } else {
+                            logger.info("Successfully published OrderPaidEvent for order: "
+                                    + order.getOrderId());
+                        }
+                    });
+
+            return ResponseEntity.ok(new OrderResponse(order, selectedAddress));
+
+        } catch (Exception e) {
+            logger.error("Error processing payment and initiating delivery", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to process payment and initiate delivery");
+        }
+    }*/
 }

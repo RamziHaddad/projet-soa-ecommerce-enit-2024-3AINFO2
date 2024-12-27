@@ -31,4 +31,9 @@ public class OrderEventProducerConfig {
     public KafkaTemplate<String, OrderEventDTO> OrderEventKafkaTemplate() {
         return new KafkaTemplate<>(OrderEventProducerFactory());
     }
+
+   /* @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }*/
 }

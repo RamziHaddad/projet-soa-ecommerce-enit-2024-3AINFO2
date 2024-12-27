@@ -2,6 +2,7 @@ spring:
   application:
     name: SpringAPI
   datasource:
+
     url: jdbc:postgresql://localhost:5432/db_order
     username: postgres
     password: azerty
