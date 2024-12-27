@@ -91,10 +91,10 @@ jobs:
           script: |
             sleep 10
 
-            echo "Starting Spring Boot service..."
+            echo "Starting Quarkus service..."
             cd ~/inventory-service
             nohup java -jar service-inventory.jar --server.port=8083 > service-inventory.log 2>&1 &
-            echo "Spring Boot service deployed successfully!"
+            echo "Quarkus service deployed successfully!"
 
             sleep 30
 
