@@ -1,0 +1,10 @@
+services:
+
+  db_shipping:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_DB: db_shipping
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: azerty
+    ports:
+      - 5442:5432

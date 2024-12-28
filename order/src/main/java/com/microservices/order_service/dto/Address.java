@@ -1,8 +1,5 @@
 package com.microservices.order_service.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AddressDTO {
+public class Address {
 
     private UUID addressId;
 

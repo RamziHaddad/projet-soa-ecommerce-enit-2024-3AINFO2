@@ -187,8 +187,8 @@ public class OrderController {
     }*/
 
     @GetMapping("/addresses")
-    public ResponseEntity<List<AddressDTO>> GetAddresses(){
-        List<AddressDTO> addresses = deliveryService.getUserAddresses();
+    public ResponseEntity<List<Address>> GetAddresses(){
+        List<Address> addresses = deliveryService.getUserAddresses();
         return ResponseEntity.ok(addresses);
     }
 

@@ -10,9 +10,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import org.jboss.logging.Logger;
-import org.shipping.dto.AddressDTO;
+import org.shipping.dto.Address;
 import org.shipping.dto.AddressUpdateDTO;
-import org.shipping.model.Address;
 import org.shipping.service.AddressService;
 
 import java.util.List;
@@ -32,13 +31,13 @@ public class AddressResource {
     @POST
     @Path("/add")
     @Transactional
-    public Response addAddress(@Valid AddressDTO addressDTO) {
+    public Response addAddress(@Valid Address address) {
         try {
-            Address createdAddress = addressService.addAddress(
-                    addressDTO.getStreet(),
-                    addressDTO.getPostalCode(),
-                    addressDTO.getCity(),
-                    addressDTO.getCountry());
+            org.shipping.model.Address createdAddress = addressService.addAddress(
+                    address.getStreet(),
+                    address.getPostalCode(),
+                    address.getCity(),
+                    address.getCountry());
 
             return Response.status(Response.Status.CREATED).entity(createdAddress).build();
 
@@ -62,7 +61,7 @@ public class AddressResource {
     @GET
     public Response getUserAddresses() {
         try {
-            List<Address> addresses = addressService.getAddressesByUserId();
+            List<org.shipping.model.Address> addresses = addressService.getAddressesByUserId();
             return Response.ok(addresses).build();
 
         } catch (IllegalArgumentException e) {
@@ -83,7 +82,7 @@ public class AddressResource {
     @Path("/{addressId}")
     public Response getAddressById(@PathParam("addressId") UUID addressId) {
         try {
-            Address address = addressService.getAddressById(addressId);
+            org.shipping.model.Address address = addressService.getAddressById(addressId);
             return Response.status(Response.Status.OK).entity(address).build();
 
         } catch (IllegalArgumentException e) {
@@ -104,7 +103,7 @@ public class AddressResource {
     @Transactional
     public Response updateAddress(@PathParam("addressId") UUID addressId, @Valid AddressUpdateDTO addressDTO) {
         try {
-            Address updatedAddress = addressService.updateAddress(
+            org.shipping.model.Address updatedAddress = addressService.updateAddress(
                     addressId,
                     addressDTO.getStreet(),
                     addressDTO.getPostalCode(),
