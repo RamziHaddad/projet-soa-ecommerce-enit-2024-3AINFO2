@@ -32,7 +32,7 @@ public class OrderService {
     /**
      * Process the order by initiating delivery after payment is successful.
      */
-    public void processOrder(UUID clientId, UUID orderId, String clientAddress) {
+/*    public void processOrder(UUID clientId, UUID orderId, String clientAddress) {
         System.out.println("Payment successful for Order: " + orderId);
 
         // Trigger delivery
@@ -44,7 +44,7 @@ public class OrderService {
         // Publish an event to indicate order processing completion
         OrderEventDTO orderEventDTO = new OrderEventDTO(orderId, null, "PROCESSING");
         orderEventProducer.sendOrderEvent(orderEventDTO);
-    }
+    }*/
 
     /**
      * Delete an order by ID.

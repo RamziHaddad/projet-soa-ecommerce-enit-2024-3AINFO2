@@ -185,4 +185,11 @@ public class OrderController {
                     .body("Failed to process payment and initiate delivery");
         }
     }*/
+
+    @GetMapping("/addresses")
+    public ResponseEntity<List<AddressDTO>> GetAddresses(){
+        List<AddressDTO> addresses = deliveryService.getUserAddresses();
+        return ResponseEntity.ok(addresses);
+    }
+
 }

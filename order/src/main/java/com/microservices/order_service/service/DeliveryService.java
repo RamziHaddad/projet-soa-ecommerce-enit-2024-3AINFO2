@@ -1,29 +1,38 @@
 package com.microservices.order_service.service;
 
+import com.microservices.order_service.dto.AddressDTO;
 import com.microservices.order_service.dto.OrderDeliveryDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 public class DeliveryService {
 
     private final WebClient webClient;
 
-    @Value("${shipping.service.url}")
+    @Value("${delivery.service.url}")
     private String shippingServiceUrl;
 
     public DeliveryService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
     }
 
-    public void startDelivery(OrderDeliveryDTO orderDeliveryDTO) {
-        webClient.post()
-                .uri(shippingServiceUrl + "/startShipping")
-                .body(Mono.just(orderDeliveryDTO), OrderDeliveryDTO.class)
+    /**
+     * Fetches the list of user addresses from the shipping service.
+     *
+     * @return List of AddressDTO
+     */
+    public List<AddressDTO> getUserAddresses() {
+        return webClient.get()
+                .uri(shippingServiceUrl)
                 .retrieve()
-                .bodyToMono(Void.class)
+                .bodyToFlux(AddressDTO.class)
+                .collectList()
                 .block();
     }
+
+
 }
