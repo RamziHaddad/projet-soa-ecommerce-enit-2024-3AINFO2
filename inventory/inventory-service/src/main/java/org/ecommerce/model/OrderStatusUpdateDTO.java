@@ -1,11 +1,12 @@
 package org.ecommerce.model;
 
-import java.util.List;
 import java.util.UUID;
 
-public class   OrderDTO {
+public class OrderStatusUpdateDTO {
     private UUID orderId;
     private String status;
+    public OrderStatusUpdateDTO(){}
+
     public UUID getOrderId() {
         return orderId;
     }
@@ -18,5 +19,9 @@ public class   OrderDTO {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String toString(){
+        return "orderId: "+orderId+ ", status: "+status;
     }
 }

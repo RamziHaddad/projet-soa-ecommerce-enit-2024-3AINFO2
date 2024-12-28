@@ -8,16 +8,10 @@ import java.util.UUID;
 @Entity
 public class Item {
     @Id
-    private UUID id;
+    private UUID itemId;
+    private String name;
     private int quantity;
 
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public int getQuantity() {
         return quantity;
@@ -25,5 +19,25 @@ public class Item {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public UUID getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(UUID itemId) {
+        this.itemId = itemId;
+    }
+
+    public String toString(){
+        return "itemId: "+itemId+", name: "+name+", quantity: "+quantity;
     }
 }

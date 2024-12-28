@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class Orders {
+public class OrderEventDTO {
     @Id
     private UUID orderId;
     @OneToMany
     @JoinColumn(name="orderId")
     private List<Item> items;
-    private String status;
+    private String orderStatus;
+
+    public OrderEventDTO(){}
 
     public UUID getOrderId() {
         return orderId;
@@ -29,11 +31,19 @@ public class Orders {
     public void setItems(List<Item> items) {
         this.items = items;
     }
-    public String getStatus() {
-        return status;
+
+    public String getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String toString(){
+        String printed= "orderId: "+orderId+",  status:"+orderStatus+", items:"+items;
+        printed+=items.stream()
+                .map(Item::toString).reduce("",(partialResult,str)->partialResult+str);
+    return printed;
     }
 }

@@ -8,12 +8,12 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.ecommerce.model.Item;
-import org.ecommerce.model.Orders;
-import org.ecommerce.model.OrderDTO;
+import org.ecommerce.model.OrderEventDTO;
+import org.ecommerce.model.OrderStatusUpdateDTO;
 import org.ecommerce.repository.OrderRepository;
 
 import java.util.Objects;
-import java.util.Optional;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class EventConsumerService {
@@ -28,12 +28,17 @@ public class EventConsumerService {
     @Transactional
     public void consumeOrderCreationEvent(String orderEventJSON)throws JsonProcessingException {
         try{
-            Orders order= objectMapper.readValue(orderEventJSON,Orders.class);
+            OrderEventDTO order= objectMapper.readValue(orderEventJSON, OrderEventDTO.class);
             System.out.println("orderEventJSON:\t"+orderEventJSON);
-            orderRepository.addOrder(order);
-            for(Item item :order.getItems()){
-                productService.reserveProduct(item.getId(), item.getQuantity());
+            System.out.println("order object: "+order.toString());
+            if(Objects.equals(order.getOrderStatus(), "CREATED")){
+
+                orderRepository.addOrder(order);
+                for(Item item :order.getItems()){
+                    productService.reserveProduct(item.getItemId(), item.getQuantity());
+                }
             }
+
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -44,23 +49,25 @@ public class EventConsumerService {
     @Transactional
     public void consumeOrderStatusEvent(String orderEventJSON)throws JsonProcessingException {
         try{
-            OrderDTO orderDTO= objectMapper.readValue(orderEventJSON,OrderDTO.class);
-            System.out.println("orderEventJSON:\t"+orderEventJSON);
-            Orders order=orderRepository.getOrderByID(orderDTO.getOrderId())
+            OrderStatusUpdateDTO orderStatusUpdateDTO = objectMapper.readValue(orderEventJSON, OrderStatusUpdateDTO.class);
+            System.out.println("orderEventUpdateJSON:\t"+orderEventJSON);
+            System.out.println("orderEventUpdateObject:\t"+orderStatusUpdateDTO);
+            OrderEventDTO order=orderRepository.getOrderByID(orderStatusUpdateDTO.getOrderId())
                     .orElseThrow(() -> new WebApplicationException("Product not found", 404));
-            if(Objects.equals(orderDTO.getStatus(), "canceled")){
-                order.setStatus("canceled");
+            if(Objects.equals(orderStatusUpdateDTO.getStatus(), "CANCELED")){
+                order.setOrderStatus("CANCELED");
                 orderRepository.updateOrder(order);
                 for(Item item :order.getItems()){
-                    productService.releaseReservation(item.getId(), item.getQuantity());
+                    productService.releaseReservation(item.getItemId(), item.getQuantity());
                 }
 
             }
-            else if(Objects.equals(orderDTO.getStatus(), "paid")){
-                order.setStatus("paid");
+            else if(Objects.equals(orderStatusUpdateDTO.getStatus(), "PAID")){
+                order.setOrderStatus("PAID");
+
                 orderRepository.updateOrder(order);
                 for(Item item :order.getItems()){
-                    productService.recordOrderShipment(item.getId(), item.getQuantity());
+                    productService.recordOrderShipment(item.getItemId(), item.getQuantity());
                 }
             }
 

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.ecommerce.events.PricingEvent;
 import org.ecommerce.model.AvailabilityCheckDTO;
 import org.ecommerce.model.Item;
-import org.ecommerce.model.OrderDTO;
 import org.ecommerce.model.Product;
 import org.ecommerce.repository.ProductRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -124,7 +123,7 @@ public class ProductService {
     //function to the order-service to check if the quantity of a product is available or not
     @Transactional
     public Boolean checkAvailibilityProduct(Item item){
-        Product product = repo.getProductByID(item.getId())
+        Product product = repo.getProductByID(item.getItemId())
                 .orElseThrow(() -> new WebApplicationException("Product not found", 404));
 
         return product.availableQuantity() >= item.getQuantity();
