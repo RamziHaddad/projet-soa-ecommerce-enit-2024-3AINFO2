@@ -15,6 +15,7 @@ public class OrderEventConsumer {
 
     @Incoming("order-paid") // Correspond au topic configuré
     public void consumeOrderPaidEvent(OrderPaidEvent event) {
+        System.out.println("Order paid event with address: " + event.getAddressId());
         // Créez une livraison à partir des données reçues
         shippingService.createShipment(event.getOrderId(), event.getAddressId());
     }
