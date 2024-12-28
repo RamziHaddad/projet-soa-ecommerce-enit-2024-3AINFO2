@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
-public class AddressDTO {
+public class Address {
 
     private UUID addressId; // Utilisé pour l'identifiant de l'adresse (lecture seule)
 
@@ -27,11 +27,11 @@ public class AddressDTO {
     private String country; // Pays
 
     // Constructeur sans paramètres
-    public AddressDTO() {
+    public Address() {
     }
 
     // Constructeur avec paramètres
-    public AddressDTO(UUID addressId, String street, String postalCode, String city, String country) {
+    public Address(UUID addressId, String street, String postalCode, String city, String country) {
         this.addressId = addressId;
         this.street = street;
         this.postalCode = postalCode;

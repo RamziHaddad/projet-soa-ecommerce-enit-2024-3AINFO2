@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/order/SpringAPI.iml" filepath="$PROJECT_DIR$/order/SpringAPI.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/projet-soa-ecommerce-enit-2024-3AINFO2.iml" filepath="$PROJECT_DIR$/.idea/projet-soa-ecommerce-enit-2024-3AINFO2.iml" />
     </modules>
   </component>
