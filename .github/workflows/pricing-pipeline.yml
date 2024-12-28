@@ -100,7 +100,7 @@ jobs:
             sleep 30
 
             echo "Performing health check..."
-            curl -X 'GET' 'http://localhost:8086/actuator/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
+            curl -X 'GET' 'http://localhost:8086/health' -H 'accept: application/json' || (echo "Service health check failed!" && exit 1)
 
             echo "Service deployed and healthy!"
             
