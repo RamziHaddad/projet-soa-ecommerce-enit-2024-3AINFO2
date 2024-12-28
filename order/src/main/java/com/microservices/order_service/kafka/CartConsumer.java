@@ -1,27 +1,16 @@
 
 package com.microservices.order_service.kafka;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import com.microservices.order_service.dto.CartDTO;
 import com.microservices.order_service.dto.ItemDTO;
 import com.microservices.order_service.model.Item;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.repository.ItemRepository;
 import com.microservices.order_service.repository.OrderRepository;
-import com.microservices.order_service.service.OrderService;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.hibernate.service.spi.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

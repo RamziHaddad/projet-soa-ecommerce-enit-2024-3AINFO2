@@ -5,6 +5,7 @@ import com.microservices.order_service.dto.*;
 import com.microservices.order_service.events.OrderPaidEvent;
 import com.microservices.order_service.kafka.CartConsumer;
 import com.microservices.order_service.kafka.OrderEventProducer;
+import com.microservices.order_service.kafka.OrderPaidEventProducer;
 import com.microservices.order_service.kafka.OrderStatusUpdateProducer;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.service.*;
@@ -39,6 +40,8 @@ public class OrderController {
 
     private final DeliveryService deliveryService;
 
+    private final OrderPaidEventProducer orderPaidEventProducer;
+
     private final KafkaTemplate<String, OrderPaidEvent> kafkaTemplate;
 
     @PostMapping("/create")
@@ -56,11 +59,11 @@ public class OrderController {
     }
     @RestController
     public class HealthController {
-    @GetMapping("/api")
-    public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Service is healthy!");
-      }
-      }
+        @GetMapping("/api")
+        public ResponseEntity<String> healthCheck() {
+            return ResponseEntity.ok("Service is healthy!");
+        }
+    }
 
 
     @PutMapping("/update/{id}")
@@ -190,6 +193,13 @@ public class OrderController {
     public ResponseEntity<List<Address>> GetAddresses(){
         List<Address> addresses = deliveryService.getUserAddresses();
         return ResponseEntity.ok(addresses);
+    }
+
+    @PostMapping("/inform")
+    public ResponseEntity<String> sendToDelivery(@RequestBody OrderPaidEvent orderPaidEvent){
+        orderPaidEventProducer.publishOrderPaidEvent(orderPaidEvent);
+        return ResponseEntity.ok("Order paid successfully");
+
     }
 
 }
