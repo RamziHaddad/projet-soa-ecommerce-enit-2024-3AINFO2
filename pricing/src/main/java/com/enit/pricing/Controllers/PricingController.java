@@ -56,4 +56,14 @@ public class PricingController {
         return ResponseEntity.ok(basePrice);
     }
     
+       // Health check endpoint
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        try {
+            jdbcTemplate.queryForObject("SELECT 1", Integer.class);
+            return ResponseEntity.ok("Pricing service is up and running! Database connection is healthy.");
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(500).body("Pricing service is up, but database connection failed: " + e.getMessage());
+        }
+    }
 }
