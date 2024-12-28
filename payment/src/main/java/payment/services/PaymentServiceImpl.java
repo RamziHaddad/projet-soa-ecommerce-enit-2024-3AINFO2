@@ -95,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId);
         if (payment != null && payment.getPaymentStatus() == PaymentStatus.PENDING) {
             payment.setPaymentStatus(PaymentStatus.FAILED);
-            paymentRepository.savePayment(payment);
+            paymentRepository.updatePayment(payment);
             return true;
         }
         return false;

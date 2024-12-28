@@ -40,15 +40,15 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
     BankClient bankClient;
 
     @Override
-    @Retry(maxRetries = 2, delay = 500, jitter = 200) // Retry mechanism for failures
-    @Timeout(500) // Timeout after 1 second
+    @Retry(delay = 1000, maxRetries = 3) // Retry mechanism for failures
+    @Timeout(1000) // 1s is the time out
     public Response processPaymentWithRetry(BankPaymentRequest request) {
         return bankClient.makeNewPayment(request);
     }
     int i = 0 ; 
     @Override
     @Scheduled(every = "10s")
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public void processOutboxEvents() {
         List<PaymentOutBox> unprocessedEvents = boxRepository.findUnprocessedEvents();
         int maxEventsToProcess = 200;
@@ -57,9 +57,7 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
         for (PaymentOutBox event : unprocessedEvents) {
             if (processedCount >= maxEventsToProcess) {
                 i++ ; 
-                System.out.println("oppa 33la sel3t oropa"+i);
-                
-
+                System.out.println("rate limiter"+i);
                 break; // Exit loop if we have processed the maximum number of events
             }
             JsonObject payloadJson = Json.createReader(new StringReader(event.getPayload())).readObject();
@@ -87,30 +85,20 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
                     cardNumber,
                     cardCode
                 );
-
-                // Process the payment with retry and timeout mechanisms
                 Response response = processPaymentWithRetry(bankPaymentRequest);
-
                 if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                     paymentService.completePayment(payment.getPaymentId());
                 }
-                else if (response.getStatus() == Response.Status.CONFLICT.getStatusCode()) {
-                paymentService.cancelPayment(payment.getPaymentId()) ;  
-                System.out.println("oooooh ya 3alm");
-                } else {
-                    paymentService.cancelPayment(payment.getPaymentId());
-                }
-
-                // Mark the event as processed
                 event.setProcessed(true);
                 boxRepository.update(event);
                 processedCount++; 
 
             } catch (Exception e) {
-                System.err.println("Error processing payment: " + e.getMessage());
+
                 paymentService.cancelPayment(event.getPaymentId());
                 event.setProcessed(true);
                 boxRepository.update(event);
+                System.out.println(e);
                 processedCount++; 
             }
         }
