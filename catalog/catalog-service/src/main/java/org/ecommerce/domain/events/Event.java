@@ -15,8 +15,11 @@ import lombok.ToString;
         visible = true
 )
 @JsonSubTypes({
- @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed"),
- @JsonSubTypes.Type(value = ProductUpdated.class, name = "ProductUpdated"),
+        @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed"),
+        @JsonSubTypes.Type(value = ProductUpdated.class, name = "ProductUpdated"),
+        @JsonSubTypes.Type(value = InventoryEvent.class, name = "CREATE"),
+        @JsonSubTypes.Type(value = InventoryEvent.class, name = "UPDATE"),
+        @JsonSubTypes.Type(value = InventoryEvent.class, name = "DELETE")
 })
 
 @Data

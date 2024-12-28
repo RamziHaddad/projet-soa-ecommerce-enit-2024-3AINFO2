@@ -18,7 +18,7 @@ public class ProductListed extends Event {
     private  String categoryName;
     private  String description;
     private  BigDecimal price;
-//to do add disponibility later on 
+
     public ProductListed(Product product) {
         super("ProductListed", "Product", product.getId().toString());
         this.productName = product.getProductName();

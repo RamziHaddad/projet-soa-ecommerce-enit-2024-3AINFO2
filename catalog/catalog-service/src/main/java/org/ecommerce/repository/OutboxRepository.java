@@ -1,5 +1,6 @@
 package org.ecommerce.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -47,42 +48,62 @@ public class OutboxRepository {
     @Transactional
     public OutboxEvent insert(Event event) throws EntityAlreadyExistsException, JsonProcessingException {
         try {
-            System.out.println("New OutboxEvent will created  in repo for "+ event.getEventId().toString());
+            System.out.println("New OutboxEvent will be created in repo for " + event.getEventId().toString());
             String payload;
+
             if (event instanceof ProductListed productListed) {
-            payload = jsonMapper.writeValueAsString(Map.of(
-                "productName", productListed.getProductName(),
-                "categoryName", productListed.getCategoryName(),
-                "description", productListed.getDescription(),
-                "price", productListed.getPrice()
-            ));
+
+                String productName = productListed.getProductName() != null ? productListed.getProductName() : "Unknown Product";
+                String categoryName = productListed.getCategoryName() != null ? productListed.getCategoryName() : "Unknown Category";
+                String description = productListed.getDescription() != null ? productListed.getDescription() : "No Description";
+                BigDecimal price = productListed.getPrice().compareTo(BigDecimal.ZERO) > 0 ? productListed.getPrice() : BigDecimal.ZERO;
+
+                payload = jsonMapper.writeValueAsString(Map.of(
+                        "productName", productName,
+                        "categoryName", categoryName,
+                        "description", description,
+                        "price", price
+                ));
             } else if (event instanceof ProductUpdated productUpdated) {
-            payload = jsonMapper.writeValueAsString(Map.of(
-                "productName", productUpdated.getProductName(),
-                "categoryName", productUpdated.getCategoryName(),
-                "description", productUpdated.getDescription(),
-                "shownPrice", productUpdated.getShownPrice(),
-                "disponibility", productUpdated.isDisponibility()
-            ));
-        } else {
-            payload = jsonMapper.writeValueAsString(event);
-        }
-            OutboxEvent oe=new OutboxEvent(event.getEventId(),
-                                            event.getEventType(),
-                                            "PENDING",
-                                            event.getCreatedAt(),
-                                            event.getAggregateType(),
-                                            event.getAggregateId(),
-                                            payload);
-            System.out.println("new oe created "+oe.getId());
-                                            em.persist(oe);
+                payload = jsonMapper.writeValueAsString(Map.of(
+                        "productName", productUpdated.getProductName(),
+                        "categoryName", productUpdated.getCategoryName(),
+                        "description", productUpdated.getDescription(),
+                        "shownPrice", productUpdated.getShownPrice(),
+                        "disponibility", productUpdated.isDisponibility()
+                ));
+            } else {
+                payload = jsonMapper.writeValueAsString(event);
+                System.out.println("Not recognized case");
+            }
+
+            OutboxEvent oe = new OutboxEvent(event.getEventId(),
+                    event.getEventType(),
+                    "PENDING",
+                    event.getCreatedAt(),
+                    event.getAggregateType(),
+                    event.getAggregateId(),
+                    payload);
+            System.out.println("New OutboxEvent created with ID: " + oe.getId());
+
+            em.persist(oe);
+
+            em.flush();
+
+            System.out.println("OutboxEvent persisted successfully.");
             return oe;
+
         } catch (EntityExistsException e) {
             throw new EntityAlreadyExistsException("OutboxEvent entry already exists");
-        } catch (JsonProcessingException e){
+        } catch (JsonProcessingException e) {
+            System.err.println("Failed to serialize event payload: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
             throw e;
         }
     }
+
 
     @Transactional
     public OutboxEvent update(OutboxEvent outboxEvent) throws EntityNotFoundException {

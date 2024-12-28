@@ -49,6 +49,7 @@ public class ProductService {
         return products;
     }
 
+    //Price updates happen on demand ( when display is triggered = on GET commands)
     @Transactional
     public List<Product> findAll() {
         List<Product> products = productRepo.findAll();
@@ -68,12 +69,12 @@ public class ProductService {
     }
     @Transactional
     public Product add(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
-        product.setId(UUID.randomUUID());
 
+        BigDecimal basePrice = pricingService.getProductPrice(product.getId());
 
-        BigDecimal price = pricingService.getProductPrice(product.getId());
-        product.setBasePrice(price);
-        product.setShownPrice(price);
+        product.setBasePrice(basePrice);
+        product.setShownPrice(basePrice);
+
 
         ProductCategory category = categoryService.getCategoryByName(categoryName);
         product.setCategory(category);
@@ -89,6 +90,7 @@ public class ProductService {
 
         return productRepo.insert(product);
     }
+
 
     @Transactional
     public Product updateProduct(Product product) throws EntityNotFoundException {

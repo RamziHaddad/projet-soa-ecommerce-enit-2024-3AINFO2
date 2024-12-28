@@ -33,21 +33,21 @@ public class OutboxService {
     @Transactional
     public void createOutboxMessage(Event event) throws JsonProcessingException, EntityAlreadyExistsException {
         try {
-            System.out.println("Creating outbox message in service "+event.getEventId().toString());
             outboxRepository.insert(event);
+            System.out.println("Event inserted in outbox repo");
         } catch (EntityAlreadyExistsException e) {
             logger.error("OutboxEvent already exists: " + e.getMessage());
             throw new RuntimeException("Failed to insert outbox event: Duplicate entry");
         } catch (JsonProcessingException e) {
             logger.error("Failed to serialize event to JSON: " + e.getMessage());
-            throw e; 
+            throw e;
         }
     }
+
 
     @Transactional
     public void markAsSent(UUID id) {
         try {
-            //outbox.setSentAt(Instant.now().toString());
             outboxRepository.markAsSent(id);
         } catch (EntityNotFoundException e) {
             System.err.println(e.getMessage());
@@ -75,11 +75,8 @@ public Event convertToEvent(OutboxEvent outboxEvent) throws Exception {
         @SuppressWarnings("unchecked")
         Map<String, Object> messageMap = objectMapper.readValue(outboxEvent.getMessage(), Map.class);
 
-
-        // Output all types of the message map for debugging
         System.out.println("Message Map: " + messageMap);
-        
-        // Print each key, value, and the type of the value in the messageMap
+
         for (Map.Entry<String, Object> entry : messageMap.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();

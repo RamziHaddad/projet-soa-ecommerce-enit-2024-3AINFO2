@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Table(name = "outbox")
 @ToString
 public class OutboxEvent {
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(nullable = false)
@@ -33,8 +33,7 @@ public class OutboxEvent {
 
     public OutboxEvent() {
     }
-    
-    
+
     public OutboxEvent(String eventType, String status, LocalDateTime createdAt, String aggregateType,
             String aggregateId, String message) {
         this.eventType = eventType;

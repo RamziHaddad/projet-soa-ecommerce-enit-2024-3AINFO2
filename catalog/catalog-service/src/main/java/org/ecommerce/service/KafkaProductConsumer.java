@@ -11,7 +11,6 @@ import org.ecommerce.domain.events.ProductAvailabilityEvent;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.exceptions.EntityNotFoundException;
 import org.ecommerce.repository.ProductRepository;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
@@ -31,10 +30,9 @@ public class KafkaProductConsumer {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Transactional
-    @Incoming("products-created")
+    @Incoming("product-events")
     public void handleInventoryEvent(String payload) {
         try {
-            var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
             InventoryEvent event = objectMapper.readValue(payload, InventoryEvent.class);
 
             switch (event.getEventType()) {
@@ -58,16 +56,23 @@ public class KafkaProductConsumer {
 
     private void handleCreateEvent(InventoryEvent event) {
         try {
-            ProductCategory category = getOrCreateCategory(event.getCategory());
+
+            String categoryName = event.getCategory().getName();
+            ProductCategory category = getOrCreateCategory(categoryName);
+
             Product product = new Product(
                     UUID.fromString(event.getProductId()),
                     event.getName(),
                     event.getDescription(),
                     java.time.LocalDateTime.now(),
                     category,
-                    null, null, event.isDisponibility()
+                    null,
+                    null,
+                    event.isDisponibility()
             );
-            productService.add(product, event.getCategory());
+
+            productService.add(product, categoryName);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to handle create event for product: " + event.getProductId());
@@ -79,8 +84,7 @@ public class KafkaProductConsumer {
             Product product = productRepo.findById(UUID.fromString(event.getProductId()));
             if (product != null) {
                 product.setDescription(event.getDescription());
-                //product.setDisponibility(event.isDisponibility());
-                ProductCategory category = getOrCreateCategory(event.getCategory());
+                ProductCategory category = getOrCreateCategory(event.getCategory().getName());  // Adjusted to use DTO
                 product.setCategory(category);
                 productRepo.update(product);
             } else {
@@ -102,10 +106,11 @@ public class KafkaProductConsumer {
     }
 
     private ProductCategory getOrCreateCategory(String categoryName) {
-        ProductCategory category = new ProductCategory();
+        ProductCategory category;
         try {
             category = categoryService.getCategoryByName(categoryName);
         } catch (EntityNotFoundException e) {
+            category = new ProductCategory();
             category.setCategoryName(categoryName);
             try {
                 categoryService.addCategory(category);

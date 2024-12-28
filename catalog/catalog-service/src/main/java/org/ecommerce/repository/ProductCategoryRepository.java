@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.ecommerce.domain.ProductCategory;
 import org.ecommerce.exceptions.EntityNotFoundException;
 
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -49,5 +50,9 @@ public class ProductCategoryRepository {
     @Transactional
     public void delete(ProductCategory category) {
         em.remove(em.contains(category) ? category : em.merge(category));
+    }
+
+    public List<ProductCategory> findAll() {
+        return em.createQuery("SELECT c FROM ProductCategory c", ProductCategory.class).getResultList();
     }
 }

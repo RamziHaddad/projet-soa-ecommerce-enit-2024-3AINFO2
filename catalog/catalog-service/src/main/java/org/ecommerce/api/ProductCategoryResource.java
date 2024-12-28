@@ -8,6 +8,8 @@ import org.ecommerce.domain.ProductCategory;
 import org.ecommerce.exceptions.EntityAlreadyExistsException;
 import org.ecommerce.service.ProductCategoryService;
 
+import java.util.List;
+
 @Path("/categories")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -24,5 +26,11 @@ public class ProductCategoryResource {
         } catch (EntityAlreadyExistsException e) {
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
         }
+    }
+
+    @GET
+    public Response getAllCategories() {
+        List<ProductCategory> categories = categoryService.getAllCategories();
+        return Response.ok(categories).build();
     }
 }

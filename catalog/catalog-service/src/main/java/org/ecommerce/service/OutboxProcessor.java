@@ -13,7 +13,7 @@ import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
+
 
 @ApplicationScoped
 public class OutboxProcessor {

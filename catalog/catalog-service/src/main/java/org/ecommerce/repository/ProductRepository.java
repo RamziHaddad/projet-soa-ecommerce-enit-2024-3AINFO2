@@ -46,25 +46,18 @@ public class ProductRepository {
 
     @Transactional
     public Product insert(Product product) throws EntityAlreadyExistsException {
-        //no need to check null id as it will be imposed from the inventory 
-        //so we wont create it for now and for further implemetations
-        // if (product.getId() == null) {
-            product.setId(UUID.randomUUID());
             try {
                 em.persist(product);
                 return product;
             } catch (EntityExistsException e) {
                 throw new EntityAlreadyExistsException("Product already exists");
             }
-        // }
-        // throw new EntityAlreadyExistsException("Product already has an ID");
     }
 
     @Transactional
     public Product addProductWithCategory(Product product, String categoryName) throws EntityAlreadyExistsException, EntityNotFoundException {
-        // Validate that the category exists
         ProductCategory category = categoryRepo.findByName(categoryName);
-        product.setCategory(category); // Set only the category name
+        product.setCategory(category);
         return insert(product);
     }
 

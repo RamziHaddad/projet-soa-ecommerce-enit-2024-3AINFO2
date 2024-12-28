@@ -1,7 +1,5 @@
 package org.ecommerce.domain.events;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class ProductAvailabilityEvent {
     private String productId;
     private String availability;
