@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.quarkiverse.bucket4j.runtime.RateLimited;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -30,6 +31,7 @@ public class PaymentResource {
     private PaymentService paymentService;
     int i=0 ; 
     @POST
+    
     public Response processPayment(PaymentRequestDTO paymentRequest) {
         i++ ; 
         System.out.println(i);
