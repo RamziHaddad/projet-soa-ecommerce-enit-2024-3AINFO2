@@ -9,6 +9,7 @@ import payment.domain.PaymentOutBox;
 import payment.domain.objectValues.PaymentStatus;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 @Transactional
@@ -80,5 +81,18 @@ public class PaymentOutBoxRepositoryImpl implements PaymentOutBoxRepository {
             Payment.class)
             .setParameter("status", PaymentStatus.FAILED)
             .getResultList();
+    }
+
+    @Override
+    public PaymentOutBox findByPaymentId(UUID transactionId) {
+        try {
+            return em.createQuery(
+                "SELECT po FROM PaymentOutBox po WHERE po.paymentId = :transactionId", PaymentOutBox.class)
+                .setParameter("transactionId", transactionId)
+                .getSingleResult();
+        } catch (Exception e) {
+            // Log the exception if necessary and return null if no result is found
+            return null;
+        }
     }
 }

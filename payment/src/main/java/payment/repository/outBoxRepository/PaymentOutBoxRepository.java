@@ -3,6 +3,7 @@ package payment.repository.outBoxRepository;
 import payment.domain.Payment;
 import payment.domain.PaymentOutBox;
 import java.util.List;
+import java.util.UUID;
 
 public interface PaymentOutBoxRepository {
 
@@ -19,5 +20,7 @@ public interface PaymentOutBoxRepository {
     List<PaymentOutBox> findUnprocessedEvents();
     List<PaymentOutBox> findCompletedEvents() ; 
     List<Payment> findCompletedPayments() ; 
-    List<Payment> findFailedPayments() ; 
+    List<Payment> findFailedPayments() ;
+
+    PaymentOutBox findByPaymentId(UUID transactionId); 
 }

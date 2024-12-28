@@ -47,42 +47,39 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponseDTO processPayment(PaymentRequestDTO paymentRequest) {
-        // 1. Change the payment DTO to an entity
+        
         Payment payment = paymentMapper.toEntity(paymentRequest);
 
-        // 2. Set the payment status to 'PENDING' initially
+       
         payment.setPaymentStatus(PaymentStatus.PENDING);
 
-        // 3. Save the payment to the database
+      
         payment.setPaymentDate(LocalDateTime.now());
         Payment savedPayment = paymentRepository.savePayment(payment);
 
-        // 4. Register the credit card (external call)
         CreditCardRequestDTO creditCardRequest = new CreditCardRequestDTO();
         creditCardRequest.setCustomerId(paymentRequest.getCustomerId());
         creditCardRequest.setCardCode(paymentRequest.getCardCode());
         creditCardRequest.setSecretNumber(paymentRequest.getCardNumber());
         cardServices.registerCreditCard(creditCardRequest);
-        if(paymentRequest.getCardCode()!=paymentRequest.getCardNumber()){
-            payment.setPaymentStatus(PaymentStatus.FAILED);
-            paymentRepository.updatePayment(payment) ; 
-            return paymentMapper.toResponseDTO(savedPayment);
-        }
-
-        // 6. Create a PaymentOutBox entry for the Outbox pattern
+        JsonObject payloadJson = Json.createObjectBuilder()
+        .add("amount", paymentRequest.getAmount())
+        .add("cardNumber", paymentRequest.getCardNumber())
+        .add("cardCode", paymentRequest.getCardCode())
+        .add("paymentStatus", payment.getPaymentStatus().name())
+        .build();
+        String payloadString = payloadJson.toString();
+       
         PaymentOutBox outBoxEvent = new PaymentOutBox();
         outBoxEvent.setEventType("PAYMENT_CREATED");
         outBoxEvent.setPaymentId(savedPayment.getPaymentId());
-        outBoxEvent.setAmount(paymentRequest.getAmount());
-        outBoxEvent.setCardNumber(paymentRequest.getCardNumber());
-        outBoxEvent.setCardCode(paymentRequest.getCardCode());        // Convert JsonObject to string
+        outBoxEvent.setPayload(payloadString);       
         outBoxEvent.setProcessed(false);
 
-        // 7. Save the PaymentOutBox event to the outbox table (part of the same
-        // transaction)
+        
         boxRepository.save(outBoxEvent);
 
-        // 8. Return the response DTO
+        
         return paymentMapper.toResponseDTO(savedPayment);
     }
 

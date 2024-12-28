@@ -4,6 +4,7 @@ package payment.api.clients;
 
 import java.util.UUID;
 
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,8 +23,11 @@ import jakarta.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 @RegisterRestClient(baseUri = "http://localhost:8099/")
 public interface BankClient {
+
     @POST
     @Transactional
+     @Retry(maxRetries = 3, delay = 500, jitter = 200)
+     
     Response makeNewPayment(BankPaymentRequest bankPaymentRequest);
     @GET
     @Path("/{id}")
