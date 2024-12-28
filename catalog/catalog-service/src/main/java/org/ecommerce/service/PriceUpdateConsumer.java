@@ -16,6 +16,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+//Consumer service for handling product price update events from a messaging channel
+//Updates product price based on received event data
+
+
 @ApplicationScoped
 public class PriceUpdateConsumer {
     

@@ -11,6 +11,9 @@ import org.ecommerce.repository.ProductCategoryRepository;
 import java.util.List;
 import java.util.UUID;
 
+//Service responsible for ProductCategory related operations add/update/remove category
+//Handles category retrieval and validation operations
+
 @ApplicationScoped
 public class ProductCategoryService {
 

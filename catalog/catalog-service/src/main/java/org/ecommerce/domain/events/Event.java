@@ -8,11 +8,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.ToString;
 
+// Base class representing an event in the event-driven architecture
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "eventType",
-        visible = true
+        use = JsonTypeInfo.Id.NAME, // Use the name of the type as the type identifier
+        include = JsonTypeInfo.As.EXISTING_PROPERTY, // Include the existing property
+        property = "eventType", // The property that contains the event type
+        visible = true // Make the property visible in the serialized JSON
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ProductListed.class, name = "ProductListed"),
@@ -25,46 +26,39 @@ import lombok.ToString;
 @Data
 @ToString
 public abstract class Event {
-    protected UUID eventId = UUID.randomUUID();
-    protected String eventType;
-    protected String aggregateType;
-    protected String aggregateId;
-    protected LocalDateTime createdAt = LocalDateTime.now();
+    protected UUID eventId = UUID.randomUUID(); // Unique identifier for the event
+    protected String eventType; // Type of the event
+    protected String aggregateType; // Type of the aggregate that the event pertains to
+    protected String aggregateId; // Identifier of the aggregate that the event pertains to
+    protected LocalDateTime createdAt = LocalDateTime.now(); // Timestamp of when the event was created
 
+    // Default constructor
     public Event() {}
 
+    // Constructor to initialize eventType, aggregateType, and aggregateId
     public Event(String eventType, String aggregateType, String aggregateId) {
         this.eventType = eventType;
         this.aggregateType = aggregateType;
         this.aggregateId = aggregateId;
     }
 
+    // Getters
     public UUID getEventId() {
         return eventId;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        // Custom equality check based on eventId
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Event other = (Event) obj;
-        if (eventId == null) {
-            if (other.eventId != null)
-                return false;
-        } else if (!eventId.equals(other.eventId))
-            return false;
-        return true;
+        return eventId != null ? eventId.equals(other.eventId) : other.eventId == null;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((eventId == null) ? 0 : eventId.hashCode());
-        return result;
+        // Custom hash code based on eventId
+        return eventId != null ? eventId.hashCode() : 0;
     }
 }

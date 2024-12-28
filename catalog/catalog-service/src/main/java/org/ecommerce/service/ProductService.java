@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+//Service responsible for Product related operations add/update/remove product
+//Integrates with other services category/pricing/outbox
+
 @ApplicationScoped
 public class ProductService {
 

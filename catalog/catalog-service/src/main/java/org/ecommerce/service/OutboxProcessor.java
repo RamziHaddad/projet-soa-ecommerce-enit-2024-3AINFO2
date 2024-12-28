@@ -14,7 +14,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
 
-
+// Service for processing outbox events and sending them to Kafka channels
+// Handles scheduled processing of pending outbox messages
 @ApplicationScoped
 public class OutboxProcessor {
 
@@ -24,24 +25,25 @@ public class OutboxProcessor {
     OutboxService outboxService;
 
     @Inject
-    @Channel("products-out")
+    @Channel("products-out") // Kafka channel for ProductListed events
     Emitter<Event> productsListedEmitter;
 
     @Inject
-    @Channel("products-updated")
+    @Channel("products-updated") // Kafka channel for ProductUpdated events
     Emitter<Event> productsUpdatedEmitter;
 
+    // Scheduled method that runs every 60 seconds to process outbox events
     @Scheduled(every = "60s")
     public void processOutbox() {
-        List<OutboxEvent> messages = outboxService.getPendingMessages();
+        List<OutboxEvent> messages = outboxService.getPendingMessages(); // Fetch pending messages
 
         for (OutboxEvent message : messages) {
             try {
-                Event event = outboxService.convertToEvent(message);
+                Event event = outboxService.convertToEvent(message); // Convert OutboxEvent to Event
                 if (event instanceof ProductListed) {
-                    sendProductListedEvent((ProductListed) event);
+                    sendProductListedEvent((ProductListed) event); // Send ProductListed event
                 } else if (event instanceof ProductUpdated) {
-                    sendProductUpdatedEvent((ProductUpdated) event);
+                    sendProductUpdatedEvent((ProductUpdated) event); // Send ProductUpdated event
                 }
             } catch (Exception e) {
                 logger.error("Error processing outbox message with ID " + message.getId() + ": " + e.getMessage());
@@ -49,37 +51,31 @@ public class OutboxProcessor {
         }
     }
 
+    // Sends a ProductListed event to the Kafka channel
     private void sendProductListedEvent(ProductListed productListed) {
-        try {
-            CompletionStage<Void> ack = productsListedEmitter.send(productListed);
-            ack.thenAccept(result -> {
-                logger.info("Product listed and sent via Kafka: " + productListed);
-                outboxService.markAsSent(productListed.getEventId());
-            }).exceptionally(error -> {
-                logger.error("Error when sending the product listed event: " + error.getMessage());
-                outboxService.markAsFailed(productListed.getEventId());
-                return null;
-            });
-        } catch (Exception e) {
-            logger.error("Error when serializing JSON for ProductListed event: " + e.getMessage());
-            outboxService.markAsFailed(productListed.getEventId());
-        }
+        sendEvent(productListed, productsListedEmitter);
     }
 
+    // Sends a ProductUpdated event to the Kafka channel
     private void sendProductUpdatedEvent(ProductUpdated productUpdated) {
+        sendEvent(productUpdated, productsUpdatedEmitter);
+    }
+
+    // Generic method to send events to a specified emitter
+    private <T extends Event> void sendEvent(T event, Emitter<T> emitter) {
         try {
-            CompletionStage<Void> ack = productsUpdatedEmitter.send(productUpdated);
+            CompletionStage<Void> ack = emitter.send(event); // Send event to Kafka
             ack.thenAccept(result -> {
-                logger.info("Product updated and sent via Kafka: " + productUpdated);
-                outboxService.markAsSent(productUpdated.getEventId());
+                logger.info("Event sent via Kafka: " + event);
+                outboxService.markAsSent(event.getEventId()); // Mark event as sent
             }).exceptionally(error -> {
-                logger.error("Error when sending the product updated event: " + error.getMessage());
-                outboxService.markAsFailed(productUpdated.getEventId());
+                logger.error("Error when sending the event: " + error.getMessage());
+                outboxService.markAsFailed(event.getEventId()); // Mark event as failed
                 return null;
             });
         } catch (Exception e) {
-            logger.error("Error when serializing JSON for ProductUpdated event: " + e.getMessage());
-            outboxService.markAsFailed(productUpdated.getEventId());
+            logger.error("Error when serializing JSON for event: " + e.getMessage());
+            outboxService.markAsFailed(event.getEventId()); // Mark event as failed
         }
     }
 }
