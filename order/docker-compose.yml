@@ -5,7 +5,7 @@ services:
     container_name: db_order
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: azerty
+      POSTGRES_PASSWORD: fadizoe1212
       POSTGRES_DB: db_order
       PGDATA: /var/lib/postgresql/data
     ports:
