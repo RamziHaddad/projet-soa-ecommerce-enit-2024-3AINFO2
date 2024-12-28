@@ -17,12 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.dao.DataAccessException;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -58,15 +55,10 @@ public class PricingController {
         BigDecimal basePrice = productService.getBasePrice(productId);
         return ResponseEntity.ok(basePrice);
     }
-    
-       // Health check endpoint
+     // Health check endpoint
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
-        try {
-            jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            return ResponseEntity.ok("Pricing service is up and running! Database connection is healthy.");
-        } catch (DataAccessException e) {
-            return ResponseEntity.status(500).body("Pricing service is up, but database connection failed: " + e.getMessage());
-        }
+        return ResponseEntity.ok("Pricing service is up and running!");
     }
+    
 }
