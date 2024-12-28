@@ -1,7 +1,7 @@
 package com.microservices.order_service.service;
 
-import com.microservices.order_service.dto.AddressDTO;
-import com.microservices.order_service.dto.OrderDeliveryDTO;
+
+import com.microservices.order_service.dto.Address;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,11 +25,11 @@ public class DeliveryService {
      *
      * @return List of AddressDTO
      */
-    public List<AddressDTO> getUserAddresses() {
+    public List<Address> getUserAddresses() {
         return webClient.get()
                 .uri(shippingServiceUrl)
                 .retrieve()
-                .bodyToFlux(AddressDTO.class)
+                .bodyToFlux(Address.class)
                 .collectList()
                 .block();
     }

@@ -32,10 +32,12 @@ public class Shipment {
     private LocalDateTime deliveryDate;
 
     @ManyToOne
-    @JoinColumn(name = "addressId", referencedColumnName = "id")
+    @JoinColumn(name = "addressId", referencedColumnName = "addressId")
     private Address address;
 
 
+    @ManyToOne
+    @JoinColumn(name = "delivery_address_address_id")
     private Address deliveryAddress;
 
     // Ajouter addressId en tant que UUID pour utiliser explicitement la colonne
