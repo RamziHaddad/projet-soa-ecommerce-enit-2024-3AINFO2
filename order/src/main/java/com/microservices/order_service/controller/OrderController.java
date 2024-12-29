@@ -137,9 +137,10 @@ public class OrderController {
     private PaymentService paymentService;
 
     @PostMapping("/pay")
-    public PaymentResponseDTO payForOrder(@RequestBody List<CartItem> cartItems, @RequestBody PaymentRequestDTO paymentRequestDTO) {
+    public PaymentResponseDTO payForOrder(@RequestBody PaymentRequestWrapperDTO paymentRequestDTO) {
+
         // Call processPayment to handle both pricing and payment
-        return paymentService.processPayment(cartItems, paymentRequestDTO);
+        return paymentService.processPayment(paymentRequestDTO.getCartItems(), paymentRequestDTO.getPaymentRequestDTO());
     }
 
 
