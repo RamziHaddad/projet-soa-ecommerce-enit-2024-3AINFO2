@@ -143,6 +143,12 @@ public class OrderController {
         return paymentService.processPayment(paymentRequestDTO.getCartItems(), paymentRequestDTO.getPaymentRequestDTO());
     }
 
+    @GetMapping("/checkPaymentResponse")
+    public PaymentResponseDTO checkPaymentResponse() {
+        List<PaymentResponseDTO> responses = paymentService.getAllPayments();
+        return responses.get(responses.size() - 1);
+    }
+
 
 
 

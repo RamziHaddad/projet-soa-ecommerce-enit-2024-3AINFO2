@@ -60,4 +60,13 @@ public class PaymentService {
                 .timeout(Duration.of(60, ChronoUnit.SECONDS))
                 .block(); // Communication is synchronous here
     }
+
+    public List<PaymentResponseDTO> getAllPayments() {
+        return webClient.get()
+                .uri("http://localhost:8085/payments")
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<PaymentResponseDTO>>() {})
+                .block();
+
+    }
 }
