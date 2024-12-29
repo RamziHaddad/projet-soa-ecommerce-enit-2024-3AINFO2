@@ -31,7 +31,7 @@ public class CartConsumer {
     @Autowired
     ItemRepository itemRepository;
 
-    @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "CartListenerContainerFactory")
     public void listen(CartDTO cartDTO) {
 
         logger.info("Received event with ID :"+cartDTO.getCartId());

@@ -18,7 +18,7 @@ import java.util.Map;
 public class CartConsumerConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, CartDTO> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, CartDTO> CartListenerContainerFactory() {
         // Create the consumer configuration
         Map<String, Object> props = new LinkedHashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");

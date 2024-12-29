@@ -1,5 +1,6 @@
 package com.microservices.order_service.kafka;
 
+import com.microservices.order_service.dto.DeliveryStatusMessage;
 import com.microservices.order_service.events.OrderPaidEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +14,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
-
 @Component
-public class OrderPaidEventConsumer {
+public class DeliveryEventConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderPaidEventConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryEventConsumer.class);
 
     private final RestTemplate restTemplate;
 
@@ -28,20 +27,27 @@ public class OrderPaidEventConsumer {
     @Value("${shipping.service.url}")
     private String shippingServiceUrl;
 
-    public OrderPaidEventConsumer(RestTemplate restTemplate) {
+
+
+    public DeliveryEventConsumer(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     @KafkaListener(
-            topics = "${spring.kafka.topic.order-paid}",
-            groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "kafkaListenerContainerFactory"
+            topics = "delivery-status",
+            groupId = "deliveryReceiver",
+            containerFactory = "DeliveryListenerContainerFactory"
     )
     @Transactional
-    public void consume(@Payload OrderPaidEvent event,
+    public void consume(@Payload DeliveryStatusMessage deliveryStatusMessage,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
                         @Header(KafkaHeaders.OFFSET) long offset) {
-        try {
+        logger.info("Received deliveryStatusMessage: {}", deliveryStatusMessage.getOrderId());
+        logger.info("Received deliveryStatusMessage: {}", deliveryStatusMessage.getStatus());
+
+
+    }
+        /*try {
             logger.info("Received OrderPaidEvent: partition={}, offset={}, event={}",
                     partition, offset, event);
 
@@ -98,5 +104,5 @@ public class OrderPaidEventConsumer {
     private void handleProcessingError(OrderPaidEvent event, Exception e) {
         logger.error("Error processing event: {}. Error: {}", event, e.getMessage());
         // Implement retry logic or publish to a retry topic if needed
-    }
+    } */
 }

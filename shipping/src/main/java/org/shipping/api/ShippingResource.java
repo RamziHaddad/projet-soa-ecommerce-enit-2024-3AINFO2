@@ -9,8 +9,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
+import org.shipping.dto.DeliveryStatusMessage;
 import org.shipping.dto.ShipmentDTO;
 import org.shipping.dto.ShipmentUpdateDTO;
+import org.shipping.messaging.DeliveryStatusPublisher;
 import org.shipping.model.DeliveryStatus;
 import org.shipping.model.Shipment;
 import org.shipping.service.ShippingService;
@@ -25,6 +27,9 @@ public class ShippingResource {
 
     @Inject
     ShippingService shippingService;
+
+    @Inject
+    DeliveryStatusPublisher deliveryStatusPublisher;
 
     private static final Logger logger = Logger.getLogger(ShippingResource.class);
 
@@ -190,4 +195,14 @@ public class ShippingResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error deleting shipment").build();
         }
     }
+
+    @POST
+    @Path("/delivery-status")
+    public String updateDeliveryStatus(@Valid DeliveryStatusMessage deliveryStatusMessage) {
+        deliveryStatusPublisher.publishStatus(deliveryStatusMessage.getOrderId(), deliveryStatusMessage.getStatus());
+        return "Delivery Status Updated";
+
+
+    }
+
 }

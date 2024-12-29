@@ -8,8 +8,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 public class DeliveryStatusMessageConsumer {
     private static final Logger logger = LoggerFactory.getLogger(DeliveryStatusMessageConsumer.class);
 
-    @KafkaListener(topics = "delivery-status", groupId = "deliveryReceiver", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${spring.kafka.topic.delivery-status}", groupId = "deliveryReceiver", containerFactory = "DeliveryListenerContainerFactory")
     public void listen(DeliveryStatusMessage deliveryStatusMessage) {
+        logger.info("WELYEEEEEY !!!");
 
         logger.info("Received record: " + deliveryStatusMessage.getOrderId());
         logger.info("Delivery status: " + deliveryStatusMessage.getStatus());
