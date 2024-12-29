@@ -1,1 +1,155 @@
-description
+# Payment Microservice
+
+The Payment Microservice is a robust and scalable service designed to handle payment processing with mechanisms to ensure reliability, fault tolerance, and smooth integration with external payment providers. It adheres to industry best practices, such as the outbox pattern, to maintain transactional integrity and eventual consistency, even in distributed systems.
+
+---
+## Features
+
+- **Outbox Pattern**: Ensures reliable message delivery and consistency across systems.
+- **Fault Tolerance**: Includes retry mechanisms and transactional guarantees to handle failures gracefully.
+- **Scheduled Task**: Periodically processes unprocessed payment events, ensuring no events are lost.
+- **Integration with Bank API**: Facilitates secure communication with external banking services for payment processing.
+- **Event-Driven Architecture**: Supports decoupled, asynchronous, and scalable event handling.
+
+---
+## Technologies Used
+
+- **Java**: The core programming language.
+- **Quarkus**: Lightweight, cloud-native Java framework.
+- **Jakarta EE**: Provides JPA for persistence, CDI for dependency injection, and transactional support.
+- **MicroProfile**: Offers REST client, fault tolerance, and scheduling features.
+- **PostgreSQL**: Database used to store payment data and events.
+- **Docker**: For containerization and streamlined deployment.
+- **Maven**: Build and dependency management tool.
+
+---
+## Prerequisites
+
+- **Java**: Version 17 or later.
+- **Maven**: Version 3.8 or newer.
+- **Docker**: To build and deploy containers.
+- **PostgreSQL**: Database for data persistence.
+
+---
+## Setup
+
+### Database Configuration
+
+Ensure that a PostgreSQL database instance is running. Configure the database settings in the `application.properties` file:
+
+```properties
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.username=postgres
+quarkus.datasource.password=azerty
+quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5438/db_payment
+
+
+
+Run the following SQL script to create the necessary database tables:
+
+CREATE TABLE payment (
+    id UUID PRIMARY KEY,
+    amount NUMERIC NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE payment_outbox (
+    id UUID PRIMARY KEY,
+    payment_id UUID NOT NULL,
+    payload TEXT NOT NULL,
+    processed BOOLEAN DEFAULT FALSE
+);
+#### Build and Run ###
+
+    1.Clone the Repository:
+
+    git clone https://github.com/your-repo/payment-microservice.git
+    cd payment-microservice
+
+    2.Build the Project:
+
+    mvn clean package
+
+    3.Run the Application:
+
+    java -jar target/quarkus-app/quarkus-run.jar
+
+    4.Development Mode: Run the application with live reload:
+
+    mvn quarkus:dev
+
+### How It Works
+
+### Payment Workflow
+
+1.***Payment Creation***:
+
+    -A payment record is created and stored in the payment table.
+
+2.***Outbox Event***:
+
+    -Payment details are added as an event in the payment_outbox table.
+
+3.***Scheduled Processing***:
+
+    -A scheduled task scans for unprocessed events, validates them, sends them to the Bank API, and marks them as processed.
+
+###Core Components
+
+-**PaymentOutBoxProcessor**: Handles events from the outbox table and communicates with the Bank API.
+-**BankClient**: Manages RESTful communication with external payment gateways.
+-**PaymentService**: Contains business logic for payment initiation, completion, and failure handling.
+
+### Fault Tolerance
+
+- Implements retry mechanisms using the @Retry annotation.
+- Transaction management ensures atomicity and consistency.
+
+### Testing
+
+1.Run Unit Tests:
+
+    mvn test
+
+2.Manual Testing:
+
+    -Insert test payment data into the database.
+    -Verify scheduled tasks update the payment status correctly.
+
+## Deployment
+
+### Docker
+
+1. Build the Docker image:
+
+    docker build -t payment-microservice .
+
+2.Run the Docker Container:
+
+    docker run -d -p 8085:8085 payment-microservice
+
+## Troubleshooting
+
+- *Database Connection Issues*:
+  - Ensure the database server is running and accessible.
+  - Verify the JDBC URL, username, and password in application.properties.
+
+- *Bank API Failures*:
+  - Check the bank API endpoint for connectivity issues.
+  - Review application logs for error details.
+
+##Future Enhancements
+
+-Add support for multiple payment gateways.
+-Introduce monitoring and alerting for failed payment events.
+-Implement rate-limiting for external API calls.
+-Expand fault tolerance mechanisms with circuit breakers.
+
+
+---
+Feel free to contribute or open issues if you encounter any problems. Happy coding!
+
+
+
+
+
