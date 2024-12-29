@@ -189,9 +189,9 @@ public class OrderController {
         }
     }*/
 
-    @GetMapping("/addresses")
-    public ResponseEntity<List<Address>> GetAddresses(){
-        List<Address> addresses = deliveryService.getUserAddresses();
+    @GetMapping("/addresses/{userId}")
+    public ResponseEntity<List<Address>> GetAddresses(@PathVariable("userId") UUID userId) {
+        List<Address> addresses = deliveryService.getUserAddresses(userId);
         return ResponseEntity.ok(addresses);
     }
 

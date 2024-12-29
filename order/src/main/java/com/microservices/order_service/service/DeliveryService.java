@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DeliveryService {
@@ -25,9 +26,9 @@ public class DeliveryService {
      *
      * @return List of AddressDTO
      */
-    public List<Address> getUserAddresses() {
+    public List<Address> getUserAddresses(UUID userId) {
         return webClient.get()
-                .uri(shippingServiceUrl)
+                .uri(shippingServiceUrl +"/"+userId)
                 .retrieve()
                 .bodyToFlux(Address.class)
                 .collectList()
