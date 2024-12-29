@@ -58,7 +58,7 @@ public class PaymentOutBoxProcessorImpl implements PaymentOutBoxProcessor {
             if (processedCount >= maxEventsToProcess) {
                 i++ ; 
                 System.out.println("rate limiter"+i);
-                break; // Exit loop if we have processed the maximum number of events
+                break; 
             }
             JsonObject payloadJson = Json.createReader(new StringReader(event.getPayload())).readObject();
 
