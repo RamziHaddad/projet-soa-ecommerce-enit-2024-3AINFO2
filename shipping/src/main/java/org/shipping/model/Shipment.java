@@ -32,7 +32,7 @@ public class Shipment {
     private LocalDateTime deliveryDate;
 
     @ManyToOne
-    @JoinColumn(name = "addressId", referencedColumnName = "id")
+    @JoinColumn(name = "addressId", referencedColumnName = "addressId")
     private Address address;
 
 
