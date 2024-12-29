@@ -11,8 +11,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 
@@ -51,6 +54,10 @@ public class PaymentService {
                             .flatMap(error -> Mono.error(new RuntimeException("Server Error: " + error.getMessage())));
                 })
                 .bodyToMono(new ParameterizedTypeReference<PaymentResponseDTO>() {})
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(10))
+                        .filter(throwable -> throwable instanceof RuntimeException))
+                // Adding timeout
+                .timeout(Duration.of(60, ChronoUnit.SECONDS))
                 .block(); // Communication is synchronous here
     }
 }
