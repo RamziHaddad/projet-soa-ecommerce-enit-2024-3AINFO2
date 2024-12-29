@@ -1,7 +1,6 @@
 package com.microservices.order_service.service;
 
 import com.microservices.order_service.dto.AvailabilityCheckDTO;
-import com.microservices.order_service.dto.OrderRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;

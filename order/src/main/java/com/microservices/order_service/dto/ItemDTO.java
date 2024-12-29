@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 public class ItemDTO {
 
-    private UUID id;
+    private UUID itemId;
     private String name;
     private int quantity;
 

@@ -17,7 +17,6 @@ import java.util.UUID;
 public class Item {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "item_id", updatable = false, nullable = false)
     private UUID itemId;
 

@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderPaidEvent implements Serializable {
     @Setter
     private UUID orderId;
