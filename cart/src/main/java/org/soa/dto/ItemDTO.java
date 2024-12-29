@@ -6,8 +6,8 @@ public class ItemDTO {
 
     private UUID itemId; // Identifiant de l'item
     private String name; // Nom de l'item
-    private int quantity;
-    private double price; // Quantité de l'item
+    private int quantity; // Quantité de l'item
+    private double price; // Prix de l'item
 
     // Constructeur sans paramètres
     public ItemDTO() {

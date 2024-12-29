@@ -19,27 +19,48 @@ import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
 public class CartService {
-    
 
-    public ItemDTO getItemDetails(UUID itemId) {
-        return catalogueClient.fetchItemDetails(itemId);
-    }
-    
     @Inject
     RedissonClient redissonClient;
 
+    @Inject
+    @RestClient
+    CatalogueClient catalogueClient;
+
+    @Inject
+    CartPublisher cartPublisher;
+
     private static final Logger logger = Logger.getLogger(CartService.class);
 
+    /**
+     * Retrieves the map of carts from the Redis cache.
+     *
+     * @return RMapCache<UUID, Cart> representing the carts.
+     */
     private RMapCache<UUID, Cart> getCartsMap() {
         return redissonClient.getMapCache("carts");
     }
 
-    // Créer un nouveau panier
+    /**
+     * Fetches item details from the Catalogue service.
+     *
+     * @param itemId UUID of the item to fetch details for.
+     * @return ItemDTO containing the item details.
+     */
+    public ItemDTO getItemDetails(UUID itemId) {
+        return catalogueClient.fetchItemDetails(itemId);
+    }
+
+    /**
+     * Creates a new cart for a user.
+     *
+     * @param userId UUID of the user.
+     * @return Cart object representing the newly created cart.
+     */
     public Cart createCart(UUID userId) {
         try {
             logger.info("Creating cart for userId: " + userId);
 
-            // Utiliser RMapCacheCache pour permettre la gestion du TTL
             RMapCache<UUID, Cart> carts = redissonClient.getMapCache("carts");
 
             if (carts.containsKey(userId)) {
@@ -47,11 +68,8 @@ public class CartService {
                 throw new IllegalStateException("Cart already exists for userId: " + userId);
             }
 
-            // Créer un nouveau panier
             Cart cart = new Cart(userId);
-
-            // Ajouter le panier avec une durée de vie de 24 heures
-            carts.put(userId, cart, 24, TimeUnit.HOURS);
+            carts.put(userId, cart, 24, TimeUnit.HOURS); // Cache the cart for 24 hours
 
             logger.info("Cart created successfully for userId: " + userId);
             return cart;
@@ -61,7 +79,12 @@ public class CartService {
         }
     }
 
-    // Récupérer un panier par userId
+    /**
+     * Retrieves an existing cart by user ID.
+     *
+     * @param userId UUID of the user.
+     * @return Cart object if found.
+     */
     public Cart getCart(UUID userId) {
         try {
             logger.info("Fetching cart for userId: " + userId);
@@ -79,33 +102,37 @@ public class CartService {
             throw new RuntimeException("An unexpected error occurred while fetching the cart.", e);
         }
     }
-   
-    @Inject
-    @RestClient
-    CatalogueClient catalogueClient;
 
+    /**
+     * Adds an item to the user's cart by fetching item details from the catalogue.
+     *
+     * @param userId    UUID of the user.
+     * @param productId UUID of the product to add.
+     * @param quantity  Quantity of the product to add.
+     * @return Item object representing the added item.
+     */
     public Item addItemFromCatalog(UUID userId, UUID productId, int quantity) {
-        // Récupérer les informations du produit via l'API Catalogue
         ItemDTO product = catalogueClient.fetchItemDetails(productId);
-        
+
         if (product == null) {
             throw new IllegalArgumentException("Produit non trouvé pour l'ID : " + productId);
         }
-        
+
         RMapCache<UUID, Cart> carts = getCartsMap();
         Cart cart = carts.get(userId);
 
         Item newItem = new Item(productId, quantity, product.getPrice(), product.getName());
-    
-        // Ajoutez cet item au panier existant
         cart.getItems().put(newItem.getItemId(), newItem);
         carts.put(userId, cart);
         return newItem;
     }
 
-
-
-    // Mettre à jour un item dans le panier
+    /**
+     * Updates an item in the user's cart.
+     *
+     * @param userId   UUID of the user.
+     * @param cartItem Item object with updated details.
+     */
     public void updateItem(UUID userId, Item cartItem) {
         try {
             logger.info("Updating item in cart for userId: " + userId);
@@ -131,7 +158,12 @@ public class CartService {
         }
     }
 
-    // Supprimer un item du panier
+    /**
+     * Removes an item from the user's cart.
+     *
+     * @param userId UUID of the user.
+     * @param itemId UUID of the item to remove.
+     */
     public void removeItem(UUID userId, UUID itemId) {
         try {
             logger.info("Removing item from cart for userId: " + userId);
@@ -157,7 +189,12 @@ public class CartService {
         }
     }
 
-    // Récupérer l'historique des items du panier
+    /**
+     * Retrieves all items from the user's cart.
+     *
+     * @param userId UUID of the user.
+     * @return List of Item objects in the cart.
+     */
     public List<Item> getCartItems(UUID userId) {
         try {
             logger.info("Fetching items from cart for userId: " + userId);
@@ -176,7 +213,11 @@ public class CartService {
         }
     }
 
-    // Supprimer le panier
+    /**
+     * Deletes the user's cart.
+     *
+     * @param userId UUID of the user.
+     */
     public void deleteCart(UUID userId) {
         try {
             logger.info("Deleting cart for userId: " + userId);
@@ -195,24 +236,24 @@ public class CartService {
         }
     }
 
-    // Vider le panier
+    /**
+     * Clears all items in the user's cart.
+     *
+     * @param userId UUID of the user.
+     */
     public void clearCart(UUID userId) {
         try {
             logger.info("Clearing cart for userId: " + userId);
             RMapCache<UUID, Cart> carts = getCartsMap();
 
-            // Vérifier si le panier existe
             if (!carts.containsKey(userId)) {
                 logger.error("Cart not found for userId: " + userId);
                 throw new IllegalArgumentException("Cart not found for userId: " + userId);
             }
 
-            // Récupérer le panier
             Cart cart = carts.get(userId);
-
-            // Vider le contenu du panier
             cart.getItems().clear();
-            carts.put(userId, cart); // Mettre à jour la carte après nettoyage
+            carts.put(userId, cart);
 
             logger.info("Cart cleared successfully for userId: " + userId);
         } catch (Exception e) {
@@ -221,32 +262,27 @@ public class CartService {
         }
     }
 
-    @Inject
-    CartPublisher cartPublisher;
-
+    /**
+     * Validates and publishes the user's cart to the messaging broker.
+     *
+     * @param cartId UUID of the cart to validate.
+     */
     public void validateCart(UUID cartId) {
-        // Récupérer le panier à partir de son ID
         Cart cart = getCart(cartId);
         if (cart == null) {
             throw new IllegalArgumentException("Cart not found with ID: " + cartId);
         }
-    
-        // Vérifier si le panier est vide
+
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Cannot validate an empty cart.");
         }
-    
-        // Convertir les items du panier en objets ItemDTO
+
         List<ItemDTO> itemDTOs = cart.getItems().entrySet().stream()
-            .map(entry -> new ItemDTO(entry.getKey(), entry.getValue().getName(), 
-                                      entry.getValue().getQuantity(), entry.getValue().getPrice()))
-            .toList();
-    
-        // Publier le panier dans le broker
+                .map(entry -> new ItemDTO(entry.getKey(), entry.getValue().getName(),
+                        entry.getValue().getQuantity(), entry.getValue().getPrice()))
+                .toList();
+
         cartPublisher.publishCart(cartId, itemDTOs);
-    
-        // Optionnel : journaliser l'action
         logger.info("Cart with ID: " + cartId + " successfully published to the broker.");
     }
-    
 }

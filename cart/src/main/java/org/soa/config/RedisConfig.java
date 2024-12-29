@@ -13,7 +13,7 @@ public class RedisConfig {
     @ApplicationScoped
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://localhost:6379");
+        config.useSingleServer().setAddress("redis://localhost:6379"); // Redis server address
         return Redisson.create(config);
     }
 }
