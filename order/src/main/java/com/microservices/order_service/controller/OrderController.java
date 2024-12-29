@@ -199,7 +199,6 @@ public class OrderController {
     public ResponseEntity<String> sendToDelivery(@RequestBody OrderPaidEvent orderPaidEvent){
         orderPaidEventProducer.publishOrderPaidEvent(orderPaidEvent);
         return ResponseEntity.ok("Order paid successfully");
-
     }
 
 }
