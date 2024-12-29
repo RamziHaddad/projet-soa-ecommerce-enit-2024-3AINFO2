@@ -30,9 +30,6 @@ public class ShippingService {
     AddressService addressService;
 
     @Inject
-    SecurityService securityService;
-
-    @Inject
     DeliveryStatusPublisher statusPublisher;
 
     @Inject

@@ -30,11 +30,12 @@ public class AddressResource {
 
     // Ajouter une adresse pour un utilisateur
     @POST
-    @Path("/add")
+    @Path("/add/{userId}")
     @Transactional
-    public Response addAddress(@Valid AddressDTO addressDTO) {
+    public Response addAddress(@Valid AddressDTO addressDTO, @PathParam("userId") UUID userId) {
         try {
             Address createdAddress = addressService.addAddress(
+                    userId,
                     addressDTO.getStreet(),
                     addressDTO.getPostalCode(),
                     addressDTO.getCity(),
@@ -60,9 +61,10 @@ public class AddressResource {
 
     // Trouver les adresses de l'utilisateur courant
     @GET
-    public Response getUserAddresses() {
+    @Path("/{userId}")
+    public Response getUserAddresses(UUID userId) {
         try {
-            List<Address> addresses = addressService.getAddressesByUserId();
+            List<Address> addresses = addressService.getAddressesByUserId(userId);
             return Response.ok(addresses).build();
 
         } catch (IllegalArgumentException e) {

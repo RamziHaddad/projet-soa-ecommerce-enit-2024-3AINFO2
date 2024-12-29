@@ -20,9 +20,6 @@ public class AddressService {
     @Inject
     AddressRepository addressRepository;
 
-    // @Inject
-    // SecurityService securityService;
-
     @Inject
     AddressEventPublisher eventPublisher;
 
@@ -57,16 +54,13 @@ public class AddressService {
 
     // Ajouter une adresse pour un utilisateur
     @Transactional
-    public Address addAddress(String street, String postalCode, String city, String country) {
+    public Address addAddress(UUID userId, String street, String postalCode, String city, String country) {
         try {
             // Validation des champs
             if (street == null || postalCode == null || city == null || country == null) {
                 throw new IllegalArgumentException(
                         "All address fields (street, postal code, city, country) must be provided.");
             }
-
-            // UUID utilisateur simulé pour le moment
-            UUID userId = UUID.fromString("faa1b47d-27e3-4106-b42b-2d1e7d1f6e93");
 
             // Vérifier si l'adresse existe déjà pour l'utilisateur
             boolean addressExists = addressRepository
@@ -98,10 +92,8 @@ public class AddressService {
     }
 
     // Trouver les adresses d'un utilisateur
-    public List<Address> getAddressesByUserId() {
+    public List<Address> getAddressesByUserId(UUID userId) {
         try {
-            // UUID userId = securityService.getCurrentUserId();
-            UUID userId = UUID.fromString("faa1b47d-27e3-4106-b42b-2d1e7d1f6e93"); // Simulé pour le moment
             if (userId == null) {
                 throw new IllegalArgumentException("User ID could not be extracted from the token.");
             }
