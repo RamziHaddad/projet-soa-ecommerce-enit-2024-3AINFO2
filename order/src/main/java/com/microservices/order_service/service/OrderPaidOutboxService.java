@@ -23,7 +23,7 @@ public class OrderPaidOutboxService {
     @Autowired
     private OrderPaidEventProducer orderPaidEventProducer;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void processOrderPaidOutbox() {
 
         List<OrderPaidOutbox> events = orderPaidOutboxRepository.findAll();

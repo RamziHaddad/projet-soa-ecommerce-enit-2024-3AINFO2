@@ -1,9 +1,20 @@
 package com.microservices.order_service.kafka;
 
+import com.microservices.order_service.domain.DeliveryStatus;
+import com.microservices.order_service.domain.OrderStatus;
 import com.microservices.order_service.dto.DeliveryStatusMessage;
 import com.microservices.order_service.events.OrderPaidEvent;
+import com.microservices.order_service.model.Order;
+import com.microservices.order_service.outbox.OrderPaidOutbox;
+import com.microservices.order_service.outbox.OrderStatusOutbox;
+import com.microservices.order_service.repository.OrderPaidOutboxRepository;
+import com.microservices.order_service.repository.OrderRepository;
+import com.microservices.order_service.repository.OrderStatusOutboxRepository;
+import com.microservices.order_service.service.OrderService;
+import com.microservices.order_service.service.OrderStatusOutboxService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,6 +25,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import static com.microservices.order_service.domain.OrderStatus.CANCELED;
+
 @Component
 public class DeliveryEventConsumer {
 
@@ -21,11 +34,15 @@ public class DeliveryEventConsumer {
 
     private final RestTemplate restTemplate;
 
-    @Value("${delivery.service.url}")
-    private String deliveryServiceUrl;
+    @Autowired
+    private OrderStatusOutboxRepository orderStatusOutboxRepository;
 
-    @Value("${shipping.service.url}")
-    private String shippingServiceUrl;
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderService orderService;
+
 
 
 
@@ -44,6 +61,19 @@ public class DeliveryEventConsumer {
                         @Header(KafkaHeaders.OFFSET) long offset) {
         logger.info("Received deliveryStatusMessage: {}", deliveryStatusMessage.getOrderId());
         logger.info("Received deliveryStatusMessage: {}", deliveryStatusMessage.getStatus());
+        if(deliveryStatusMessage.getStatus()== DeliveryStatus.CANCELLED || deliveryStatusMessage.getStatus() == DeliveryStatus.RETURNED ){
+            OrderStatusOutbox orderStatusOutbox = new OrderStatusOutbox();
+            orderStatusOutbox.setOrderId(deliveryStatusMessage.getOrderId());
+            orderStatusOutbox.setStatus(CANCELED);
+            orderStatusOutbox.setProcessed(false);
+            orderStatusOutboxRepository.save(orderStatusOutbox);
+
+            Order order = orderRepository.findById(deliveryStatusMessage.getOrderId()).get();
+            order.setOrderStatus(CANCELED);
+
+            orderService.updateOrder(deliveryStatusMessage.getOrderId(), order);
+        }
+
 
 
     }

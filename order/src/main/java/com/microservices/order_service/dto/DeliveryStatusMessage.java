@@ -15,4 +15,5 @@ import java.util.UUID;
 public class DeliveryStatusMessage {
     private UUID orderId;
     private DeliveryStatus status;
+    private UUID cartId;
 }

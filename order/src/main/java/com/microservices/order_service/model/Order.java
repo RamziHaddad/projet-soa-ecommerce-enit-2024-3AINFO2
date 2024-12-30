@@ -42,7 +42,7 @@ public class Order {
     private BigDecimal price;  // Price field
 
     @ManyToOne
-    @JoinColumn(name = "idClient", referencedColumnName = "idClient")
+    @JoinColumn(name = "idClient", referencedColumnName = "idClient", nullable = false)
     private Client client;  // Reference to the Client entity
 
     @Column(name = "quantity")

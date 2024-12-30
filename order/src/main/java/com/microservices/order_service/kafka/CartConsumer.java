@@ -3,6 +3,7 @@ package com.microservices.order_service.kafka;
 
 import com.microservices.order_service.domain.PaymentStatus;
 import com.microservices.order_service.dto.*;
+import com.microservices.order_service.model.Client;
 import com.microservices.order_service.model.Item;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.outbox.OrderEventOutbox;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +56,9 @@ public class CartConsumer {
 
     @Autowired
     DeliveryService deliveryService;
+
+    @Autowired
+    ClientRepository clientRepository;
 
     @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "CartListenerContainerFactory")
     public void listen(CartDTO cartDTO) {
@@ -103,6 +104,10 @@ public class CartConsumer {
         orderEventDTO.setItems(items);
         orderEventOutbox.setProcessed(false);
         try{
+            Client client = new Client();
+            clientRepository.save(client);
+
+            order.setClient(client);
             orderRepository.save(order);
             orderEventOutbox.setOrderId(order.getId());
             orderEventDTO.setOrderId(order.getId());
@@ -114,9 +119,13 @@ public class CartConsumer {
             availabilityCheckDTO.setOrderId(order.getId());
             availabilityCheckDTO.setItems(items);
 
-            Map<String, Object> AvailabilityCheckResponse = inventoryService.checkOrderAvailability(availabilityCheckDTO);
+            Map<String, Object> AvailabilityCheckResponse = new HashMap<>();
+            AvailabilityCheckResponse.putIfAbsent("status", "OK");
+
+            /*AvailabilityCheckResponse= inventoryService.checkOrderAvailability(availabilityCheckDTO); */ // this instruction to verify whether the cart items are available in inventory or not
             if ("OK".equals(AvailabilityCheckResponse.get("status"))){
                 orderEventOutboxRepository.save(orderEventOutbox);
+
             }
             else {
                 OrderStatusOutbox orderStatusOutbox = new OrderStatusOutbox();
@@ -124,7 +133,8 @@ public class CartConsumer {
                 orderStatusOutbox.setStatus(CANCELED);
                 orderStatusOutbox.setProcessed(false);
                 orderStatusOutboxRepository.save(orderStatusOutbox);
-                orderRepository.delete(order);
+                order.setOrderStatus(CANCELED);
+                orderRepository.save(order);
             }
 
 

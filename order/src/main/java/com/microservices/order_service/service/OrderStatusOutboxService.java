@@ -23,7 +23,7 @@ public class OrderStatusOutboxService {
     @Autowired
     private OrderStatusUpdateProducer orderStatusUpdateProducer;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void processOrderStatusOutbox() {
 
         List<OrderStatusOutbox> events = orderStatusOutboxRepository.findAll();
