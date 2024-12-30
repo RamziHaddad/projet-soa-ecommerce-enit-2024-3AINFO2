@@ -1,27 +1,34 @@
 
 package com.microservices.order_service.kafka;
 
-import com.microservices.order_service.dto.CartDTO;
-import com.microservices.order_service.dto.ItemDTO;
-import com.microservices.order_service.dto.OrderEventDTO;
+import com.microservices.order_service.domain.PaymentStatus;
+import com.microservices.order_service.dto.*;
 import com.microservices.order_service.model.Item;
 import com.microservices.order_service.model.Order;
 import com.microservices.order_service.outbox.OrderEventOutbox;
-import com.microservices.order_service.repository.ItemRepository;
-import com.microservices.order_service.repository.OrderEventOutboxRepository;
-import com.microservices.order_service.repository.OrderRepository;
+import com.microservices.order_service.outbox.OrderPaidOutbox;
+import com.microservices.order_service.outbox.OrderStatusOutbox;
+import com.microservices.order_service.repository.*;
+import com.microservices.order_service.service.DeliveryService;
+import com.microservices.order_service.service.InventoryService;
+import com.microservices.order_service.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.microservices.order_service.domain.OrderStatus.CREATED;
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
+
+import static com.microservices.order_service.domain.OrderStatus.*;
 
 @Service
 public class CartConsumer {
@@ -35,7 +42,22 @@ public class CartConsumer {
     OrderEventOutboxRepository orderEventOutboxRepository;
 
     @Autowired
+    OrderStatusOutboxRepository orderStatusOutboxRepository;
+
+    @Autowired
+    OrderPaidOutboxRepository orderPaidOutboxRepository;
+
+    @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
+    InventoryService inventoryService;
+
+    @Autowired
+    PaymentService paymentService;
+
+    @Autowired
+    DeliveryService deliveryService;
 
     @KafkaListener(topics = "cart-topic", groupId = "cartReceiver", containerFactory = "CartListenerContainerFactory")
     public void listen(CartDTO cartDTO) {
@@ -86,7 +108,26 @@ public class CartConsumer {
             orderEventDTO.setOrderId(order.getId());
             orderEventOutbox.setPayload(orderEventDTO.convertToJson());
 
-            orderEventOutboxRepository.save(orderEventOutbox);
+
+
+            AvailabilityCheckDTO availabilityCheckDTO = new AvailabilityCheckDTO();
+            availabilityCheckDTO.setOrderId(order.getId());
+            availabilityCheckDTO.setItems(items);
+
+            Map<String, Object> AvailabilityCheckResponse = inventoryService.checkOrderAvailability(availabilityCheckDTO);
+            if ("OK".equals(AvailabilityCheckResponse.get("status"))){
+                orderEventOutboxRepository.save(orderEventOutbox);
+            }
+            else {
+                OrderStatusOutbox orderStatusOutbox = new OrderStatusOutbox();
+                orderStatusOutbox.setOrderId(order.getId());
+                orderStatusOutbox.setStatus(CANCELED);
+                orderStatusOutbox.setProcessed(false);
+                orderStatusOutboxRepository.save(orderStatusOutbox);
+                orderRepository.delete(order);
+            }
+
+
 
         } catch (Exception e) {
             e.printStackTrace();

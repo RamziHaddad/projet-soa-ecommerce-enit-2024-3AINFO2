@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Address {
+public class AddressDTO {
 
     private UUID addressId;
 

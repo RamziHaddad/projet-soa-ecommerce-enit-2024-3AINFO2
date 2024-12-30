@@ -1,6 +1,7 @@
 package com.microservices.order_service.controller;
 
 import com.microservices.order_service.domain.OrderStatus;
+import com.microservices.order_service.domain.PaymentStatus;
 import com.microservices.order_service.dto.*;
 import com.microservices.order_service.events.OrderPaidEvent;
 import com.microservices.order_service.kafka.CartConsumer;
@@ -8,6 +9,11 @@ import com.microservices.order_service.kafka.OrderEventProducer;
 import com.microservices.order_service.kafka.OrderPaidEventProducer;
 import com.microservices.order_service.kafka.OrderStatusUpdateProducer;
 import com.microservices.order_service.model.Order;
+import com.microservices.order_service.outbox.OrderPaidOutbox;
+import com.microservices.order_service.outbox.OrderStatusOutbox;
+import com.microservices.order_service.repository.OrderPaidOutboxRepository;
+import com.microservices.order_service.repository.OrderRepository;
+import com.microservices.order_service.repository.OrderStatusOutboxRepository;
 import com.microservices.order_service.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +48,13 @@ public class OrderController {
 
     private final OrderPaidEventProducer orderPaidEventProducer;
 
+    private final OrderStatusOutboxRepository orderStatusOutboxRepository;
+
+    private final OrderPaidOutboxRepository orderPaidOutboxRepository;
+
+
     private final KafkaTemplate<String, OrderPaidEvent> kafkaTemplate;
+    private OrderRepository orderRepository;
 
     @PostMapping("/create")
     public ResponseEntity<String> placeOrder(@RequestBody Order order){
@@ -136,11 +148,52 @@ public class OrderController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("/pay")
-    public PaymentResponseDTO payForOrder(@RequestBody PaymentRequestWrapperDTO paymentRequestDTO) {
+    @PostMapping("/pay/{orderId}")
+    public String payForOrder(@PathVariable("orderId") UUID orderId, @RequestBody PaymentRequestWrapperDTO paymentRequestDTO) {
 
         // Call processPayment to handle both pricing and payment
-        return paymentService.processPayment(paymentRequestDTO.getCartItems(), paymentRequestDTO.getPaymentRequestDTO());
+        PaymentResponseDTO PaymentResponse = paymentService.processPayment(paymentRequestDTO.getCartItems(), paymentRequestDTO.getPaymentRequestDTO());
+
+        // Insérer un délai de 10 secondes
+        try {
+            Thread.sleep(10000); // 10000 millisecondes = 10 secondes
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Rétablir le statut d'interruption
+            System.err.println("Le délai a été interrompu : " + e.getMessage());
+        }
+
+        List<PaymentResponseDTO> responses = paymentService.getAllPayments();
+        PaymentResponseDTO response = responses.get(responses.size()-1);
+        OrderStatusOutbox orderStatusOutbox = new OrderStatusOutbox();
+        orderStatusOutbox.setOrderId(orderId);
+        orderStatusOutbox.setProcessed(false);
+        if (response.getPaymentStatus() == PaymentStatus.COMPLETED){
+            orderStatusOutbox.setStatus(OrderStatus.PAID);
+            orderStatusOutboxRepository.save(orderStatusOutbox);
+            Order order = orderService.getOrderById(orderId);
+            order.setOrderStatus(OrderStatus.PAID);
+            orderService.updateOrder(orderId, order);
+
+            List<AddressDTO> addressDTOS = deliveryService.getUserAddresses(order.getClient().getIdClient());
+            AddressDTO addressDTO = addressDTOS.get(0);
+            OrderPaidOutbox orderPaidOutbox = new OrderPaidOutbox();
+            orderPaidOutbox.setOrderId(orderId);
+            orderPaidOutbox.setAddressId(addressDTO.getAddressId());
+            orderPaidOutbox.setPaymentStatus(PaymentStatus.COMPLETED);
+            orderPaidOutbox.setCartId(order.getIdCart());
+            orderPaidOutbox.setProcessed(false);
+            orderPaidOutboxRepository.save(orderPaidOutbox);
+
+            return "Order Paid successfully";
+        }
+        else {
+            orderStatusOutbox.setStatus(OrderStatus.CANCELED);
+            orderStatusOutboxRepository.save(orderStatusOutbox);
+            Order order = orderService.getOrderById(orderId);
+            order.setOrderStatus(OrderStatus.CANCELED);
+            orderService.updateOrder(orderId, order);
+            return "Order Canceled successfully";
+        }
     }
 
     @GetMapping("/checkPaymentResponse")
@@ -148,6 +201,8 @@ public class OrderController {
         List<PaymentResponseDTO> responses = paymentService.getAllPayments();
         return responses.get(responses.size() - 1);
     }
+
+    @PostMapping()
 
 
 
@@ -197,9 +252,9 @@ public class OrderController {
     }*/
 
     @GetMapping("/addresses/{userId}")
-    public ResponseEntity<List<Address>> GetAddresses(@PathVariable("userId") UUID userId) {
-        List<Address> addresses = deliveryService.getUserAddresses(userId);
-        return ResponseEntity.ok(addresses);
+    public ResponseEntity<List<AddressDTO>> GetAddresses(@PathVariable("userId") UUID userId) {
+        List<AddressDTO> addressDTOS = deliveryService.getUserAddresses(userId);
+        return ResponseEntity.ok(addressDTOS);
     }
 
     @PostMapping("/inform")
