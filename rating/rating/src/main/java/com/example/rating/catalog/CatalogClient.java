@@ -8,6 +8,6 @@ import java.util.UUID;
 @FeignClient(name = "catalog-service", url = "http://localhost:8082")
 public interface CatalogClient {
 
-    @GetMapping("/products/{id}")
-    Product getProductDetails(@PathVariable("id") UUID id);
+    @GetMapping("/products/{id}/available")
+    boolean isProductAvailable(@PathVariable("id") UUID id);
 }

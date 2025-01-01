@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - service-catalog
+  pull_request:
+    branches:
+      - service-catalog
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: |
+          cd catalog/catalog-service/
+          mvn clean package -Dquarkus.package.type=uber-jar
+
+      - name: Archive JAR Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: service-catalog.jar
+          path: catalog/catalog-service/target/*-runner.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 30
+
+    steps:
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Download JAR Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: service-catalog.jar
+          path: ./
+
+      - name: Verify if the correct JAR file exists
+        run: |
+          ls catalog-service-1.0.0-SNAPSHOT-runner.jar || (echo "JAR file not found!" && exit 1)
+
+      - name: Add Server to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOYMENT_MACHINE_IP }} >> ~/.ssh/known_hosts
+
+      - name: Transfer JAR to VPS
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" scp ./catalog-service-1.0.0-SNAPSHOT-runner.jar \
+          ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }}:~/service-catalog/service-catalog.jar
+
+      - name: Verify if the JAR file exists on the VPS
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "ls -l ~/service-catalog/service-catalog.jar"
+
+      - name: Show system resources usage after file transfer
+        run: |
+          sshpass -p "${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}" ssh ${{ secrets.DEPLOYMENT_MACHINE_USER }}@${{ secrets.DEPLOYMENT_MACHINE_IP }} \
+          "df -h && free -h && top -bn1 | grep 'Cpu(s)'"
+
+      - name: Deploy JAR to VPS
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.DEPLOYMENT_MACHINE_IP }}
+          username: ${{ secrets.DEPLOYMENT_MACHINE_USER }}
+          password: ${{ secrets.DEPLOYMENT_MACHINE_USER_PSW }}
+          script: |
+
+            sleep 10
+
+            echo "Starting Java service..."
+            cd ~/service-catalog
+            nohup java -jar service-catalog.jar --server.port=8082 > service-catalog.log 2>&1 &
+            echo "Service deployed successfully!"
+            
+            sleep 10
+
+            echo "Performing health check..."
+            curl -X 'GET'   'http://localhost:8082/products'   -H 'accept: /' || (echo "Service health check failed!" && exit 1)
+
+            echo "Service deployed successfully!"
